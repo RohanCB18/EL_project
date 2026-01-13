@@ -1,0 +1,22 @@
+# Quiz Proctoring System - Phase 5 Integration Requirements
+
+# FastAPI and Server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Database
+SQLAlchemy==2.0.23
+
+# Computer Vision (already installed in Phase 2/3)
+opencv-python==4.8.1.78
+ultralytics==8.0.196
+mediapipe==0.10.7
+numpy==1.24.3
+
+# Existing dependencies (from Phase 2/3)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Utilities
+python-dateutil==2.8.2
