@@ -2,22 +2,22 @@
 
 An AI-powered study companion that transforms PDFs into interactive learning experiences. Built with **FastAPI** backend and **React** frontend, powered by **LangChain** and **Ollama**.
 
-## ✨ Features
+## Features
 
 ### For Students
-- 📄 **Upload PDFs** - Drag and drop your study materials
-- 💬 **Smart Q&A** - Ask questions and get accurate, context-aware answers
-- 📝 **Auto Summaries** - Generate concise summaries of any document
-- 📋 **Practice Quizzes** - Create interactive quizzes to test your understanding
-- 🎯 **Clear Doubts** - Get explanations of complex topics
+- **Upload PDFs** - Drag and drop your study materials
+- **Smart Q&A** - Ask questions and get accurate, context-aware answers
+- **Auto Summaries** - Generate concise summaries of any document
+- **Practice Quizzes** - Create interactive quizzes to test your understanding
+- **Clear Doubts** - Get explanations of complex topics
 
 ### For Teachers
-- 📚 **Upload Course Material** - Upload PDFs containing topic content
-- ⚙️ **Configure Question Papers** - Set topic, difficulty, and number of questions
-- 📄 **Multiple Question Types** - MCQs, short answer, and long answer questions
-- ⬇️ **Download as PDF** - Generate and download professional question papers
+- **Upload Course Material** - Upload PDFs containing topic content
+- **Configure Question Papers** - Set topic, difficulty, and number of questions
+- **Multiple Question Types** - MCQs, short answer, and long answer questions
+- **Download as PDF** - Generate and download professional question papers
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **FastAPI** - High-performance Python web framework
@@ -33,7 +33,7 @@ An AI-powered study companion that transforms PDFs into interactive learning exp
 - **jsPDF** - PDF generation
 - **Axios** - HTTP client
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 langchain_gemini/
@@ -65,7 +65,7 @@ langchain_gemini/
 └── Chat-With-PDF-Using-LangChain-Gemini/  # Original Streamlit app (reference)
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **Python 3.9+**
@@ -127,7 +127,7 @@ langchain_gemini/
 
    The app will be available at `http://localhost:5173`
 
-## 📡 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -139,7 +139,7 @@ langchain_gemini/
 | POST | `/teacher/upload` | Upload topic material |
 | POST | `/teacher/generate-paper` | Generate question paper |
 
-## 🎨 Design
+## Design
 
 The application features a modern dark theme with:
 - Glassmorphism effects
@@ -148,7 +148,7 @@ The application features a modern dark theme with:
 - Responsive layout
 - Color-coded themes for Student (blue) and Teacher (green)
 
-## 📝 Usage
+## Usage
 
 ### Student Flow
 1. Click "For Students" on the home page
@@ -163,7 +163,7 @@ The application features a modern dark theme with:
 4. Click "Generate Question Paper"
 5. Preview and download as PDF
 
-## 🔧 Configuration
+## Configuration
 
 Edit `.env` in the backend directory:
 
@@ -176,10 +176,10 @@ OLLAMA_EMBED_MODEL=nomic-embed-text
 VECTOR_STORE_PATH=./vector_stores
 ```
 
-## 📄 License
+## License
 
 This project is for educational purposes.
 
-## 🤝 Contributing
+## Contributing
 
 Feel free to open issues or submit pull requests!
