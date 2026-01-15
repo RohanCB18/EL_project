@@ -326,3 +326,22 @@ def run_custom_test_api(
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+from app.models.classroom import get_classroom_leaderboard
+
+@app.get("/classrooms/leaderboard")
+def classroom_leaderboard_api(
+    teacher_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        classroom_id, leaderboard = get_classroom_leaderboard(
+            db=db,
+            teacher_id=teacher_id
+        )
+        return {
+            "classroom_id": classroom_id,
+            "leaderboard": leaderboard
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

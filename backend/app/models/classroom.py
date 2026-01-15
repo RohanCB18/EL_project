@@ -191,3 +191,57 @@ def get_students_in_classroom(db: Session, teacher_id: int):
     )
 
     return classroom.id, students
+
+def get_classroom_leaderboard(db: Session, teacher_id: int):
+    teacher = db.query(User).filter(User.id == teacher_id).first()
+
+    if not teacher:
+        raise ValueError("Teacher not found")
+
+    if teacher.role != "teacher":
+        raise ValueError("Only teachers can view leaderboard")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == teacher_id)
+        .first()
+    )
+
+    if not classroom:
+        raise ValueError("No active classroom found")
+
+    rows = (
+        db.query(
+            User.id,
+            User.name,
+            User.email,
+            ClassroomParticipant.score
+        )
+        .join(
+            ClassroomParticipant,
+            ClassroomParticipant.student_id == User.id
+        )
+        .filter(ClassroomParticipant.classroom_id == classroom.id)
+        .order_by(
+            ClassroomParticipant.score.desc(),
+            User.id.asc()
+        )
+        .all()
+    )
+
+    leaderboard = []
+    rank = 1
+
+    for i, row in enumerate(rows):
+        if i > 0 and row.score < rows[i - 1].score:
+            rank = i + 1
+
+        leaderboard.append({
+            "rank": rank,
+            "id": row.id,
+            "name": row.name,
+            "email": row.email,
+            "score": row.score
+        })
+
+    return classroom.id, leaderboard
