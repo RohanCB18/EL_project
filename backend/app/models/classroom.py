@@ -178,8 +178,14 @@ def get_students_in_classroom(db: Session, teacher_id: int):
         raise ValueError("No active classroom found")
 
     students = (
-        db.query(User)
-        .join(ClassroomParticipant, ClassroomParticipant.student_id == User.id)
+        db.query(
+            User,
+            ClassroomParticipant.score
+        )
+        .join(
+            ClassroomParticipant,
+            ClassroomParticipant.student_id == User.id
+        )
         .filter(ClassroomParticipant.classroom_id == classroom.id)
         .all()
     )

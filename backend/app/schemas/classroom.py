@@ -22,6 +22,7 @@ class StudentInClassroom(BaseModel):
     id: int
     name: str
     email: str
+    score : int
 
 
 class ClassroomStudentsResponse(BaseModel):

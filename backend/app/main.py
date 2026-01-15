@@ -10,6 +10,11 @@ from app.models import classroom_participant
 from app.models import quiz
 from app.models import quiz_question
 from app.models import quiz_submission
+from app.schemas.contest import ContestCreate, ContestSubmissionCreate
+from app.models.contest import create_or_update_contest, start_contest, delete_contest
+from app.models.contest import get_contest_question_for_student
+from app.models.contest import get_sample_test_cases_for_student
+from app.models.contest import submit_contest_solution
 
 
 
@@ -131,13 +136,15 @@ def list_students(
             "classroom_id": classroom_id,
             "students": [
                 {
-                    "id": s.id,
-                    "name": s.name,
-                    "email": s.email
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email,
+                    "score": score
                 }
-                for s in students
+                for user, score in students
             ]
         }
+
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -238,5 +245,64 @@ def delete_quiz_api(
     try:
         delete_quiz(db=db, teacher_id=teacher_id)
         return {"message": "Quiz deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
+
+@app.post("/contests/create")
+def create_contest_api(data: ContestCreate, db: Session = Depends(get_db)):
+    try:
+        contest_id = create_or_update_contest(db, data.teacher_id, data)
+        return {"contest_id": contest_id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/contests/start")
+def start_contest_api(teacher_id: int, db: Session = Depends(get_db)):
+    try:
+        contest_id = start_contest(db, teacher_id)
+        return {"contest_id": contest_id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.delete("/contests/delete")
+def delete_contest_api(teacher_id: int, db: Session = Depends(get_db)):
+    try:
+        delete_contest(db, teacher_id)
+        return {"message": "Contest deleted"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/contests/question")
+def get_contest_question(student_id: int, db: Session = Depends(get_db)):
+    try:
+        return get_contest_question_for_student(db, student_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/contests/sample-tests")
+def get_sample_tests(student_id: int, db: Session = Depends(get_db)):
+    try:
+        return get_sample_test_cases_for_student(db, student_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/contests/submit")
+def submit_contest_api(data: ContestSubmissionCreate, db: Session = Depends(get_db)):
+    try:
+        score = submit_contest_solution(
+            db,
+            data.student_id,
+            data.source_code,
+            data.language_id
+        )
+        return {"score": score}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
