@@ -276,3 +276,45 @@ def get_classroom_leaderboard_for_student(db: Session, student_id: int):
     ]
 
     return student.current_classroom_id, leaderboard
+
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.models.quiz import Quiz
+from app.models.contest import Contest
+
+def get_classroom_status(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        raise ValueError("User not found")
+
+    if user.current_classroom_id is None:
+        raise ValueError("User is not in a classroom")
+
+    classroom_id = user.current_classroom_id
+
+    quiz_active = (
+        db.query(Quiz)
+        .filter(
+            Quiz.classroom_id == classroom_id,
+            Quiz.is_active == True
+        )
+        .first()
+        is not None
+    )
+
+    contest_active = (
+        db.query(Contest)
+        .filter(
+            Contest.classroom_id == classroom_id,
+            Contest.is_active == True
+        )
+        .first()
+        is not None
+    )
+
+    return {
+        "classroom_id": classroom_id,
+        "quiz_active": quiz_active,
+        "contest_active": contest_active
+    }

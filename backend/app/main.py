@@ -5,6 +5,15 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import os
 
+
+from app.schemas.doubt import DoubtCreate, DoubtListResponse
+from app.models.doubt import (
+    create_doubt,
+    get_doubts_for_classroom,
+    delete_doubt,
+    clear_all_doubts
+)
+
 from app.database import engine, Base, SessionLocal
 from app.models import user as user_model
 from app.models import user
@@ -495,5 +504,90 @@ def contest_submissions_overview_api(
             teacher_id=current_user.id
         )
         return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
+@app.post("/doubts/create")
+def create_doubt_api(
+    data: DoubtCreate,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        doubt_id = create_doubt(
+            db=db,
+            student_id=current_user.id,
+            content=data.content
+        )
+        return {"doubt_id": doubt_id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/doubts", response_model=DoubtListResponse)
+def get_doubts_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        classroom_id, doubts = get_doubts_for_classroom(
+            db=db,
+            user_id=current_user.id
+        )
+        return {
+            "classroom_id": classroom_id,
+            "doubts": doubts
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.delete("/doubts/{doubt_id}")
+def delete_doubt_api(
+    doubt_id: int,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        delete_doubt(
+            db=db,
+            teacher_id=current_user.id,
+            doubt_id=doubt_id
+        )
+        return {"message": "Doubt deleted"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.delete("/doubts")
+def clear_doubts_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        clear_all_doubts(
+            db=db,
+            teacher_id=current_user.id
+        )
+        return {"message": "All doubts cleared"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.models.quiz import Quiz
+from app.models.contest import Contest
+
+from app.models.classroom import get_classroom_status
+
+@app.get("/classrooms/status")
+def classroom_status_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        return get_classroom_status(
+            db=db,
+            user_id=current_user.id
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
