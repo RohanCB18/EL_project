@@ -24,3 +24,9 @@ class ContestSubmissionCreate(BaseModel):
     student_id: int
     source_code: str
     language_id: int
+
+class ContestRunCreate(BaseModel):
+    student_id: int
+    source_code: str
+    language_id: int
+    input_data: str

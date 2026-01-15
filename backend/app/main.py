@@ -306,3 +306,23 @@ def submit_contest_api(data: ContestSubmissionCreate, db: Session = Depends(get_
         return {"score": score}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+from app.schemas.contest import ContestRunCreate
+from app.models.contest import run_custom_test_case
+
+
+@app.post("/contests/run")
+def run_custom_test_api(
+    data: ContestRunCreate,
+    db: Session = Depends(get_db)
+):
+    try:
+        return run_custom_test_case(
+            db=db,
+            student_id=data.student_id,
+            source_code=data.source_code,
+            language_id=data.language_id,
+            custom_input=data.input_data
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
