@@ -1,67 +1,90 @@
-[
-  {
-    "name": "Megha I",
-    "usn": "1RV23CS001",
-    "rvce_email": "megha.i@rvce.edu.in",
-    "branch": "CSE",
-    "section": "A",
-    "year": "2",
-    "cgpa": 9.2,
-    "average_EL_marks": 88,
-    "programming_languages": ["Python", "C", "JavaScript"],
-    "tech_skills": ["Web Development", "Machine Learning"],
-    "domain_interests": ["AI/ML", "Web Dev"],
-    "past_projects": [
-      { "title": "Weather App", "description": "Built a weather prediction app using Python and OpenWeather API." },
-      { "title": "Face Recognition", "description": "Real-time face recognition using OpenCV and CNN." }
-    ],
-    "hackathon_participation_count": 2,
-    "hackathon_achievement_level": "finalist",
-    "project_completion_approach": "consistent_work",
-    "commitment_type": "technical_commitments",
-    "residence": "day_scholar"
-  },
-  {
-    "name": "Rohan C",
-    "usn": "1RV23CS002",
-    "rvce_email": "rohan.c@rvce.edu.in",
-    "branch": "CSE",
-    "section": "A",
-    "year": "2",
-    "cgpa": 8.7,
-    "average_EL_marks": 92,
-    "programming_languages": ["Python", "C++"],
-    "tech_skills": ["DSA", "Backend Development"],
-    "domain_interests": ["AI/ML", "Backend"],
-    "past_projects": [
-      { "title": "Chatbot", "description": "Simple seq2seq chatbot for helpdesk." },
-      { "title": "Weather App", "description": "A full-stack weather app using Node and React." }
-    ],
-    "hackathon_participation_count": 3,
-    "hackathon_achievement_level": "winner",
-    "project_completion_approach": "deadline_driven",
-    "commitment_type": "generally_available",
-    "residence": "pg"
-  },
-  {
-    "name": "Sutej",
-    "usn": "1RV23EC010",
-    "rvce_email": "sutej@rvce.edu.in",
-    "branch": "ECE",
-    "section": "B",
-    "year": "2",
-    "cgpa": 8.4,
-    "average_EL_marks": 85,
-    "programming_languages": ["C", "Python"],
-    "tech_skills": ["IoT", "Embedded Systems"],
-    "domain_interests": ["IoT", "AI/ML"],
-    "past_projects": [
-      { "title": "Line Follower", "description": "Electronics and microcontroller based robot." }
-    ],
-    "hackathon_participation_count": 1,
-    "hackathon_achievement_level": "participant",
-    "project_completion_approach": "weekend_sprinter",
-    "commitment_type": "extracurricular_commitments",
-    "residence": "hostellite"
+{
+  "students": [
+    {
+      "name": "Riya",
+      "usn": "1RV23CS001",
+      "rvce_email": "riya@rvce.edu.in",
+      "branch": "CSE",
+      "year": "2",
+      "section": "A",
+      "cgpa": 9.1,
+      "average_EL_marks": 87,
+      "gender": "female",
+      "programming_languages": ["Python", "C"],
+      "tech_skills": ["Machine Learning", "Web Development"],
+      "past_projects": [
+        {
+          "title": "AI Attendance System",
+          "description": "Face recognition based attendance automation."
+        }
+      ],
+      "domain_interests": ["AI", "ML", "Software Development"],
+      "hackathon_participation_count": 3,
+      "hackathon_achievement_level": "finalist",
+      "project_completion_approach": "consistent_work",
+      "commitment_preference": "generally_available",
+      "residence": "hostellite"
+    },
+    {
+      "name": "Raj",
+      "usn": "1RV23CS015",
+      "rvce_email": "raj@rvce.edu.in",
+      "branch": "CSE",
+      "year": "2",
+      "section": "A",
+      "cgpa": 9.0,
+      "average_EL_marks": 85,
+      "gender": "male",
+      "programming_languages": ["Python", "Java"],
+      "tech_skills": ["Machine Learning", "Backend Development"],
+      "past_projects": [
+        {
+          "title": "Exam Proctoring System",
+          "description": "Developed an ML model to detect malpractice during online exams."
+        }
+      ],
+      "domain_interests": ["AI", "ML", "Software Development"],
+      "hackathon_participation_count": 3,
+      "hackathon_achievement_level": "finalist",
+      "project_completion_approach": "consistent_work",
+      "commitment_preference": "generally_available",
+      "residence": "hostellite"
+    },
+    {
+      "name": "Siya",
+      "usn": "1RV23ME021",
+      "rvce_email": "siya@rvce.edu.in",
+      "branch": "ME",
+      "year": "2",
+      "section": "C",
+      "cgpa": 7.8,
+      "average_EL_marks": 72,
+      "gender": "female",
+      "programming_languages": ["MATLAB"],
+      "tech_skills": ["CAD", "Robotics"],
+      "past_projects": [
+        {
+          "title": "Robotic Arm Model",
+          "description": "Designed a 3-axis robotic arm using servo motors and Arduino."
+        }
+      ],
+      "domain_interests": ["Mechanics", "Robotics"],
+      "hackathon_participation_count": 1,
+      "hackathon_achievement_level": "participant",
+      "project_completion_approach": "deadline_driven",
+      "commitment_preference": "technical_commitments",
+      "residence": "day_scholar"
+    }
+  ],
+  "filters": {
+    "same_gender_only": false,
+    "same_branch_only": false,
+    "same_year_only": false,
+    "min_score": 0,
+    "top_k": 0
   }
-]
+}
+
+
+
+
