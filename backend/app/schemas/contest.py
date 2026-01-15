@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+# ---------- REQUEST SCHEMAS ----------
 
 class ContestTestCaseCreate(BaseModel):
     input_data: str
@@ -9,7 +10,6 @@ class ContestTestCaseCreate(BaseModel):
 
 
 class ContestCreate(BaseModel):
-    teacher_id: int
     title: str
     description: str
     input_format: str
@@ -21,12 +21,11 @@ class ContestCreate(BaseModel):
 
 
 class ContestSubmissionCreate(BaseModel):
-    student_id: int
     source_code: str
     language_id: int
 
+
 class ContestRunCreate(BaseModel):
-    student_id: int
     source_code: str
     language_id: int
     input_data: str

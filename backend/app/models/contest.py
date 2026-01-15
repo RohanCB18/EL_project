@@ -412,3 +412,86 @@ def run_custom_test_case(
         "compile_output": result.get("compile_output"),
         "status": result["status"]
     }
+
+def deactivate_contest(db: Session, teacher_id: int):
+    teacher = db.query(User).filter(User.id == teacher_id).first()
+
+    if not teacher or teacher.role != "teacher":
+        raise ValueError("Only teachers can deactivate contests")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == teacher_id)
+        .first()
+    )
+
+    if not classroom:
+        raise ValueError("No active classroom")
+
+    contest = (
+        db.query(Contest)
+        .filter(Contest.classroom_id == classroom.id)
+        .first()
+    )
+
+    if not contest:
+        raise ValueError("No contest found")
+
+    if not contest.is_active:
+        raise ValueError("Contest already inactive")
+
+    contest.is_active = False
+    db.commit()
+
+    return contest.id
+
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.models.classroom import Classroom
+from app.models.contest import Contest
+from app.models.contest_submission import ContestSubmission
+
+def get_contest_submissions_overview(db: Session, teacher_id: int):
+    teacher = db.query(User).filter(User.id == teacher_id).first()
+
+    if not teacher or teacher.role != "teacher":
+        raise ValueError("Only teachers can view contest submissions")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == teacher_id)
+        .first()
+    )
+
+    if not classroom:
+        raise ValueError("No active classroom")
+
+    contest = (
+        db.query(Contest)
+        .filter(Contest.classroom_id == classroom.id)
+        .first()
+    )
+
+    if not contest:
+        raise ValueError("No contest found")
+
+    submissions = (
+        db.query(ContestSubmission, User)
+        .join(User, User.id == ContestSubmission.student_id)
+        .filter(ContestSubmission.contest_id == contest.id)
+        .all()
+    )
+
+    return {
+        "contest_id": contest.id,
+        "total_submissions": len(submissions),
+        "submissions": [
+            {
+                "student_id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "score": submission.score
+            }
+            for submission, user in submissions
+        ]
+    }

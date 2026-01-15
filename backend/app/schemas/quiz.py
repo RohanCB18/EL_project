@@ -1,5 +1,7 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
+
+# ---------- REQUEST SCHEMAS ----------
 
 class QuizQuestionCreate(BaseModel):
     question_text: str
@@ -11,12 +13,14 @@ class QuizQuestionCreate(BaseModel):
 
 
 class QuizCreateWithQuestions(BaseModel):
-    teacher_id: int
     questions: List[QuizQuestionCreate]
 
+
 class QuizSubmissionCreate(BaseModel):
-    student_id: int
-    answers: dict  # {question_id: "A" | "B" | "C" | "D"}
+    answers: Dict[int, str]  # {question_id: "A" | "B" | "C" | "D"}
+
+
+# ---------- RESPONSE SCHEMAS ----------
 
 class QuizQuestionStudent(BaseModel):
     id: int

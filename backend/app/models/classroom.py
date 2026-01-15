@@ -245,3 +245,34 @@ def get_classroom_leaderboard(db: Session, teacher_id: int):
         })
 
     return classroom.id, leaderboard
+
+def get_classroom_leaderboard_for_student(db: Session, student_id: int):
+    student = db.query(User).filter(User.id == student_id).first()
+
+    if not student:
+        raise ValueError("Student not found")
+
+    if student.role != "student":
+        raise ValueError("Only students can view leaderboard")
+
+    if student.current_classroom_id is None:
+        raise ValueError("Student is not in a classroom")
+
+    participants = (
+        db.query(ClassroomParticipant, User)
+        .join(User, User.id == ClassroomParticipant.student_id)
+        .filter(ClassroomParticipant.classroom_id == student.current_classroom_id)
+        .order_by(ClassroomParticipant.score.desc())
+        .all()
+    )
+
+    leaderboard = [
+        {
+            "student_id": user.id,
+            "name": user.name,
+            "score": participant.score
+        }
+        for participant, user in participants
+    ]
+
+    return student.current_classroom_id, leaderboard

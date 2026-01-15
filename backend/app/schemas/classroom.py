@@ -1,9 +1,19 @@
 from pydantic import BaseModel
+from typing import List
+
+# ---------- REQUEST SCHEMAS ----------
 
 class ClassroomCreate(BaseModel):
     room_name: str
     password: str
 
+
+class ClassroomJoin(BaseModel):
+    room_code: str
+    password: str
+
+
+# ---------- RESPONSE SCHEMAS ----------
 
 class ClassroomResponse(BaseModel):
     id: int
@@ -11,18 +21,12 @@ class ClassroomResponse(BaseModel):
     room_code: str
     is_active: bool
 
-class ClassroomJoin(BaseModel):
-    room_code: str
-    password: str
-    student_id: int
-
-from typing import List
 
 class StudentInClassroom(BaseModel):
     id: int
     name: str
     email: str
-    score : int
+    score: int
 
 
 class ClassroomStudentsResponse(BaseModel):
