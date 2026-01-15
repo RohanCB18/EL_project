@@ -60,5 +60,14 @@ export const StudentModel = {
       [usn]
     );
     return rows[0];
+  },
+
+    async updateVisibility(usn, isVisible) {
+    await matchmakingPool.query(
+      `UPDATE students
+       SET is_visible_for_matching = $1
+       WHERE usn = $2`,
+      [isVisible, usn]
+    );
   }
 };

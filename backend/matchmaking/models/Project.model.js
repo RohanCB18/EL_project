@@ -50,5 +50,14 @@ export const ProjectModel = {
       [ownerType, ownerId]
     );
     return rows;
+  },
+
+    async updateActive(projectId, isActive) {
+    await matchmakingPool.query(
+      `UPDATE projects
+       SET is_active = $1
+       WHERE project_id = $2`,
+      [isActive, projectId]
+    );
   }
 };

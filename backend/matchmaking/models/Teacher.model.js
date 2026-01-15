@@ -57,5 +57,14 @@ export const TeacherModel = {
       [facultyId]
     );
     return rows[0];
+  },
+  
+    async updateVisibility(facultyId, isVisible) {
+    await matchmakingPool.query(
+      `UPDATE teachers
+       SET is_visible_for_matching = $1
+       WHERE faculty_id = $2`,
+      [isVisible, facultyId]
+    );
   }
 };
