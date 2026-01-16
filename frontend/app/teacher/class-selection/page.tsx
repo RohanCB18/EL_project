@@ -28,14 +28,11 @@ export default function TeacherClassSelectionPage() {
 
     const checkStatus = async () => {
       try {
-        const res = await fetch(
-          `${BACKEND_URL}/classrooms/status`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+        const res = await fetch(`${BACKEND_URL}/classrooms/status`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
         if (!res.ok) return
 
@@ -45,7 +42,7 @@ export default function TeacherClassSelectionPage() {
           router.replace("/teacher/dashboard")
         }
       } catch {
-        // silent — do not block UI
+        // silent
       }
     }
 
@@ -59,20 +56,17 @@ export default function TeacherClassSelectionPage() {
     setError(null)
 
     try {
-      const res = await fetch(
-        `${BACKEND_URL}/classrooms/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            room_name: className,
-            password: classPassword,
-          }),
-        }
-      )
+      const res = await fetch(`${BACKEND_URL}/classrooms/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          room_name: className,
+          password: classPassword,
+        }),
+      })
 
       const data = await res.json()
 
@@ -139,6 +133,23 @@ export default function TeacherClassSelectionPage() {
           >
             {loading ? "Creating..." : "Create Class"}
           </Button>
+
+          {/* 🔽 NEW BUTTONS */}
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/teacher/quiz-creation")}
+            >
+              My Quizzes
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => router.push("/teacher/contest-creation")}
+            >
+              My Contests
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </main>

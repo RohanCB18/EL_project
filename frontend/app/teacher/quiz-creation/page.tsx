@@ -1,11 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
@@ -14,139 +19,195 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Trash2, Save, ArrowLeft, X } from "lucide-react"
+import {
+  Plus,
+  ArrowLeft,
+  Save,
+  X,
+  Play,
+  Trash2,
+} from "lucide-react"
 
 const BACKEND_URL = "http://localhost:8000"
 
-interface Question {
+interface QuizTemplate {
   id: number
-  question: string
-  optionA: string
-  optionB: string
-  optionC: string
-  optionD: string
-  correctOption: string
+  title: string
+}
+
+interface Question {
+  question_text: string
+  option_a: string
+  option_b: string
+  option_c: string
+  option_d: string
+  correct_option: string
 }
 
 export default function TeacherQuizCreationPage() {
   const router = useRouter()
-
   const token =
     typeof window !== "undefined"
       ? localStorage.getItem("access_token")
       : null
 
+  const [mode, setMode] = useState<"list" | "create" | "view">("list")
+  const [templates, setTemplates] = useState<QuizTemplate[]>([])
+  const [selectedTemplate, setSelectedTemplate] = useState<{
+    id: number
+    title: string
+    questions: Question[]
+  } | null>(null)
+
+  const [inClassroom, setInClassroom] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // ---------------- CREATE STATE ----------------
+  const [title, setTitle] = useState("")
   const [questions, setQuestions] = useState<Question[]>([
     {
-      id: 1,
-      question: "",
-      optionA: "",
-      optionB: "",
-      optionC: "",
-      optionD: "",
-      correctOption: "",
+      question_text: "",
+      option_a: "",
+      option_b: "",
+      option_c: "",
+      option_d: "",
+      correct_option: "",
     },
   ])
 
+  // ---------------- FETCH INITIAL ----------------
+  useEffect(() => {
+    if (!token) return
+
+    fetch(`${BACKEND_URL}/quiz-templates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then(setTemplates)
+
+    fetch(`${BACKEND_URL}/classrooms/status`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => setInClassroom(true))
+      .catch(() => setInClassroom(false))
+  }, [token])
+
   // ---------------- HELPERS ----------------
-  const addQuestion = () => {
+  const addQuestion = () =>
     setQuestions([
       ...questions,
       {
-        id: questions.length + 1,
-        question: "",
-        optionA: "",
-        optionB: "",
-        optionC: "",
-        optionD: "",
-        correctOption: "",
+        question_text: "",
+        option_a: "",
+        option_b: "",
+        option_c: "",
+        option_d: "",
+        correct_option: "",
       },
     ])
-  }
 
-  const removeQuestion = (id: number) => {
-    if (questions.length > 1) {
-      setQuestions(questions.filter((q) => q.id !== id))
-    }
+  const removeQuestion = (idx: number) => {
+    if (questions.length === 1) return
+    setQuestions(questions.filter((_, i) => i !== idx))
   }
 
   const updateQuestion = (
-    id: number,
+    idx: number,
     field: keyof Question,
     value: string
   ) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === id ? { ...q, [field]: value } : q
-      )
+    const copy = [...questions]
+    copy[idx][field] = value
+    setQuestions(copy)
+  }
+
+  const validate = () => {
+    if (!title.trim()) return false
+    return questions.every(
+      (q) =>
+        q.question_text.trim() &&
+        q.option_a.trim() &&
+        q.option_b.trim() &&
+        q.option_c.trim() &&
+        q.option_d.trim() &&
+        q.correct_option
     )
   }
 
-  // ---------------- VALIDATION ----------------
-  const validate = () => {
-    for (const q of questions) {
-      if (
-        !q.question.trim() ||
-        !q.optionA.trim() ||
-        !q.optionB.trim() ||
-        !q.optionC.trim() ||
-        !q.optionD.trim() ||
-        !q.correctOption
-      ) {
-        return false
-      }
-    }
-    return true
-  }
-
-  // ---------------- SAVE QUIZ ----------------
-  const handleSave = async () => {
-    if (!token) return
-
+  // ---------------- CREATE TEMPLATE ----------------
+  const saveTemplate = async () => {
     if (!validate()) {
-      setErrorMessage("All questions and options must be filled completely.")
+      setErrorMessage("All fields must be filled.")
       return
     }
 
-    try {
-      const payload = {
-        questions: questions.map((q) => ({
-          question_text: q.question,
-          option_a: q.optionA,
-          option_b: q.optionB,
-          option_c: q.optionC,
-          option_d: q.optionD,
-          correct_option: q.correctOption,
-        })),
-      }
+    const res = await fetch(`${BACKEND_URL}/quiz-templates/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title, questions }),
+    })
 
-      const res = await fetch(`${BACKEND_URL}/quizzes/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.detail)
-
-      router.push("/teacher/dashboard")
-    } catch (err: any) {
-      setErrorMessage(err.message || "Something went wrong")
+    if (!res.ok) {
+      const d = await res.json()
+      setErrorMessage(d.detail || "Failed to create template")
+      return
     }
+
+    router.refresh()
+    setMode("list")
+  }
+
+  // ---------------- VIEW TEMPLATE ----------------
+  const openTemplate = async (id: number) => {
+    const res = await fetch(`${BACKEND_URL}/quiz-templates/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await res.json()
+    setSelectedTemplate(data)
+    setMode("view")
+  }
+
+  // ---------------- DELETE TEMPLATE ----------------
+  const deleteTemplate = async (id: number) => {
+    await fetch(`${BACKEND_URL}/quiz-templates/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    setTemplates(templates.filter((t) => t.id !== id))
+  }
+
+  // ---------------- ACTIVATE ----------------
+  const activateTemplate = async () => {
+    if (!selectedTemplate) return
+
+    const res = await fetch(
+      `${BACKEND_URL}/quiz-templates/${selectedTemplate.id}/activate`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+
+    if (!res.ok) {
+      const d = await res.json()
+      setErrorMessage(d.detail)
+      return
+    }
+
+    router.push("/teacher/dashboard")
   }
 
   return (
     <>
-      {/* ---------- ERROR POPUP ---------- */}
+      {/* ---------- ERROR MODAL ---------- */}
       {errorMessage && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <Card className="w-[360px]">
-            <CardHeader className="flex flex-row justify-between items-center">
+            <CardHeader className="flex justify-between items-center">
               <CardTitle>Error</CardTitle>
               <Button
                 variant="ghost"
@@ -163,111 +224,157 @@ export default function TeacherQuizCreationPage() {
         </div>
       )}
 
-      <main className="min-h-screen bg-background p-4 lg:p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                onClick={() => router.push("/teacher/dashboard")}
-              >
+      <main className="p-6 max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex gap-3 items-center">
+            {mode !== "list" && (
+              <Button variant="outline" onClick={() => setMode("list")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              <h1 className="text-2xl font-bold">Create Quiz</h1>
-            </div>
-            <Button onClick={handleSave}>
-              <Save className="w-4 h-4 mr-2" />
-              Save Quiz
-            </Button>
+            )}
+            <h1 className="text-2xl font-bold">Quiz Templates</h1>
           </div>
 
-          <ScrollArea className="h-[calc(100vh-8rem)]">
-            <div className="space-y-6 pr-4">
-              {questions.map((question, index) => (
-                <Card key={question.id}>
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-center">
-                      <CardTitle>Question {index + 1}</CardTitle>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeQuestion(question.id)}
-                        disabled={questions.length === 1}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Question</Label>
-                      <Input
-                        value={question.question}
-                        onChange={(e) =>
-                          updateQuestion(question.id, "question", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {(["A", "B", "C", "D"] as const).map((opt) => (
-                        <div key={opt} className="space-y-2">
-                          <Label>Option {opt}</Label>
-                          <Input
-                            value={(question as any)[`option${opt}`]}
-                            onChange={(e) =>
-                              updateQuestion(
-                                question.id,
-                                `option${opt}` as keyof Question,
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Correct Option</Label>
-                      <Select
-                        value={question.correctOption}
-                        onValueChange={(value) =>
-                          updateQuestion(
-                            question.id,
-                            "correctOption",
-                            value
-                          )
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select correct option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="A">Option A</SelectItem>
-                          <SelectItem value="B">Option B</SelectItem>
-                          <SelectItem value="C">Option C</SelectItem>
-                          <SelectItem value="D">Option D</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-
-              <Button
-                variant="outline"
-                onClick={addQuestion}
-                className="w-full h-14 border-dashed bg-transparent"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Add Question
-              </Button>
-            </div>
-          </ScrollArea>
+          {mode === "list" && (
+            <Button onClick={() => setMode("create")}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Quiz Template
+            </Button>
+          )}
         </div>
+
+        {/* ---------- LIST ---------- */}
+        {mode === "list" && (
+          <div className="space-y-4">
+            {templates.map((t) => (
+              <Card key={t.id}>
+                <CardContent className="p-4 flex justify-between items-center">
+                  <span
+                    className="font-medium cursor-pointer"
+                    onClick={() => openTemplate(t.id)}
+                  >
+                    {t.title}
+                  </span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="text-destructive"
+                    onClick={() => deleteTemplate(t.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* ---------- CREATE ---------- */}
+        {mode === "create" && (
+          <ScrollArea className="h-[70vh] pr-4 space-y-6">
+            <Label>Quiz Title</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+
+            {questions.map((q, i) => (
+              <Card key={i}>
+                <CardHeader className="flex flex-row justify-between items-center">
+                  <CardTitle>Question {i + 1}</CardTitle>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    disabled={questions.length === 1}
+                    onClick={() => removeQuestion(i)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Input
+                    placeholder="Question"
+                    value={q.question_text}
+                    onChange={(e) =>
+                      updateQuestion(i, "question_text", e.target.value)
+                    }
+                  />
+                  {(["a", "b", "c", "d"] as const).map((o) => (
+                    <Input
+                      key={o}
+                      placeholder={`Option ${o.toUpperCase()}`}
+                      value={(q as any)[`option_${o}`]}
+                      onChange={(e) =>
+                        updateQuestion(
+                          i,
+                          `option_${o}` as keyof Question,
+                          e.target.value
+                        )
+                      }
+                    />
+                  ))}
+                  <Select
+                    onValueChange={(v) =>
+                      updateQuestion(i, "correct_option", v)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Correct option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["A", "B", "C", "D"].map((o) => (
+                        <SelectItem key={o} value={o}>
+                          Option {o}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+            ))}
+
+            <Button variant="outline" onClick={addQuestion} className="w-full">
+              <Plus className="w-4 h-4 mr-2" /> Add Question
+            </Button>
+
+            <Button onClick={saveTemplate}>
+              <Save className="w-4 h-4 mr-2" /> Save Template
+            </Button>
+          </ScrollArea>
+        )}
+
+        {/* ---------- VIEW ---------- */}
+        {mode === "view" && selectedTemplate && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">
+              {selectedTemplate.title}
+            </h2>
+
+            {selectedTemplate.questions.map((q, i) => (
+              <Card key={i}>
+                <CardContent className="p-4 space-y-2">
+                  <p className="font-medium">{q.question_text}</p>
+                  <p>A) {q.option_a}</p>
+                  <p>B) {q.option_b}</p>
+                  <p>C) {q.option_c}</p>
+                  <p>D) {q.option_d}</p>
+                  <p className="text-sm font-semibold">
+                    Correct Option: {q.correct_option}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+
+            {inClassroom ? (
+              <Button onClick={activateTemplate}>
+                <Play className="w-4 h-4 mr-2" />
+                Activate Quiz
+              </Button>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                You must be in a classroom to activate a quiz.
+              </p>
+            )}
+          </div>
+        )}
       </main>
     </>
   )

@@ -7,6 +7,19 @@ import os
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.models.quiz_template import QuizTemplate
+from app.models.quiz_template_question import QuizTemplateQuestion
+
+from app.models.contest_template import ContestTemplate
+from app.models.contest_template_question import ContestTemplateQuestion
+from app.models.contest_template_test_case import ContestTemplateTestCase
+
+from app.schemas.contest_template import (
+    ContestTemplateCreate,
+    ContestTemplateSummary,
+    ContestTemplateDetail
+)
+
 
 from app.schemas.doubt import DoubtCreate, DoubtListResponse
 from app.models.doubt import (
@@ -15,6 +28,17 @@ from app.models.doubt import (
     delete_doubt,
     clear_all_doubts
 )
+
+from app.models.quiz_template import QuizTemplate
+from app.models.quiz_template_question import QuizTemplateQuestion
+from app.schemas.quiz_template import (
+    QuizTemplateCreate,
+    QuizTemplateSummary,
+    QuizTemplateDetail
+)
+from app.models.contest import Contest
+from app.models.contest_test_case import ContestTestCase
+
 
 from app.database import engine, Base, SessionLocal
 from app.models import user as user_model
@@ -492,35 +516,7 @@ def deactivate_contest_api(
 
 from app.models.quiz import get_quiz_submissions_overview
 
-@app.get("/quizzes/submissions")
-def quiz_submissions_overview_api(
-    current_user: user.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    try:
-        result = get_quiz_submissions_overview(
-            db=db,
-            teacher_id=current_user.id
-        )
-        return result
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
-from app.models.contest import get_contest_submissions_overview
-
-@app.get("/contests/submissions")
-def contest_submissions_overview_api(
-    current_user: user.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    try:
-        result = get_contest_submissions_overview(
-            db=db,
-            teacher_id=current_user.id
-        )
-        return result
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
 
 
@@ -685,3 +681,533 @@ def contest_submissions_overview_api(
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/quiz-templates/create")
+def create_quiz_template_api(
+    data: QuizTemplateCreate,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    template = QuizTemplate(
+        teacher_id=current_user.id,
+        title=data.title
+    )
+    db.add(template)
+    db.commit()
+    db.refresh(template)
+
+    questions = [
+        QuizTemplateQuestion(
+            quiz_template_id=template.id,
+            question_text=q.question_text,
+            option_a=q.option_a,
+            option_b=q.option_b,
+            option_c=q.option_c,
+            option_d=q.option_d,
+            correct_option=q.correct_option
+        )
+        for q in data.questions
+    ]
+
+    db.add_all(questions)
+    db.commit()
+
+    return {
+        "template_id": template.id,
+        "questions_added": len(questions)
+    }
+
+@app.get("/quiz-templates", response_model=list[QuizTemplateSummary])
+def list_quiz_templates_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    templates = (
+        db.query(QuizTemplate)
+        .filter(QuizTemplate.teacher_id == current_user.id)
+        .all()
+    )
+
+    return [
+        {"id": t.id, "title": t.title}
+        for t in templates
+    ]
+
+@app.get("/quiz-templates/{template_id}", response_model=QuizTemplateDetail)
+def get_quiz_template_api(
+    template_id: int,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    template = (
+        db.query(QuizTemplate)
+        .filter(
+            QuizTemplate.id == template_id,
+            QuizTemplate.teacher_id == current_user.id
+        )
+        .first()
+    )
+
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    questions = (
+        db.query(QuizTemplateQuestion)
+        .filter(QuizTemplateQuestion.quiz_template_id == template.id)
+        .all()
+    )
+
+    return {
+        "id": template.id,
+        "title": template.title,
+        "questions": questions
+    }
+
+@app.delete("/contest-templates/{template_id}")
+def delete_contest_template(
+    template_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    template = (
+        db.query(ContestTemplate)
+        .filter(
+            ContestTemplate.id == template_id,
+            ContestTemplate.teacher_id == current_user.id
+        )
+        .first()
+    )
+
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    db.delete(template)
+    db.commit()
+
+    return {"message": "Contest template deleted"}
+
+
+
+
+@app.delete("/quiz-templates/{template_id}")
+def delete_quiz_template_api(
+    template_id: int,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    template = (
+        db.query(QuizTemplate)
+        .filter(
+            QuizTemplate.id == template_id,
+            QuizTemplate.teacher_id == current_user.id
+        )
+        .first()
+    )
+
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    db.delete(template)
+    db.commit()
+
+    return {"message": "Quiz template deleted"}
+
+from app.models.quiz import Quiz
+from app.models.quiz_question import QuizQuestion
+@app.post("/quiz-templates/{template_id}/activate")
+def activate_quiz_template_api(
+    template_id: int,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # 1. Only teachers
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    # 2. Fetch template (ownership enforced)
+    template = (
+        db.query(QuizTemplate)
+        .filter(
+            QuizTemplate.id == template_id,
+            QuizTemplate.teacher_id == current_user.id
+        )
+        .first()
+    )
+
+    if not template:
+        raise HTTPException(status_code=404, detail="Quiz template not found")
+
+    # 3. Resolve classroom (TEACHER RULE)
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == current_user.id)
+        .first()
+    )
+
+    if not classroom:
+        raise HTTPException(status_code=400, detail="No active classroom")
+
+    # 4. Ensure no quiz already exists
+    existing_quiz = (
+        db.query(Quiz)
+        .filter(Quiz.classroom_id == classroom.id)
+        .first()
+    )
+
+    if existing_quiz:
+        raise HTTPException(
+            status_code=400,
+            detail="Quiz already exists for this classroom"
+        )
+
+    # 5. Create quiz
+    quiz = Quiz(classroom_id=classroom.id)
+    db.add(quiz)
+    db.commit()
+    db.refresh(quiz)
+
+    # 6. Copy questions
+    template_questions = (
+        db.query(QuizTemplateQuestion)
+        .filter(QuizTemplateQuestion.quiz_template_id == template.id)
+        .all()
+    )
+
+    if not template_questions:
+        raise HTTPException(
+            status_code=400,
+            detail="Template has no questions"
+        )
+
+    quiz_questions = [
+        QuizQuestion(
+            quiz_id=quiz.id,
+            question_text=q.question_text,
+            option_a=q.option_a,
+            option_b=q.option_b,
+            option_c=q.option_c,
+            option_d=q.option_d,
+            correct_option=q.correct_option
+        )
+        for q in template_questions
+    ]
+
+    db.add_all(quiz_questions)
+    db.commit()
+
+    return {
+        "message": "Quiz created from template",
+        "quiz_id": quiz.id,
+        "questions_copied": len(quiz_questions)
+    }
+
+from app.schemas.contest_template import ContestTemplateCreate
+
+@app.post("/contest-templates/create")
+def create_contest_template(
+    data: ContestTemplateCreate,
+    current_user=Depends(get_current_user),
+    db=Depends(get_db),
+):
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    template = ContestTemplate(
+        teacher_id=current_user.id,
+        title=data.title
+    )
+    db.add(template)
+    db.commit()
+    db.refresh(template)
+
+    question = ContestTemplateQuestion(
+        contest_template_id=template.id,
+        title=data.title,
+        description=data.description,
+        input_format=data.input_format,
+        output_format=data.output_format,
+        constraints=data.constraints,
+        time_limit_ms=data.time_limit_ms,
+        memory_limit_kb=data.memory_limit_kb
+    )
+    db.add(question)
+    db.commit()
+    db.refresh(question)
+
+    test_cases = [
+        ContestTemplateTestCase(
+            contest_template_question_id=question.id,
+            input_data=tc.input_data,
+            expected_output=tc.expected_output,
+            is_sample=tc.is_sample
+        )
+        for tc in data.test_cases
+    ]
+
+    if not any(tc.is_sample is False for tc in test_cases):
+        raise HTTPException(
+            status_code=400,
+            detail="At least one hidden test case required"
+        )
+
+    db.add_all(test_cases)
+    db.commit()
+
+    return {
+        "template_id": template.id,
+        "test_cases_added": len(test_cases)
+    }
+
+@app.get("/contest-templates", response_model=list[ContestTemplateSummary])
+def list_contest_templates_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    templates = (
+        db.query(ContestTemplate)
+        .filter(ContestTemplate.teacher_id == current_user.id)
+        .all()
+    )
+
+    return [{"id": t.id, "title": t.title} for t in templates]
+
+from app.models.contest_question import ContestQuestion
+
+
+@app.get("/contest-templates/{template_id}", response_model=ContestTemplateDetail)
+def get_contest_template_api(
+    template_id: int,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    template = (
+        db.query(ContestTemplate)
+        .filter(
+            ContestTemplate.id == template_id,
+            ContestTemplate.teacher_id == current_user.id
+        )
+        .first()
+    )
+
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    question = (
+        db.query(ContestTemplateQuestion)
+        .filter(ContestTemplateQuestion.contest_template_id == template.id)
+        .first()
+    )
+
+    test_cases = (
+        db.query(ContestTemplateTestCase)
+        .filter(
+            ContestTemplateTestCase.contest_template_question_id == question.id
+        )
+        .all()
+    )
+
+    return {
+        "id": template.id,
+        "title": template.title,
+        "question_title": question.title,
+        "description": question.description,
+        "input_format": question.input_format,
+        "output_format": question.output_format,
+        "constraints": question.constraints,
+        "time_limit_ms": question.time_limit_ms,
+        "memory_limit_kb": question.memory_limit_kb,
+        "test_cases": test_cases
+    }
+
+@app.post("/contest-templates/{template_id}/activate")
+def activate_contest_template_api(
+    template_id: int,
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    template = (
+        db.query(ContestTemplate)
+        .filter(
+            ContestTemplate.id == template_id,
+            ContestTemplate.teacher_id == current_user.id
+        )
+        .first()
+    )
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == current_user.id)
+        .first()
+    )
+    if not classroom:
+        raise HTTPException(status_code=400, detail="No active classroom")
+
+    existing = (
+        db.query(Contest)
+        .filter(Contest.classroom_id == classroom.id)
+        .first()
+    )
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Contest already exists for classroom"
+        )
+
+    contest = Contest(classroom_id=classroom.id)
+    db.add(contest)
+    db.commit()
+    db.refresh(contest)
+
+    template_question = (
+        db.query(ContestTemplateQuestion)
+        .filter(ContestTemplateQuestion.contest_template_id == template.id)
+        .first()
+    )
+
+    question = ContestQuestion(
+        contest_id=contest.id,
+        title=template_question.title,
+        description=template_question.description,
+        input_format=template_question.input_format,
+        output_format=template_question.output_format,
+        constraints=template_question.constraints,
+        time_limit_ms=template_question.time_limit_ms,
+        memory_limit_kb=template_question.memory_limit_kb
+    )
+    db.add(question)
+    db.commit()
+    db.refresh(question)
+
+    template_tests = (
+        db.query(ContestTemplateTestCase)
+        .filter(
+            ContestTemplateTestCase.contest_template_question_id
+            == template_question.id
+        )
+        .all()
+    )
+
+    test_cases = [
+        ContestTestCase(
+            contest_question_id=question.id,
+            input_data=tc.input_data,
+            expected_output=tc.expected_output,
+            is_sample=tc.is_sample
+        )
+        for tc in template_tests
+    ]
+
+    db.add_all(test_cases)
+    db.commit()
+
+    return {
+        "message": "Contest created from template",
+        "contest_id": contest.id,
+        "test_cases_copied": len(test_cases)
+    }
+
+from app.models.classroom_participant import ClassroomParticipant
+
+from fastapi.responses import StreamingResponse
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from io import BytesIO
+@app.get("/classrooms/leaderboard/pdf")
+def download_leaderboard_pdf(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # ---------- AUTH ----------
+    if current_user.role != "teacher":
+        raise HTTPException(status_code=403, detail="Only teachers allowed")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == current_user.id)
+        .first()
+    )
+
+    if not classroom:
+        raise HTTPException(status_code=400, detail="No active classroom")
+
+    # ---------- FETCH LEADERBOARD ----------
+    rows = (
+        db.query(
+            User.name,
+            ClassroomParticipant.score
+        )
+        .join(ClassroomParticipant, ClassroomParticipant.student_id == User.id)
+        .filter(ClassroomParticipant.classroom_id == classroom.id)
+        .order_by(ClassroomParticipant.score.desc())
+        .all()
+    )
+
+    # ---------- CREATE PDF ----------
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    y = height - 50
+
+    # Title
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(50, y, "Classroom Leaderboard")
+    y -= 25
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(50, y, f"Room Code: {classroom.room_code}")
+    y -= 15
+    pdf.drawString(50, y, f"Teacher: {current_user.name}")
+    y -= 30
+
+    # Table Header
+    pdf.setFont("Helvetica-Bold", 11)
+    pdf.drawString(50, y, "Rank")
+    pdf.drawString(100, y, "Student Name")
+    pdf.drawString(350, y, "Score")
+    y -= 15
+
+    pdf.setFont("Helvetica", 10)
+
+    if not rows:
+        pdf.drawString(50, y, "No students in classroom.")
+    else:
+        rank = 1
+        for name, score in rows:
+            if y < 50:
+                pdf.showPage()
+                y = height - 50
+                pdf.setFont("Helvetica", 10)
+
+            pdf.drawString(50, y, str(rank))
+            pdf.drawString(100, y, name)
+            pdf.drawString(350, y, str(score))
+            y -= 15
+            rank += 1
+
+    pdf.save()
+    buffer.seek(0)
+
+    # ---------- RESPONSE ----------
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": "attachment; filename=leaderboard.pdf"
+        },
+    )

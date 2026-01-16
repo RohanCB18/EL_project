@@ -342,8 +342,45 @@ export default function TeacherDashboard() {
                 ))}
               </ScrollArea>
             </Card>
-          </div>
+            
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const token = localStorage.getItem("access_token")
+                  if (!token) return
 
+                  const res = await fetch(
+                    "http://localhost:8000/classrooms/leaderboard/pdf",
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  )
+
+                  if (!res.ok) {
+                    alert("Failed to download leaderboard")
+                    return
+                  }
+
+                  const blob = await res.blob()
+                  const url = window.URL.createObjectURL(blob)
+
+                  const a = document.createElement("a")
+                  a.href = url
+                  a.download = "leaderboard.pdf"
+                  document.body.appendChild(a)
+                  a.click()
+                  a.remove()
+
+                  window.URL.revokeObjectURL(url)
+                }}
+              >
+                Download Leaderboard (PDF)
+              </Button>
+
+          </div>
+          
         </div>
       </main>
     </>
