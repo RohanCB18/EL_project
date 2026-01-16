@@ -6,7 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { ChevronLeft, ChevronRight, Send, CheckCircle } from "lucide-react"
+import {
+  ChevronLeft,
+  ChevronRight,
+  Send,
+  CheckCircle,
+} from "lucide-react"
 
 const BACKEND_URL = "http://localhost:8000"
 
@@ -23,7 +28,8 @@ export default function StudentQuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState(false)
-  const [score, setScore] = useState<number | 0>(0)
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false)
+  const [score, setScore] = useState<number>(0)
   const [loading, setLoading] = useState(true)
 
   const token =
@@ -83,6 +89,20 @@ export default function StudentQuizPage() {
     })
 
     const data = await res.json()
+
+    if (!res.ok) {
+      if (
+        typeof data.detail === "string" &&
+        data.detail.toLowerCase().includes("already")
+      ) {
+        setAlreadySubmitted(true)
+        setTimeout(() => {
+          router.push("/student/dashboard")
+        }, 3000)
+      }
+      return
+    }
+
     setScore(data.score)
     setSubmitted(true)
 
@@ -121,17 +141,21 @@ export default function StudentQuizPage() {
         </CardHeader>
 
         <CardContent className="p-6">
-          {submitted ? (
+          {(submitted || alreadySubmitted) ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 rounded-full bg-accent/20 text-accent flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                Quiz submitted successfully
+                {submitted
+                  ? "Quiz submitted successfully"
+                  : "You have already submitted this quiz"}
               </h3>
-              <p className="text-lg font-bold mb-2">
-                Your Score: {score}
-              </p>
+              {submitted && (
+                <p className="text-lg font-bold mb-2">
+                  Your Score: {score}
+                </p>
+              )}
               <p className="text-muted-foreground">
                 Redirecting to dashboard…
               </p>

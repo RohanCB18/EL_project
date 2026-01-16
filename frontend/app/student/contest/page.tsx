@@ -12,7 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Play, Send, ArrowLeft, CheckCircle, XCircle } from "lucide-react"
+import {
+  Play,
+  Send,
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+} from "lucide-react"
 
 const BACKEND_URL = "http://localhost:8000"
 
@@ -38,6 +44,7 @@ export default function StudentContestPage() {
 
   const [judgeResult, setJudgeResult] = useState<any>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [alreadySubmitted, setAlreadySubmitted] = useState(false)
   const [score, setScore] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -65,8 +72,7 @@ export default function StudentContestPage() {
       })
 
       if (s.ok) {
-        const data = await s.json()
-        setSamples(data)
+        setSamples(await s.json())
       }
     }
 
@@ -92,8 +98,7 @@ export default function StudentContestPage() {
       }),
     })
 
-    const data = await res.json()
-    setJudgeResult(data)
+    setJudgeResult(await res.json())
     setLoading(false)
   }
 
@@ -115,6 +120,21 @@ export default function StudentContestPage() {
     })
 
     const data = await res.json()
+
+    if (!res.ok) {
+      if (
+        typeof data.detail === "string" &&
+        data.detail.toLowerCase().includes("already")
+      ) {
+        setAlreadySubmitted(true)
+        setTimeout(() => {
+          router.push("/student/dashboard")
+        }, 3000)
+      }
+      setLoading(false)
+      return
+    }
+
     setScore(data.score)
     setSubmitted(true)
     setLoading(false)
@@ -130,13 +150,19 @@ export default function StudentContestPage() {
     <main className="min-h-screen bg-background p-4">
       <div className="max-w-[1600px] mx-auto h-[calc(100vh-2rem)]">
 
-        {submitted ? (
+        {(submitted || alreadySubmitted) ? (
           <Card className="h-full flex items-center justify-center">
-            <CardContent className="text-center">
-              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-accent" />
-              <h3 className="text-2xl font-semibold">Submission Successful</h3>
-              <p className="text-lg font-bold mt-2">Score: {score}</p>
-              <p className="text-muted-foreground mt-2">
+            <CardContent className="text-center space-y-3">
+              <CheckCircle className="w-12 h-12 mx-auto text-accent" />
+              <h3 className="text-2xl font-semibold">
+                {submitted
+                  ? "Submission Successful"
+                  : "Already Submitted"}
+              </h3>
+              {submitted && (
+                <p className="text-lg font-bold">Score: {score}</p>
+              )}
+              <p className="text-muted-foreground">
                 Redirecting to dashboard…
               </p>
             </CardContent>
@@ -165,14 +191,8 @@ export default function StudentContestPage() {
                 <CardContent className="space-y-4 text-sm">
                   {samples.map((s, i) => (
                     <div key={i} className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="font-semibold mb-1">Input</p>
-                        <Textarea readOnly value={s.input_data} className="font-mono bg-muted" />
-                      </div>
-                      <div>
-                        <p className="font-semibold mb-1">Output</p>
-                        <Textarea readOnly value={s.expected_output} className="font-mono bg-muted" />
-                      </div>
+                      <Textarea readOnly value={s.input_data} />
+                      <Textarea readOnly value={s.expected_output} />
                     </div>
                   ))}
                 </CardContent>
@@ -205,7 +225,6 @@ export default function StudentContestPage() {
 
             {/* RIGHT */}
             <div className="flex flex-col gap-4">
-
               {judgeResult && (
                 <Card>
                   <CardHeader>
@@ -223,7 +242,6 @@ export default function StudentContestPage() {
                         judgeResult.stdout ||
                         "No output"
                       }
-                      className="font-mono bg-muted"
                     />
                   </CardContent>
                 </Card>
@@ -238,11 +256,13 @@ export default function StudentContestPage() {
                 </Button>
               </div>
 
-              <Button variant="outline" onClick={() => router.push("/student/dashboard")}>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/student/dashboard")}
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back
               </Button>
             </div>
-
           </div>
         )}
       </div>
