@@ -5,6 +5,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 import os
 
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from app.schemas.doubt import DoubtCreate, DoubtListResponse
 from app.models.doubt import (
@@ -71,6 +73,19 @@ from typing import List
 # --------------------------------------------------
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",   # React / Next
+        "http://localhost:5173",   # Vite
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 Base.metadata.create_all(bind=engine)
 
 def get_db():
@@ -589,5 +604,54 @@ def classroom_status_api(
             db=db,
             user_id=current_user.id
         )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+from app.models.classroom import Classroom
+from app.models.user import User
+
+@app.get("/classrooms/info")
+def classroom_info_api(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        # Resolve classroom based on role
+        if current_user.role == "student":
+            if current_user.current_classroom_id is None:
+                raise ValueError("User is not in a classroom")
+
+            classroom = (
+                db.query(Classroom)
+                .filter(Classroom.id == current_user.current_classroom_id)
+                .first()
+            )
+
+        elif current_user.role == "teacher":
+            classroom = (
+                db.query(Classroom)
+                .filter(Classroom.teacher_id == current_user.id)
+                .first()
+            )
+
+            if not classroom:
+                raise ValueError("Teacher has no active classroom")
+
+        else:
+            raise ValueError("Invalid user role")
+
+        teacher = (
+            db.query(User)
+            .filter(User.id == classroom.teacher_id)
+            .first()
+        )
+
+        return {
+            "classroom_id": classroom.id,
+            "room_code": classroom.room_code,
+            "teacher_name": teacher.name
+        }
+
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

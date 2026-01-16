@@ -282,16 +282,39 @@ from app.models.user import User
 from app.models.quiz import Quiz
 from app.models.contest import Contest
 
+from app.models.user import User
+from app.models.classroom import Classroom
+from app.models.quiz import Quiz
+from app.models.contest import Contest
+from sqlalchemy.orm import Session
+
 def get_classroom_status(db: Session, user_id: int):
     user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise ValueError("User not found")
 
-    if user.current_classroom_id is None:
-        raise ValueError("User is not in a classroom")
+    # 🔑 Resolve classroom differently based on role
+    if user.role == "student":
+        if user.current_classroom_id is None:
+            raise ValueError("User is not in a classroom")
 
-    classroom_id = user.current_classroom_id
+        classroom_id = user.current_classroom_id
+
+    elif user.role == "teacher":
+        classroom = (
+            db.query(Classroom)
+            .filter(Classroom.teacher_id == user.id)
+            .first()
+        )
+
+        if not classroom:
+            raise ValueError("Teacher has no active classroom")
+
+        classroom_id = classroom.id
+
+    else:
+        raise ValueError("Invalid user role")
 
     quiz_active = (
         db.query(Quiz)
@@ -318,3 +341,4 @@ def get_classroom_status(db: Session, user_id: int):
         "quiz_active": quiz_active,
         "contest_active": contest_active
     }
+

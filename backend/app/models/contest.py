@@ -17,40 +17,64 @@ import os
 
 load_dotenv()
 
-JUDGE0_URL = "https://judge0-ce.p.rapidapi.com"
+# --------------------------------------------------
+# 🔧 PATCH 1: DEFINE THESE (WERE MISSING)
+# --------------------------------------------------
+JUDGE0_HOST = os.getenv("JUDGE0_HOST")
+JUDGE0_API_KEY = os.getenv("JUDGE0_API_KEY")
+
+# (kept exactly as you had it – not removed)
 JUDGE0_HEADERS = {
     "X-RapidAPI-Key": os.getenv("JUDGE0_API_KEY"),
     "X-RapidAPI-Host": os.getenv("JUDGE0_HOST"),
     "Content-Type": "application/json"
 }
 
+import base64
+
 def run_code_judge0(source_code: str, language_id: int, input_data: str):
+    if not JUDGE0_API_KEY:
+        raise ValueError("Judge0 API key not set")
+
+    url = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true"
+
     payload = {
-        "source_code": source_code,
+        "source_code": base64.b64encode(source_code.encode()).decode(),
         "language_id": language_id,
-        "stdin": input_data
+        "stdin": base64.b64encode((input_data or "").encode()).decode(),
     }
 
-    res = requests.post(
-        f"{JUDGE0_URL}/submissions?base64_encoded=false&wait=false",
-        headers=JUDGE0_HEADERS,
-        json=payload
+    headers = {
+        "Content-Type": "application/json",
+        "X-RapidAPI-Key": JUDGE0_API_KEY,
+        "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+    }
+
+    response = requests.post(
+        url,
+        json=payload,
+        headers=headers,
+        timeout=25,
     )
-    res.raise_for_status()
 
-    token = res.json()["token"]
+    if response.status_code != 200:
+        raise ValueError(
+            f"Judge0 error {response.status_code}: {response.text}"
+        )
 
-    while True:
-        result = requests.get(
-            f"{JUDGE0_URL}/submissions/{token}?base64_encoded=false",
-            headers=JUDGE0_HEADERS
-        ).json()
+    result = response.json()
 
-        if result["status"]["id"] in [1, 2]:  # In Queue / Processing
-            time.sleep(0.5)
-            continue
+    # Decode outputs safely
+    def decode(val):
+        return base64.b64decode(val).decode() if val else None
 
-        return result
+    return {
+        "stdout": decode(result.get("stdout")),
+        "stderr": decode(result.get("stderr")),
+        "compile_output": decode(result.get("compile_output")),
+        "status": result.get("status"),
+    }
+
 
 
 class Contest(Base):
@@ -94,7 +118,6 @@ def create_or_update_contest(db: Session, teacher_id: int, payload):
         db.commit()
         db.refresh(contest)
     else:
-        # rewrite old question + test cases
         db.query(ContestTestCase).filter(
             ContestTestCase.contest_question_id ==
             db.query(ContestQuestion.id)
@@ -204,6 +227,7 @@ def delete_contest(db: Session, teacher_id: int):
     db.delete(contest)
     db.commit()
 
+
 from app.models.user import User
 from app.models.contest_question import ContestQuestion
 
@@ -239,6 +263,7 @@ def get_contest_question_for_student(db: Session, student_id: int):
 
     return question
 
+
 def get_sample_test_cases_for_student(db: Session, student_id: int):
     student = db.query(User).filter(User.id == student_id).first()
     if not student or student.role != "student":
@@ -270,8 +295,10 @@ def get_sample_test_cases_for_student(db: Session, student_id: int):
         .all()
     )
 
+
 from app.models.contest_test_case import ContestTestCase
 from app.models.classroom_participant import ClassroomParticipant
+
 
 def submit_contest_solution(
     db: Session,
@@ -279,7 +306,6 @@ def submit_contest_solution(
     source_code: str,
     language_id: int
 ):
-    # 1. Validate student
     student = db.query(User).filter(User.id == student_id).first()
     if not student or student.role != "student":
         raise ValueError("Invalid student")
@@ -287,7 +313,6 @@ def submit_contest_solution(
     if not student.current_classroom_id:
         raise ValueError("Student not in classroom")
 
-    # 2. Get active contest
     contest = (
         db.query(Contest)
         .filter(
@@ -299,7 +324,6 @@ def submit_contest_solution(
     if not contest:
         raise ValueError("No active contest")
 
-    # 3. Prevent double submission
     existing = (
         db.query(ContestSubmission)
         .filter(
@@ -311,7 +335,6 @@ def submit_contest_solution(
     if existing:
         raise ValueError("Already submitted")
 
-    # 4. Fetch hidden test cases
     hidden_tests = (
         db.query(ContestTestCase)
         .join(ContestQuestion)
@@ -325,7 +348,6 @@ def submit_contest_solution(
     if not hidden_tests:
         raise ValueError("No hidden test cases found")
 
-    # 5. Run Judge0 on hidden tests
     score = 0
 
     for tc in hidden_tests:
@@ -335,15 +357,19 @@ def submit_contest_solution(
             input_data=tc.input_data
         )
 
-        # Accepted
-        if result["status"]["id"] == 3:
+        # --------------------------------------------------
+        # 🔧 PATCH 2: SAFE STATUS ACCESS
+        # --------------------------------------------------
+        status = result.get("status", {})
+        status_id = status.get("id")
+
+        if status_id == 3:
             output = (result.get("stdout") or "").strip()
             expected = tc.expected_output.strip()
 
             if output == expected:
                 score += 1
 
-    # 6. Store submission
     submission = ContestSubmission(
         contest_id=contest.id,
         student_id=student_id,
@@ -352,7 +378,6 @@ def submit_contest_solution(
         score=score
     )
 
-    # 7. Update aggregate classroom score
     participant = (
         db.query(ClassroomParticipant)
         .filter(
@@ -367,11 +392,11 @@ def submit_contest_solution(
 
     participant.score += score
 
-    # 8. Atomic commit
     db.add(submission)
     db.commit()
 
     return score
+
 
 def run_custom_test_case(
     db: Session,
@@ -399,7 +424,6 @@ def run_custom_test_case(
     if not contest:
         raise ValueError("No active contest")
 
-    # ⚠️ IMPORTANT: no DB writes, no submission checks
     result = run_code_judge0(
         source_code=source_code,
         language_id=language_id,
@@ -410,8 +434,9 @@ def run_custom_test_case(
         "stdout": result.get("stdout"),
         "stderr": result.get("stderr"),
         "compile_output": result.get("compile_output"),
-        "status": result["status"]
+        "status": result.get("status")
     }
+
 
 def deactivate_contest(db: Session, teacher_id: int):
     teacher = db.query(User).filter(User.id == teacher_id).first()
@@ -445,11 +470,13 @@ def deactivate_contest(db: Session, teacher_id: int):
 
     return contest.id
 
+
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.models.classroom import Classroom
 from app.models.contest import Contest
 from app.models.contest_submission import ContestSubmission
+
 
 def get_contest_submissions_overview(db: Session, teacher_id: int):
     teacher = db.query(User).filter(User.id == teacher_id).first()

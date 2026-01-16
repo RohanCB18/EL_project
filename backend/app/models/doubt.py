@@ -49,32 +49,54 @@ def create_doubt(db: Session, student_id: int, content: str):
 
     return doubt.id
 
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.models.classroom import Classroom
+from app.models.doubt import Doubt
+
 def get_doubts_for_classroom(db: Session, user_id: int):
     user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise ValueError("User not found")
 
-    if user.current_classroom_id is None:
-        raise ValueError("User is not in a classroom")
+    # Resolve classroom based on role
+    if user.role == "student":
+        if user.current_classroom_id is None:
+            raise ValueError("User is not in a classroom")
+        classroom_id = user.current_classroom_id
+
+    elif user.role == "teacher":
+        classroom = (
+            db.query(Classroom)
+            .filter(Classroom.teacher_id == user.id)
+            .first()
+        )
+        if not classroom:
+            raise ValueError("Teacher has no active classroom")
+        classroom_id = classroom.id
+
+    else:
+        raise ValueError("Invalid user role")
 
     doubts = (
         db.query(Doubt, User)
         .join(User, User.id == Doubt.student_id)
-        .filter(Doubt.classroom_id == user.current_classroom_id)
+        .filter(Doubt.classroom_id == classroom_id)
         .order_by(Doubt.created_at.asc())
         .all()
     )
 
-    return user.current_classroom_id, [
+    return classroom_id, [
         {
-            "id": doubt.id,                  # REQUIRED for delete
-            "student_name": student.name,    # SAFE to expose
+            "id": doubt.id,
+            "student_name": student.name,
             "content": doubt.content,
             "created_at": doubt.created_at
         }
         for doubt, student in doubts
     ]
+
 
 
 def delete_doubt(db: Session, teacher_id: int, doubt_id: int):
