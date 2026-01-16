@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -15,6 +15,8 @@ import {
   Clock,
   ArrowLeft,
   Award,
+  CheckCircle2,
+  Cpu
 } from "lucide-react"
 
 const BACKEND_URL = "http://localhost:8000"
@@ -36,12 +38,8 @@ export default function StudentQuizPage() {
   const [score, setScore] = useState<number>(0)
   const [loading, setLoading] = useState(true)
 
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("access_token")
-      : null
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
 
-  // ---------------- LOAD QUIZ ----------------
   useEffect(() => {
     if (!token) {
       router.push("/")
@@ -72,14 +70,12 @@ export default function StudentQuizPage() {
           ],
         }))
       )
-
       setLoading(false)
     }
 
     loadQuiz()
   }, [router, token])
 
-  // ---------------- SUBMIT QUIZ ----------------
   const handleSubmit = async () => {
     if (!token) return
 
@@ -95,32 +91,24 @@ export default function StudentQuizPage() {
     const data = await res.json()
 
     if (!res.ok) {
-      if (
-        typeof data.detail === "string" &&
-        data.detail.toLowerCase().includes("already")
-      ) {
+      if (typeof data.detail === "string" && data.detail.toLowerCase().includes("already")) {
         setAlreadySubmitted(true)
-        setTimeout(() => {
-          router.push("/student/dashboard")
-        }, 3000)
+        setTimeout(() => router.push("/student/dashboard"), 3000)
       }
       return
     }
 
     setScore(data.score)
     setSubmitted(true)
-
-    setTimeout(() => {
-      router.push("/student/dashboard")
-    }, 3000)
+    setTimeout(() => router.push("/student/dashboard"), 3000)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-lg font-medium text-gray-600">Loading quiz...</p>
+      <div className="min-h-screen bg-[#F4F4F7] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-6 animate-pulse">
+          <Cpu className="w-12 h-12 text-black/10" />
+          <p className="text-[10px] uppercase tracking-[0.4em] font-black text-black/40">Loading quiz...</p>
         </div>
       </div>
     )
@@ -131,263 +119,190 @@ export default function StudentQuizPage() {
   const progressPercentage = (answeredCount / questions.length) * 100
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
-      
-      {/* Top Navigation Bar */}
-      <div className="bg-white border-b shadow-sm backdrop-blur-sm bg-white/90 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
+    <main className="min-h-screen bg-[#F4F4F7] text-[#111111] antialiased flex flex-col">
+      {/* Header Bar */}
+      <nav className="h-16 bg-white border-b border-black/5 sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-8 h-full flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <button 
               onClick={() => router.push("/student/dashboard")}
-              className="hover:bg-indigo-50 transition-colors duration-200 group"
+              className="text-[10px] uppercase tracking-widest font-black text-black/40 hover:text-black transition-colors flex items-center gap-2"
             >
-              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
-              Dashboard
-            </Button>
-            <div className="h-6 w-px bg-gray-300"></div>
+              <ArrowLeft className="w-3 h-3" /> Dashboard
+            </button>
+            <div className="h-4 w-[1px] bg-black/10"></div>
             <div className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-indigo-600" />
-              <h1 className="text-lg font-semibold text-gray-800">Quiz Time</h1>
+              <Award className="w-4 h-4 text-indigo-600" />
+              <h1 className="text-sm font-black uppercase tracking-tight">Quiz Time</h1>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 rounded-lg">
-            <Clock className="w-4 h-4 text-indigo-600" />
-            <span className="text-sm font-medium text-indigo-900">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-black/60">
               {answeredCount}/{questions.length} Answered
             </span>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-4xl shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
+      {/* Content Container */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-4xl space-y-8">
           
           {(submitted || alreadySubmitted) ? (
-            <CardContent className="text-center py-16 px-8">
-              <div className="relative mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 blur-3xl opacity-30 animate-pulse"></div>
-                <div className="relative w-28 h-28 mx-auto bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-xl transform transition-all duration-500 hover:scale-110">
-                  <CheckCircle className="w-16 h-16 text-white animate-bounce-slow" />
+            <Card className="bg-white border-none shadow-[0_40px_80px_-15px_rgba(0,0,0,0.08)] rounded-[3rem] overflow-hidden">
+              <CardContent className="text-center py-20 px-10 space-y-8">
+                <div className="w-24 h-24 mx-auto bg-black rounded-[2.5rem] flex items-center justify-center shadow-2xl">
+                  <CheckCircle2 className="w-12 h-12 text-white" />
                 </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  {submitted ? "Quiz Submitted!" : "Already Submitted"}
-                </h3>
                 
-                {submitted && (
-                  <div className="flex items-center justify-center gap-3 py-4">
-                    <Trophy className="w-10 h-10 text-yellow-500" />
-                    <div className="text-left">
-                      <p className="text-sm text-gray-600">Your Score</p>
-                      <p className="text-4xl font-bold text-gray-800">{score}</p>
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-black tracking-tighter uppercase italic">
+                    {submitted ? "Quiz Submitted!" : "Already Submitted"}
+                  </h3>
+                  
+                  {submitted && (
+                    <div className="flex flex-col items-center pt-4">
+                      <p className="text-[10px] uppercase font-black text-black/20 tracking-widest mb-1">Your Score</p>
+                      <div className="flex items-center gap-3">
+                        <Trophy className="w-8 h-8 text-amber-500" />
+                        <p className="text-6xl font-black tracking-tighter tabular-nums">{score}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-center gap-2 text-gray-500 mt-6">
-                  <Clock className="w-4 h-4 animate-pulse" />
-                  <p className="text-sm">Redirecting to dashboard...</p>
+                  )}
                 </div>
 
-                <div className="w-full max-w-md mx-auto h-2 bg-gray-200 rounded-full overflow-hidden mt-4">
-                  <div className="h-full bg-gradient-to-r from-green-400 to-emerald-600 rounded-full animate-progress"></div>
+                <div className="flex flex-col items-center gap-2 pt-8">
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/40 font-bold">
+                    <Clock className="w-3 h-3" /> Redirecting to dashboard...
+                  </div>
+                  <div className="w-48 h-1.5 bg-black/5 rounded-full overflow-hidden mt-2">
+                    <div className="h-full bg-black rounded-full animate-progress-sync"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Question Sidebar Tracker */}
+              <div className="lg:col-span-3 space-y-4">
+                <p className="text-[10px] uppercase tracking-[0.3em] font-black text-black/20 px-1">Navigation</p>
+                <div className="p-4 bg-white rounded-[2rem] shadow-sm grid grid-cols-4 gap-2 border border-black/[0.02]">
+                  {questions.map((q, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentQuestion(index)}
+                      className={`h-10 rounded-xl text-[10px] font-black transition-all ${
+                        index === currentQuestion
+                        ? "bg-black text-white shadow-lg scale-110"
+                        : answers[q.id]
+                        ? "bg-indigo-50 text-indigo-600 border border-indigo-100"
+                        : "bg-[#F4F4F7] text-black/30 hover:bg-black/5"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          ) : (
-            <>
-              {/* Quiz Header */}
-              <CardHeader className="border-b bg-gradient-to-r from-indigo-50 to-blue-50 pb-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-                        {currentQuestion + 1}
-                      </div>
-                      Question {currentQuestion + 1} of {questions.length}
-                    </CardTitle>
-                  </div>
-                  
-                  {/* Progress Dots */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {questions.map((q, index) => (
-                      <div
-                        key={index}
-                        className={`transition-all duration-300 rounded-full ${
-                          index === currentQuestion
-                            ? "w-8 h-3 bg-gradient-to-r from-indigo-600 to-blue-600 shadow-md"
-                            : answers[q.id]
-                            ? "w-3 h-3 bg-green-500 shadow-sm hover:scale-125 cursor-pointer"
-                            : "w-3 h-3 bg-gray-300 hover:scale-125 cursor-pointer"
-                        }`}
-                        onClick={() => setCurrentQuestion(index)}
-                      />
-                    ))}
-                  </div>
 
-                  {/* Progress Bar */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs text-gray-600">
-                      <span className="font-medium">Progress</span>
-                      <span className="font-bold">{Math.round(progressPercentage)}%</span>
-                    </div>
-                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-500 ease-out"
-                        style={{ width: `${progressPercentage}%` }}
-                      ></div>
-                    </div>
-                  </div>
+              {/* Main Question Card */}
+              <Card className="lg:col-span-9 bg-white border-none shadow-[0_30px_60px_-12px_rgba(0,0,0,0.04)] rounded-[2.5rem] overflow-hidden flex flex-col">
+                {/* Visual Progress Line */}
+                <div className="w-full h-1 bg-black/5">
+                  <div 
+                    className="h-full bg-indigo-600 transition-all duration-700 ease-in-out" 
+                    style={{ width: `${progressPercentage}%` }} 
+                  />
                 </div>
-              </CardHeader>
 
-              {/* Question Content */}
-              <CardContent className="p-8">
-                <div className="space-y-8">
-                  {/* Question Text */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-indigo-500 rounded-lg p-6">
-                    <h3 className="text-xl font-semibold text-gray-800 leading-relaxed">
-                      {question.question_text}
-                    </h3>
+                <div className="p-10 space-y-10">
+                  {/* Header */}
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest">Question {currentQuestion + 1}</p>
+                      <h2 className="text-2xl font-bold tracking-tight text-black leading-tight">
+                        {question.question_text}
+                      </h2>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-[#F4F4F7] flex items-center justify-center text-xs font-black">
+                      {currentQuestion + 1}/{questions.length}
+                    </div>
                   </div>
 
                   {/* Options */}
                   <RadioGroup
                     value={answers[question.id] || ""}
                     onValueChange={(value) =>
-                      setAnswers((prev) => ({
-                        ...prev,
-                        [question.id]: value,
-                      }))
+                      setAnswers((prev) => ({ ...prev, [question.id]: value }))
                     }
-                    className="space-y-4"
+                    className="grid grid-cols-1 gap-4"
                   >
                     {question.options.map((option, index) => (
                       <Label
                         key={option.key}
-                        className={`group flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg ${
+                        className={`group flex items-center justify-between p-6 rounded-[1.5rem] border-2 transition-all duration-300 cursor-pointer ${
                           answers[question.id] === option.key
-                            ? "border-indigo-500 bg-gradient-to-r from-indigo-50 to-blue-50 shadow-md scale-[1.02]"
-                            : "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/30"
+                            ? "bg-black text-white border-black shadow-xl"
+                            : "bg-[#FBFBFC] border-transparent hover:border-black/10"
                         }`}
                       >
-                        <RadioGroupItem
-                          value={option.key}
-                          className="sr-only"
-                        />
-                        <div className={`flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-                          answers[question.id] === option.key
-                            ? "bg-gradient-to-br from-indigo-600 to-blue-600 text-white border-indigo-600 shadow-lg"
-                            : "border-gray-300 text-gray-600 group-hover:border-indigo-400 group-hover:text-indigo-600"
-                        }`}>
-                          {String.fromCharCode(65 + index)}
+                        <div className="flex items-center gap-5">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black border transition-all ${
+                            answers[question.id] === option.key
+                            ? "bg-white/10 border-white/20 text-white"
+                            : "bg-white border-black/5 text-black/40"
+                          }`}>
+                            {option.key}
+                          </div>
+                          <span className="text-sm font-bold uppercase tracking-tight">{option.value}</span>
                         </div>
-                        <span className={`flex-1 text-base leading-relaxed transition-colors duration-300 ${
-                          answers[question.id] === option.key
-                            ? "text-gray-900 font-medium"
-                            : "text-gray-700 group-hover:text-gray-900"
-                        }`}>
-                          {option.value}
-                        </span>
-                        {answers[question.id] === option.key && (
-                          <CheckCircle className="w-6 h-6 text-indigo-600 flex-shrink-0 animate-scale-in" />
-                        )}
+                        <RadioGroupItem value={option.key} className="sr-only" />
+                        {answers[question.id] === option.key && <CheckCircle className="w-5 h-5 text-indigo-400" />}
                       </Label>
                     ))}
                   </RadioGroup>
 
-                  {/* Navigation Buttons */}
-                  <div className="flex items-center justify-between pt-6 border-t">
+                  {/* Navigation Actions */}
+                  <div className="pt-8 border-t border-black/5 flex items-center justify-between">
                     <Button
-                      variant="outline"
-                      size="lg"
+                      variant="ghost"
                       disabled={currentQuestion === 0}
                       onClick={() => setCurrentQuestion((q) => q - 1)}
-                      className="h-12 px-6 border-2 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 disabled:opacity-50 group"
+                      className="text-[10px] font-black uppercase tracking-widest text-black/40 hover:text-black"
                     >
-                      <ChevronLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300" />
-                      Previous
+                      <ChevronLeft className="w-4 h-4 mr-1" /> Previous
                     </Button>
 
                     {currentQuestion === questions.length - 1 ? (
                       <Button 
                         onClick={handleSubmit}
-                        size="lg"
-                        className="h-12 px-8 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-[1.05] hover:shadow-xl group font-semibold relative overflow-hidden"
+                        className="h-12 px-10 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-indigo-200 transition-all hover:translate-y-[-2px]"
                       >
-                        <span className="relative z-10 flex items-center gap-2">
-                          <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                          Submit Quiz
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        Submit Quiz <Send className="w-3 h-3 ml-2" />
                       </Button>
                     ) : (
                       <Button 
                         onClick={() => setCurrentQuestion((q) => q + 1)}
-                        size="lg"
-                        className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-[1.05] hover:shadow-xl group font-semibold relative overflow-hidden"
+                        className="h-12 px-10 bg-black hover:bg-black/90 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all hover:translate-y-[-2px]"
                       >
-                        <span className="relative z-10 flex items-center gap-2">
-                          Next Question
-                          <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        Next Question <ChevronRight className="w-3 h-3 ml-2" />
                       </Button>
                     )}
                   </div>
                 </div>
-              </CardContent>
-            </>
+              </Card>
+            </div>
           )}
-        </Card>
+        </div>
       </div>
 
       <style jsx>{`
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
+        .animate-progress-sync {
+          animation: progress 3s linear forwards;
         }
-
-        @keyframes progress {
-          from {
-            width: 0%;
-          }
-          to {
-            width: 100%;
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            transform: scale(0);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
-        }
-
-        .animate-progress {
-          animation: progress 3s ease-in-out;
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.3s ease-out;
-        }
+        @keyframes progress { from { width: 0%; } to { width: 100%; } }
       `}</style>
     </main>
   )

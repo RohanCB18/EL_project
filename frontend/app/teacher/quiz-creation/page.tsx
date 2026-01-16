@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -36,11 +31,7 @@ import {
 
 const BACKEND_URL = "http://localhost:8000"
 
-interface QuizTemplate {
-  id: number
-  title: string
-}
-
+interface QuizTemplate { id: number; title: string }
 interface Question {
   question_text: string
   option_a: string
@@ -52,626 +43,252 @@ interface Question {
 
 export default function TeacherQuizCreationPage() {
   const router = useRouter()
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("access_token")
-      : null
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
 
   const [mode, setMode] = useState<"list" | "create" | "view">("list")
   const [templates, setTemplates] = useState<QuizTemplate[]>([])
-  const [selectedTemplate, setSelectedTemplate] = useState<{
-    id: number
-    title: string
-    questions: Question[]
-  } | null>(null)
-
+  const [selectedTemplate, setSelectedTemplate] = useState<{ id: number; title: string; questions: Question[] } | null>(null)
   const [inClassroom, setInClassroom] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  // ---------------- CREATE STATE ----------------
   const [title, setTitle] = useState("")
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      question_text: "",
-      option_a: "",
-      option_b: "",
-      option_c: "",
-      option_d: "",
-      correct_option: "",
-    },
-  ])
+  const [questions, setQuestions] = useState<Question[]>([{ question_text: "", option_a: "", option_b: "", option_c: "", option_d: "", correct_option: "" }])
 
-  // ---------------- FETCH INITIAL ----------------
   useEffect(() => {
     if (!token) return
-
-    fetch(`${BACKEND_URL}/quiz-templates`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then(setTemplates)
-
-    fetch(`${BACKEND_URL}/classrooms/status`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(() => setInClassroom(true))
-      .catch(() => setInClassroom(false))
+    fetch(`${BACKEND_URL}/quiz-templates`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json()).then(setTemplates)
+    fetch(`${BACKEND_URL}/classrooms/status`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(() => setInClassroom(true)).catch(() => setInClassroom(false))
   }, [token])
 
-  // ---------------- HELPERS ----------------
-  const addQuestion = () =>
-    setQuestions([
-      ...questions,
-      {
-        question_text: "",
-        option_a: "",
-        option_b: "",
-        option_c: "",
-        option_d: "",
-        correct_option: "",
-      },
-    ])
-
-  const removeQuestion = (idx: number) => {
-    if (questions.length === 1) return
-    setQuestions(questions.filter((_, i) => i !== idx))
-  }
-
-  const updateQuestion = (
-    idx: number,
-    field: keyof Question,
-    value: string
-  ) => {
-    const copy = [...questions]
-    copy[idx][field] = value
-    setQuestions(copy)
+  const addQuestion = () => setQuestions([...questions, { question_text: "", option_a: "", option_b: "", option_c: "", option_d: "", correct_option: "" }])
+  const removeQuestion = (idx: number) => questions.length > 1 && setQuestions(questions.filter((_, i) => i !== idx))
+  const updateQuestion = (idx: number, field: keyof Question, value: string) => {
+    const copy = [...questions]; copy[idx][field] = value; setQuestions(copy)
   }
 
   const validate = () => {
     if (!title.trim()) return false
-    return questions.every(
-      (q) =>
-        q.question_text.trim() &&
-        q.option_a.trim() &&
-        q.option_b.trim() &&
-        q.option_c.trim() &&
-        q.option_d.trim() &&
-        q.correct_option
-    )
+    return questions.every(q => q.question_text.trim() && q.option_a.trim() && q.option_b.trim() && q.option_c.trim() && q.option_d.trim() && q.correct_option)
   }
 
   const resetCreateForm = () => {
-    setTitle("")
-    setQuestions([
-      {
-        question_text: "",
-        option_a: "",
-        option_b: "",
-        option_c: "",
-        option_d: "",
-        correct_option: "",
-      },
-    ])
+    setTitle(""); setQuestions([{ question_text: "", option_a: "", option_b: "", option_c: "", option_d: "", correct_option: "" }])
   }
 
-  // ---------------- CREATE TEMPLATE ----------------
   const saveTemplate = async () => {
     if (isSaving) return
-
-    if (!validate()) {
-      setErrorMessage("All fields must be filled.")
-      return
-    }
-
+    if (!validate()) { setErrorMessage("All fields must be filled."); return }
     setIsSaving(true)
-
     try {
       const res = await fetch(`${BACKEND_URL}/quiz-templates/create`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title, questions }),
       })
-
-      if (!res.ok) {
-        const d = await res.json()
-        setErrorMessage(d.detail || "Failed to create template")
-        return
-      }
-
-      // Refresh templates list
-      const templatesRes = await fetch(`${BACKEND_URL}/quiz-templates`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const templatesData = await templatesRes.json()
-      setTemplates(templatesData)
-
-      resetCreateForm()
-      setMode("list")
-    } catch (err: any) {
-      setErrorMessage(err.message || "Something went wrong")
-    } finally {
-      setIsSaving(false)
-    }
+      if (!res.ok) throw new Error((await res.json()).detail || "Failed to create template")
+      const templatesRes = await fetch(`${BACKEND_URL}/quiz-templates`, { headers: { Authorization: `Bearer ${token}` } })
+      setTemplates(await templatesRes.json()); resetCreateForm(); setMode("list")
+    } catch (err: any) { setErrorMessage(err.message || "Something went wrong") } finally { setIsSaving(false) }
   }
 
-  // ---------------- VIEW TEMPLATE ----------------
   const openTemplate = async (id: number) => {
-    const res = await fetch(`${BACKEND_URL}/quiz-templates/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    const data = await res.json()
-    setSelectedTemplate(data)
-    setMode("view")
+    const res = await fetch(`${BACKEND_URL}/quiz-templates/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+    setSelectedTemplate(await res.json()); setMode("view")
   }
 
-  // ---------------- DELETE TEMPLATE ----------------
   const deleteTemplate = async (id: number) => {
-    await fetch(`${BACKEND_URL}/quiz-templates/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-
+    await fetch(`${BACKEND_URL}/quiz-templates/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
     setTemplates(templates.filter((t) => t.id !== id))
   }
 
-  // ---------------- ACTIVATE ----------------
   const activateTemplate = async () => {
     if (!selectedTemplate) return
-
-    const res = await fetch(
-      `${BACKEND_URL}/quiz-templates/${selectedTemplate.id}/activate`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
-
-    if (!res.ok) {
-      const d = await res.json()
-      setErrorMessage(d.detail)
-      return
-    }
-
+    const res = await fetch(`${BACKEND_URL}/quiz-templates/${selectedTemplate.id}/activate`, {
+      method: "POST", headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) { setErrorMessage((await res.json()).detail); return }
     router.push("/teacher/dashboard")
   }
 
   return (
-    <>
+    <main className="min-h-screen bg-[#F4F4F7] text-[#111111] antialiased">
+      {/* ERROR MODAL */}
       {errorMessage && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-          <Card className="w-[420px] shadow-2xl border-2 border-red-200 animate-scale-in">
-            <CardHeader className="flex flex-row justify-between items-start pb-4 bg-gradient-to-r from-red-50 to-pink-50 border-b-2 border-red-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-red-600" />
-                </div>
-                <CardTitle className="text-xl text-red-900">Error</CardTitle>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[100] animate-in fade-in duration-300">
+          <Card className="w-[400px] border-none shadow-2xl rounded-[2.5rem] bg-white overflow-hidden">
+            <div className="p-8 text-center space-y-6">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto border border-red-100"><AlertCircle className="w-8 h-8 text-red-500" /></div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-black uppercase tracking-tight">Error</h2>
+                <p className="text-sm text-black/60 leading-relaxed">{errorMessage}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setErrorMessage(null)}
-                className="hover:bg-red-100 rounded-lg transition-all duration-200"
-              >
-                <X className="w-5 h-5 text-red-600" />
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-6 pb-6">
-              <p className="text-gray-700 leading-relaxed">{errorMessage}</p>
-            </CardContent>
+              <Button onClick={() => setErrorMessage(null)} className="w-full h-12 bg-black text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest">Dismiss</Button>
+            </div>
           </Card>
         </div>
       )}
 
-      <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-          <div className="absolute top-40 right-10 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto p-8 space-y-8">
-          <div className="flex justify-between items-center animate-fade-in">
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
-                <FileQuestion className="w-9 h-9 text-indigo-600" />
-                Quiz Templates
-              </h1>
-              <p className="text-gray-600 ml-12">Create and manage quizzes for your students</p>
-            </div>
-            <div className="flex gap-3">
-              {mode !== "list" && (
-                <Button
-                  onClick={() => setMode("list")}
-                  variant="outline"
-                  className="h-12 px-6 border-2 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300 rounded-xl group"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-300" />
-                  Back to List
-                </Button>
-              )}
-              {mode === "list" && (
-                <Button
-                  onClick={() => { resetCreateForm(); setMode("create") }}
-                  className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] group"
-                >
-                  <Plus className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                  New Quiz Template
-                </Button>
-              )}
+      {/* Header */}
+      <nav className="h-20 bg-white border-b border-black/5 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-8 h-full flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-xl"><FileQuestion className="w-5 h-5 text-white" /></div>
+            <div>
+              <h1 className="text-xl font-black tracking-tighter uppercase italic">Quiz <span className="text-indigo-600">Templates</span></h1>
+              <p className="text-[10px] uppercase tracking-widest font-bold text-black/30">Create and manage quizzes</p>
             </div>
           </div>
+          <div className="flex gap-4">
+            {mode !== "list" && (
+              <Button variant="ghost" onClick={() => setMode("list")} className="text-[10px] font-black uppercase tracking-widest hover:bg-black/5"><ArrowLeft className="w-4 h-4 mr-2" /> Back to List</Button>
+            )}
+            {mode === "list" && (
+              <Button onClick={() => { resetCreateForm(); setMode("create") }} className="h-11 px-6 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:translate-y-[-2px] transition-all">
+                <Plus className="w-4 h-4 mr-2" /> New Quiz Template
+              </Button>
+            )}
+          </div>
+        </div>
+      </nav>
 
-          {mode === "list" && (
-            <div className="space-y-4 animate-fade-in">
-              {templates.length === 0 ? (
-                <Card className="shadow-xl border-0 backdrop-blur-sm bg-white/90">
-                  <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
-                      <FileQuestion className="w-10 h-10 text-indigo-600" />
-                    </div>
-                    <div className="text-center space-y-2">
-                      <h3 className="text-xl font-semibold text-gray-800">No Quiz Templates Yet</h3>
-                      <p className="text-gray-600">Create your first quiz template to get started!</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                templates.map((t, idx) => (
-                  <Card
-                    key={t.id}
-                    className="shadow-lg border-0 backdrop-blur-sm bg-white/90 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01] group animate-slide-in"
-                    style={{ animationDelay: `${idx * 50}ms` }}
-                  >
-                    <CardContent className="flex justify-between items-center p-6">
-                      <div
-                        className="flex items-center gap-4 cursor-pointer flex-1"
-                        onClick={() => openTemplate(t.id)}
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                          <ClipboardList className="w-6 h-6 text-indigo-600" />
-                        </div>
-                        <span className="font-semibold text-lg text-gray-800 group-hover:text-indigo-600 transition-colors duration-300">
-                          {t.title}
-                        </span>
-                      </div>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-300 w-11 h-11 group/delete"
-                        onClick={() => deleteTemplate(t.id)}
-                      >
-                        <Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform duration-300" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          )}
-
-          {mode === "create" && (
-            <ScrollArea className="h-[calc(100vh-200px)] pr-4 animate-fade-in">
-              <div className="space-y-6 pb-8">
-                <Card className="shadow-2xl border-0 backdrop-blur-sm bg-white/90 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b-2 border-indigo-100 pb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                        <FileQuestion className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-2xl font-bold text-gray-800">Quiz Information</CardTitle>
-                        <p className="text-sm text-gray-500 mt-1">Set the title for your quiz</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-8">
-                    <div className="space-y-2 group">
-                      <Label htmlFor="quiz-title" className="text-sm font-semibold text-gray-700">Quiz Title</Label>
-                      <Input
-                        id="quiz-title"
-                        placeholder="e.g., Chapter 1 Assessment"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="h-12 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-300 group-hover:border-indigo-300"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <div className="space-y-6">
-                  {questions.map((q, i) => (
-                    <Card
-                      key={i}
-                      className="shadow-2xl border-0 backdrop-blur-sm bg-white/90 overflow-hidden hover:shadow-3xl transition-all duration-300"
-                    >
-                      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-100 pb-5">
-                        <div className="flex flex-row justify-between items-center">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
-                              {i + 1}
-                            </div>
-                            <CardTitle className="text-xl font-bold text-gray-800">Question {i + 1}</CardTitle>
-                          </div>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            disabled={questions.length === 1}
-                            onClick={() => removeQuestion(i)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-300 disabled:opacity-30 group/delete"
-                          >
-                            <Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform duration-300" />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4 p-8">
-                        <div className="space-y-2 group">
-                          <Label className="text-sm font-semibold text-gray-700">Question Text</Label>
-                          <Input
-                            placeholder="Enter your question..."
-                            value={q.question_text}
-                            onChange={(e) =>
-                              updateQuestion(i, "question_text", e.target.value)
-                            }
-                            className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 group-hover:border-blue-300"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {(["a", "b", "c", "d"] as const).map((o) => (
-                            <div key={o} className="space-y-2 group">
-                              <Label className="text-sm font-semibold text-gray-700">
-                                Option {o.toUpperCase()}
-                              </Label>
-                              <Input
-                                placeholder={`Enter option ${o.toUpperCase()}...`}
-                                value={(q as any)[`option_${o}`]}
-                                onChange={(e) =>
-                                  updateQuestion(
-                                    i,
-                                    `option_${o}` as keyof Question,
-                                    e.target.value
-                                  )
-                                }
-                                className="h-11 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 group-hover:border-blue-300"
-                              />
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="space-y-2 group pt-2">
-                          <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            Correct Answer
-                          </Label>
-                          <Select
-                            value={q.correct_option}
-                            onValueChange={(v) =>
-                              updateQuestion(i, "correct_option", v)
-                            }
-                          >
-                            <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 group-hover:border-green-300">
-                              <SelectValue placeholder="Select the correct option" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {["A", "B", "C", "D"].map((o) => (
-                                <SelectItem key={o} value={o} className="cursor-pointer">
-                                  Option {o}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+      <div className="max-w-6xl mx-auto p-8">
+        {/* LIST MODE */}
+        {mode === "list" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {templates.length === 0 ? (
+              <div className="col-span-full py-24 text-center space-y-6">
+                <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-sm border border-black/5"><FileQuestion className="w-10 h-10 text-black/10" /></div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-black uppercase tracking-tight">No Quiz Templates Yet</h3>
+                  <p className="text-sm text-black/40">Create your first quiz template to get started!</p>
                 </div>
-
-                <Button
-                  variant="outline"
-                  onClick={addQuestion}
-                  className="w-full h-14 border-2 border-indigo-300 hover:bg-indigo-50 hover:border-indigo-400 transition-all duration-300 rounded-xl group text-base font-semibold"
-                >
-                  <Plus className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                  Add Another Question
-                </Button>
-
-                <Card className="shadow-2xl border-0 backdrop-blur-sm bg-white/90 overflow-hidden sticky bottom-0">
-                  <CardContent className="p-6">
-                    <Button
-                      onClick={saveTemplate}
-                      disabled={isSaving}
-                      className="w-full h-16 text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group relative overflow-hidden"
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-3">
-                        {isSaving ? (
-                          <>
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                            Saving Quiz Template...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-                            Save Quiz Template
-                          </>
-                        )}
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </Button>
+              </div>
+            ) : (
+              templates.map((t) => (
+                <Card key={t.id} className="bg-white border-none shadow-md rounded-[2rem] hover:shadow-2xl transition-all group overflow-hidden">
+                  <CardContent className="p-8 flex items-center justify-between">
+                    <div className="cursor-pointer flex-1" onClick={() => openTemplate(t.id)}>
+                      <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><ClipboardList className="w-5 h-5 text-indigo-600" /></div>
+                      <h3 className="font-black text-sm uppercase tracking-tight">{t.title}</h3>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => deleteTemplate(t.id)} className="text-black/10 hover:text-red-500 rounded-xl"><Trash2 className="w-5 h-5" /></Button>
                   </CardContent>
                 </Card>
-              </div>
-            </ScrollArea>
-          )}
+              ))
+            )}
+          </div>
+        )}
 
-          {mode === "view" && selectedTemplate && (
-            <div className="space-y-6 animate-fade-in">
-              <Card className="shadow-2xl border-0 backdrop-blur-sm bg-white/90">
-                <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b-2 border-indigo-100 pb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                      <FileQuestion className="w-7 h-7 text-white" />
+        {/* VIEW MODE */}
+        {mode === "view" && selectedTemplate && (
+          <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
+            <Card className="bg-white border-none shadow-xl rounded-[3rem] overflow-hidden">
+              <div className="p-10 border-b border-black/5 bg-[#FBFBFC] flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center shadow-xl"><FileQuestion className="w-6 h-6 text-white" /></div>
+                  <div>
+                    <h2 className="text-3xl font-black tracking-tighter uppercase">{selectedTemplate.title}</h2>
+                    <p className="text-[10px] uppercase font-black text-black/20 tracking-widest mt-1">{selectedTemplate.questions.length} Questions Registered</p>
+                  </div>
+                </div>
+                {inClassroom && (
+                  <Button onClick={activateTemplate} className="h-14 px-8 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg shadow-indigo-200 hover:translate-y-[-2px] transition-all">
+                    <Play className="w-4 h-4 mr-2" /> Activate Quiz
+                  </Button>
+                )}
+              </div>
+              <div className="p-10 grid grid-cols-1 gap-6">
+                {selectedTemplate.questions.map((q, i) => (
+                  <div key={i} className="p-8 bg-[#F4F4F7] rounded-[2.5rem] space-y-6 border border-black/[0.02]">
+                    <div className="flex gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center text-xs font-black flex-shrink-0">{i + 1}</div>
+                      <p className="text-lg font-bold tracking-tight leading-relaxed">{q.question_text}</p>
                     </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
-                        {selectedTemplate.title}
-                      </CardTitle>
-                      <p className="text-sm text-gray-500 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-purple-500" />
-                        {selectedTemplate.questions.length} Question{selectedTemplate.questions.length !== 1 ? 's' : ''}
-                      </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-12">
+                      {['a', 'b', 'c', 'd'].map((opt) => (
+                        <div key={opt} className={`p-4 rounded-xl border-2 flex items-center justify-between ${q.correct_option === opt.toUpperCase() ? 'bg-white border-indigo-600 shadow-sm' : 'bg-black/[0.02] border-transparent'}`}>
+                          <span className={`text-xs font-bold ${q.correct_option === opt.toUpperCase() ? 'text-indigo-600' : 'text-black/40'}`}>{(q as any)[`option_${opt}`]}</span>
+                          {q.correct_option === opt.toUpperCase() && <CheckCircle2 className="w-4 h-4 text-indigo-600" />}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </CardHeader>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* CREATE MODE */}
+        {mode === "create" && (
+          <ScrollArea className="h-[calc(100vh-160px)] pr-4 animate-in fade-in duration-500">
+            <div className="max-w-4xl mx-auto space-y-8 pb-12">
+              <Card className="bg-white border-none shadow-xl rounded-[2.5rem] overflow-hidden">
+                <div className="p-8 border-b border-black/5 bg-[#FBFBFC] flex items-center gap-4">
+                  <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg"><Sparkles className="w-5 h-5 text-white" /></div>
+                  <h2 className="text-xl font-black uppercase tracking-tight">Quiz Information</h2>
+                </div>
+                <CardContent className="p-8">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-1">Quiz Title</Label>
+                    <Input placeholder="e.g., Chapter 1 Assessment" value={title} onChange={(e) => setTitle(e.target.value)} className="h-14 bg-[#F4F4F7] border-none rounded-2xl px-6 focus-visible:ring-1 focus-visible:ring-black font-medium" />
+                  </div>
+                </CardContent>
               </Card>
 
-              <div className="space-y-5">
-                {selectedTemplate.questions.map((q, i) => (
-                  <Card
-                    key={i}
-                    className="shadow-lg border-0 backdrop-blur-sm bg-white/90 overflow-hidden hover:shadow-xl transition-all duration-300"
-                  >
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md">
-                          {i + 1}
-                        </div>
-                        <p className="font-semibold text-lg text-gray-800 leading-relaxed flex-1">
-                          {q.question_text}
-                        </p>
+              <div className="space-y-6">
+                {questions.map((q, i) => (
+                  <Card key={i} className="bg-white border-none shadow-xl rounded-[2.5rem] overflow-hidden group">
+                    <div className="p-8 border-b border-black/5 bg-[#FBFBFC] flex justify-between items-center">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-black text-sm">{i + 1}</div>
+                        <h3 className="text-sm font-black uppercase tracking-widest">Question Details</h3>
                       </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-11">
-                        {(['a', 'b', 'c', 'd'] as const).map((opt) => {
-                          const isCorrect = q.correct_option === opt.toUpperCase()
-                          return (
-                            <div
-                              key={opt}
-                              className={`p-4 rounded-lg border-2 transition-all duration-300 ${
-                                isCorrect
-                                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300'
-                                  : 'bg-gray-50 border-gray-200'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className={`font-bold ${isCorrect ? 'text-green-700' : 'text-gray-600'}`}>
-                                  {opt.toUpperCase()})
-                                </span>
-                                <span className={`${isCorrect ? 'text-green-900 font-medium' : 'text-gray-700'}`}>
-                                  {(q as any)[`option_${opt}`]}
-                                </span>
-                                {isCorrect && (
-                                  <CheckCircle2 className="w-5 h-5 text-green-600 ml-auto" />
-                                )}
-                              </div>
-                            </div>
-                          )
-                        })}
+                      <Button variant="ghost" size="icon" disabled={questions.length === 1} onClick={() => removeQuestion(i)} className="text-black/10 hover:text-red-500 transition-colors"><Trash2 className="w-5 h-5" /></Button>
+                    </div>
+                    <CardContent className="p-8 space-y-8">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-1">Question Text</Label>
+                        <Input placeholder="Enter your question..." value={q.question_text} onChange={(e) => updateQuestion(i, "question_text", e.target.value)} className="h-14 bg-[#F4F4F7] border-none rounded-2xl px-6 focus-visible:ring-1 focus-visible:ring-black font-medium" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {['a', 'b', 'c', 'd'].map((o) => (
+                          <div key={o} className="space-y-2">
+                            <Label className="text-[9px] font-black uppercase tracking-widest text-black/30 ml-1">Option {o.toUpperCase()}</Label>
+                            <Input placeholder={`Option ${o.toUpperCase()} content...`} value={(q as any)[`option_${o}`]} onChange={(e) => updateQuestion(i, `option_${o}` as keyof Question, e.target.value)} className="h-12 bg-[#F4F4F7] border-none rounded-xl px-4 focus-visible:ring-1 focus-visible:ring-indigo-600" />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="space-y-2 pt-4 border-t border-black/5">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-1">Correct Answer</Label>
+                        <Select value={q.correct_option} onValueChange={(v) => updateQuestion(i, "correct_option", v)}>
+                          <SelectTrigger className="h-14 bg-black text-white border-none rounded-2xl px-6 font-black uppercase text-[10px] tracking-widest">
+                            <SelectValue placeholder="Select correct answer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-black text-white border-white/10">
+                            {["A", "B", "C", "D"].map((o) => <SelectItem key={o} value={o} className="uppercase font-bold text-[10px] tracking-widest">Option {o}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
 
-              <Card className="shadow-xl border-0 backdrop-blur-sm bg-white/90">
-                <CardContent className="p-6">
-                  {inClassroom ? (
-                    <Button
-                      onClick={activateTemplate}
-                      className="w-full h-14 text-base font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] group"
-                    >
-                      <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                      Activate Quiz in Classroom
-                    </Button>
-                  ) : (
-                    <div className="p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border-l-4 border-amber-500">
-                      <p className="text-amber-900 flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" />
-                        You must create a classroom first to activate quizzes
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <Button variant="outline" onClick={addQuestion} className="w-full h-16 border-2 border-dashed border-black/10 rounded-[2rem] font-black uppercase text-[10px] tracking-widest hover:bg-black hover:text-white transition-all">
+                <Plus className="w-4 h-4 mr-2" /> Add Another Question
+              </Button>
+
+              <Button onClick={saveTemplate} disabled={isSaving} className="w-full h-20 bg-black text-white rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.3em] shadow-2xl hover:translate-y-[-2px] transition-all sticky bottom-0">
+                {isSaving ? <Loader2 className="animate-spin w-6 h-6" /> : <><Save className="w-5 h-5 mr-3" /> Save Quiz Template</>}
+              </Button>
             </div>
-          )}
-        </div>
-      </main>
-
-      <style jsx>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-        }
-        
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.3s ease-out;
-        }
-
-        @keyframes slide-in {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .animate-slide-in {
-          animation: slide-in 0.4s ease-out forwards;
-        }
-      `}</style>
-    </>
+          </ScrollArea>
+        )}
+      </div>
+    </main>
   )
 }

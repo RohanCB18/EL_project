@@ -466,6 +466,15 @@ def classroom_leaderboard_student_api(
     current_user: user.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    print("ROLE FROM DB:", current_user.role)
+
+    # 🔒 Explicit role guard FIRST
+    if current_user.role != "student":
+        raise HTTPException(
+            status_code=403,
+            detail="Only students can view student leaderboard"
+        )
+
     try:
         classroom_id, leaderboard = get_classroom_leaderboard_for_student(
             db=db,
@@ -478,7 +487,9 @@ def classroom_leaderboard_student_api(
         }
 
     except ValueError as e:
+        # These are logical errors (e.g. not in classroom)
         raise HTTPException(status_code=400, detail=str(e))
+
 
 
 from app.models.quiz import deactivate_quiz
