@@ -101,3 +101,53 @@ def submit_quiz_and_score(
     db.commit()
 
     return score
+
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.models.classroom import Classroom
+from app.models.quiz import Quiz
+from app.models.quiz_submission import QuizSubmission
+
+def get_active_quiz_submissions_overview(db: Session, teacher_id: int):
+    teacher = db.query(User).filter(User.id == teacher_id).first()
+    if not teacher or teacher.role != "teacher":
+        raise ValueError("Only teachers can view quiz submissions")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == teacher_id)
+        .first()
+    )
+    if not classroom:
+        raise ValueError("No active classroom")
+
+    quiz = (
+        db.query(Quiz)
+        .filter(
+            Quiz.classroom_id == classroom.id,
+            Quiz.is_active == True
+        )
+        .first()
+    )
+    if not quiz:
+        raise ValueError("No active quiz")
+
+    submissions = (
+        db.query(QuizSubmission, User)
+        .join(User, User.id == QuizSubmission.student_id)
+        .filter(QuizSubmission.quiz_id == quiz.id)
+        .all()
+    )
+
+    return {
+        "quiz_id": quiz.id,
+        "total_submissions": len(submissions),
+        "submissions": [
+            {
+                "student_name": user.name,
+                "email": user.email,
+                "score": submission.score
+            }
+            for submission, user in submissions
+        ]
+    }

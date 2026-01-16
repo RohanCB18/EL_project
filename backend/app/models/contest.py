@@ -522,3 +522,47 @@ def get_contest_submissions_overview(db: Session, teacher_id: int):
             for submission, user in submissions
         ]
     }
+
+def get_active_contest_submissions_overview(db: Session, teacher_id: int):
+    teacher = db.query(User).filter(User.id == teacher_id).first()
+    if not teacher or teacher.role != "teacher":
+        raise ValueError("Only teachers can view contest submissions")
+
+    classroom = (
+        db.query(Classroom)
+        .filter(Classroom.teacher_id == teacher_id)
+        .first()
+    )
+    if not classroom:
+        raise ValueError("No active classroom")
+
+    contest = (
+        db.query(Contest)
+        .filter(
+            Contest.classroom_id == classroom.id,
+            Contest.is_active == True
+        )
+        .first()
+    )
+    if not contest:
+        raise ValueError("No active contest")
+
+    submissions = (
+        db.query(ContestSubmission, User)
+        .join(User, User.id == ContestSubmission.student_id)
+        .filter(ContestSubmission.contest_id == contest.id)
+        .all()
+    )
+
+    return {
+        "contest_id": contest.id,
+        "total_submissions": len(submissions),
+        "submissions": [
+            {
+                "student_name": user.name,
+                "email": user.email,
+                "score": submission.score
+            }
+            for submission, user in submissions
+        ]
+    }

@@ -14,6 +14,7 @@ import {
   XCircle,
   MessageCircle,
   X,
+  Users,
 } from "lucide-react"
 
 const BACKEND_URL = "http://localhost:8000"
@@ -33,6 +34,11 @@ export default function TeacherDashboard() {
   const [classInfo, setClassInfo] = useState<any>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // submissions modal
+  const [showSubmissions, setShowSubmissions] = useState(false)
+  const [submissionsTitle, setSubmissionsTitle] = useState("")
+  const [submissions, setSubmissions] = useState<any[]>([])
+
   // ---------------- POLLING ----------------
   useEffect(() => {
     if (!token) {
@@ -44,20 +50,16 @@ export default function TeacherDashboard() {
 
     const poll = async () => {
       try {
-        // classroom status
-        const statusRes = await fetch(`${BACKEND_URL}/classrooms/status`, {
-          headers,
-        })
+        // status
+        const statusRes = await fetch(`${BACKEND_URL}/classrooms/status`, { headers })
         const statusData = await statusRes.json()
         if (!statusRes.ok) throw new Error(statusData.detail)
 
         setQuizActive(statusData.quiz_active)
         setContestActive(statusData.contest_active)
 
-        // classroom info
-        const infoRes = await fetch(`${BACKEND_URL}/classrooms/info`, {
-          headers,
-        })
+        // class info
+        const infoRes = await fetch(`${BACKEND_URL}/classrooms/info`, { headers })
         const infoData = await infoRes.json()
         if (!infoRes.ok) throw new Error(infoData.detail)
         setClassInfo(infoData)
@@ -69,10 +71,7 @@ export default function TeacherDashboard() {
         setDoubts(doubtsData.doubts)
 
         // leaderboard
-        const lbRes = await fetch(
-          `${BACKEND_URL}/classrooms/leaderboard`,
-          { headers }
-        )
+        const lbRes = await fetch(`${BACKEND_URL}/classrooms/leaderboard`, { headers })
         const lbData = await lbRes.json()
         if (!lbRes.ok) throw new Error(lbData.detail)
         setLeaderboard(lbData.leaderboard)
@@ -86,7 +85,7 @@ export default function TeacherDashboard() {
     return () => clearInterval(interval)
   }, [router, token])
 
-  // ---------------- SAFE HELPERS ----------------
+  // ---------------- HELPERS ----------------
   const safePost = async (endpoint: string) => {
     try {
       const res = await fetch(`${BACKEND_URL}${endpoint}`, {
@@ -113,6 +112,31 @@ export default function TeacherDashboard() {
     }
   }
 
+  // ---------------- SUBMISSIONS ----------------
+  const openSubmissions = async (type: "quiz" | "contest") => {
+    try {
+      const endpoint =
+        type === "quiz"
+          ? "/quizzes/submissions"
+          : "/contests/submissions"
+
+      const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail)
+
+      setSubmissions(data.submissions ?? data)
+      setSubmissionsTitle(
+        type === "quiz" ? "Quiz Submissions" : "Contest Submissions"
+      )
+      setShowSubmissions(true)
+    } catch (err: any) {
+      setErrorMessage(err.message)
+    }
+  }
+
   // ---------------- END CLASS ----------------
   const handleEndClass = async () => {
     await safePost("/classrooms/end")
@@ -128,16 +152,49 @@ export default function TeacherDashboard() {
           <Card className="w-[360px]">
             <CardHeader className="flex flex-row justify-between items-center">
               <CardTitle>Error</CardTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setErrorMessage(null)}
-              >
+              <Button variant="ghost" size="icon" onClick={() => setErrorMessage(null)}>
                 <X className="w-4 h-4" />
               </Button>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               {errorMessage}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* SUBMISSIONS POPUP */}
+      {showSubmissions && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <Card className="w-[420px] max-h-[70vh] flex flex-col">
+            <CardHeader className="flex flex-row justify-between items-center">
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                {submissionsTitle}
+              </CardTitle>
+              <Button variant="ghost" size="icon" onClick={() => setShowSubmissions(false)}>
+                <X className="w-4 h-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="flex-1 p-0">
+              <ScrollArea className="h-full p-4 space-y-2">
+                {submissions.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    No submissions yet
+                  </p>
+                )}
+                {submissions.map((s, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between p-3 bg-muted/50 rounded-lg"
+                  >
+                    <span>{s.student_name || s.name}</span>
+                    {s.score !== undefined && (
+                      <span className="font-bold">{s.score}</span>
+                    )}
+                  </div>
+                ))}
+              </ScrollArea>
             </CardContent>
           </Card>
         </div>
@@ -149,71 +206,54 @@ export default function TeacherDashboard() {
           {/* LEFT COLUMN */}
           <div className="flex flex-col gap-4">
             <div className="space-y-4 pt-4">
-              <Button
-                size="lg"
-                onClick={() => router.push("/teacher/quiz-creation")}
-                className="w-full h-14"
-              >
+              <Button size="lg" onClick={() => router.push("/teacher/quiz-creation")} className="w-full h-14">
                 <BookOpen className="w-5 h-5 mr-2" />
                 Make Quiz
               </Button>
 
-              <Button
-                size="lg"
-                onClick={() => router.push("/teacher/contest-creation")}
-                className="w-full h-14"
-              >
+              <Button size="lg" onClick={() => router.push("/teacher/contest-creation")} className="w-full h-14">
                 <Code className="w-5 h-5 mr-2" />
                 Make Contest
               </Button>
 
-              <Button
-                size="lg"
-                onClick={() =>
-                  safePost(
-                    quizActive ? "/quizzes/deactivate" : "/quizzes/start"
-                  )
-                }
-                className="w-full h-14"
-              >
+              <Button size="lg" onClick={() => safePost(quizActive ? "/quizzes/deactivate" : "/quizzes/start")} className="w-full h-14">
                 <PlayCircle className="w-5 h-5 mr-2" />
                 {quizActive ? "Deactivate Quiz" : "Activate Quiz"}
               </Button>
 
-              <Button
-                size="lg"
-                onClick={() =>
-                  safePost(
-                    contestActive
-                      ? "/contests/deactivate"
-                      : "/contests/start"
-                  )
-                }
-                className="w-full h-14"
-              >
+              <Button size="lg" onClick={() => safePost(contestActive ? "/contests/deactivate" : "/contests/start")} className="w-full h-14">
                 <PlayCircle className="w-5 h-5 mr-2" />
-                {contestActive
-                  ? "Deactivate Contest"
-                  : "Activate Contest"}
+                {contestActive ? "Deactivate Contest" : "Activate Contest"}
               </Button>
 
-              {/* ✅ NEW DELETE BUTTONS */}
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => safeDelete("/quizzes/delete")}
+                disabled={!quizActive}
+                onClick={() => openSubmissions("quiz")}
                 className="w-full h-14"
               >
+                <Users className="w-5 h-5 mr-2" />
+                View Quiz Submissions
+              </Button>
+
+              <Button
+                size="lg"
+                variant="outline"
+                disabled={!contestActive}
+                onClick={() => openSubmissions("contest")}
+                className="w-full h-14"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                View Contest Submissions
+              </Button>
+
+              <Button size="lg" variant="outline" onClick={() => safeDelete("/quizzes/delete")} className="w-full h-14">
                 <Trash2 className="w-5 h-5 mr-2" />
                 Delete Quiz
               </Button>
 
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => safeDelete("/contests/delete")}
-                className="w-full h-14"
-              >
+              <Button size="lg" variant="outline" onClick={() => safeDelete("/contests/delete")} className="w-full h-14">
                 <Trash2 className="w-5 h-5 mr-2" />
                 Delete Contest
               </Button>
@@ -221,12 +261,7 @@ export default function TeacherDashboard() {
 
             <div className="flex-1" />
 
-            <Button
-              variant="destructive"
-              size="lg"
-              onClick={handleEndClass}
-              className="w-full h-14"
-            >
+            <Button variant="destructive" size="lg" onClick={handleEndClass} className="w-full h-14">
               <XCircle className="w-5 h-5 mr-2" />
               End Class
             </Button>
@@ -236,14 +271,10 @@ export default function TeacherDashboard() {
           <div className="flex flex-col gap-4">
             <Card className="animate-float shadow-lg">
               <CardHeader>
-                <CardTitle className="text-center">
-                  Classroom Info
-                </CardTitle>
+                <CardTitle className="text-center">Classroom Info</CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-2">
-                <p className="text-2xl font-bold">
-                  {classInfo?.teacher_name}
-                </p>
+                <p className="text-2xl font-bold">{classInfo?.teacher_name}</p>
                 <p className="text-muted-foreground">
                   Class ID:{" "}
                   <span className="font-mono text-primary">
@@ -264,20 +295,13 @@ export default function TeacherDashboard() {
               <CardContent className="flex-1 flex flex-col p-4 pt-0">
                 <ScrollArea className="flex-1 pr-4 -mr-4">
                   {doubts.map((d) => (
-                    <div
-                      key={d.id}
-                      className="p-4 rounded-lg bg-muted/50 group"
-                    >
-                      <p className="font-medium text-sm text-primary">
-                        {d.student_name}
-                      </p>
+                    <div key={d.id} className="p-4 rounded-lg bg-muted/50 group">
+                      <p className="font-medium text-sm text-primary">{d.student_name}</p>
                       <p className="text-sm mt-1">{d.content}</p>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() =>
-                          safeDelete(`/doubts/${d.id}`)
-                        }
+                        onClick={() => safeDelete(`/doubts/${d.id}`)}
                         className="opacity-0 group-hover:opacity-100"
                       >
                         <Trash2 className="w-4 h-4" />

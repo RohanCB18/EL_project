@@ -42,7 +42,7 @@ export default function TeacherContestCreationPage() {
     { id: 1, input: "", output: "" },
   ])
 
-  // ---------- SAMPLE TEST CASES ----------
+  // ---------------- SAMPLE TEST CASES ----------------
   const addSampleTestCase = () => {
     setSampleTestCases([
       ...sampleTestCases,
@@ -68,7 +68,7 @@ export default function TeacherContestCreationPage() {
     )
   }
 
-  // ---------- HIDDEN TEST CASES ----------
+  // ---------------- HIDDEN TEST CASES ----------------
   const addHiddenTestCase = () => {
     setHiddenTestCases([
       ...hiddenTestCases,
@@ -94,9 +94,42 @@ export default function TeacherContestCreationPage() {
     )
   }
 
-  // ---------- SAVE CONTEST ----------
+  // ---------------- VALIDATION ----------------
+  const validate = () => {
+    if (
+      !title.trim() ||
+      !description.trim() ||
+      !inputFormat.trim() ||
+      !outputFormat.trim() ||
+      !constraints.trim()
+    ) {
+      return "All problem fields must be filled."
+    }
+
+    for (const tc of sampleTestCases) {
+      if (!tc.input.trim() || !tc.output.trim()) {
+        return "All sample test cases must have input and output."
+      }
+    }
+
+    for (const tc of hiddenTestCases) {
+      if (!tc.input.trim() || !tc.output.trim()) {
+        return "All hidden test cases must have input and output."
+      }
+    }
+
+    return null
+  }
+
+  // ---------------- SAVE CONTEST ----------------
   const handleSave = async () => {
     if (!token) return
+
+    const validationError = validate()
+    if (validationError) {
+      setErrorMessage(validationError)
+      return
+    }
 
     try {
       const test_cases = [
@@ -143,11 +176,11 @@ export default function TeacherContestCreationPage() {
 
   return (
     <>
-      {/* ---------- ERROR POPUP ---------- */}
+      {/* ---------------- ERROR POPUP ---------------- */}
       {errorMessage && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <Card className="w-[360px]">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row justify-between items-center">
               <CardTitle>Error</CardTitle>
               <Button
                 variant="ghost"
@@ -175,9 +208,7 @@ export default function TeacherContestCreationPage() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              <h1 className="text-2xl font-bold text-foreground">
-                Create Contest
-              </h1>
+              <h1 className="text-2xl font-bold">Create Contest</h1>
             </div>
             <Button onClick={handleSave}>
               <Save className="w-4 h-4 mr-2" />
@@ -188,47 +219,47 @@ export default function TeacherContestCreationPage() {
           <ScrollArea className="h-[calc(100vh-8rem)]">
             <div className="space-y-6 pr-4">
 
-              {/* ---------- PROBLEM DETAILS ---------- */}
+              {/* PROBLEM DETAILS */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Problem Details</CardTitle>
+                  <CardTitle>Problem Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
+                  <div>
                     <Label>Question Title</Label>
                     <Input value={title} onChange={(e) => setTitle(e.target.value)} />
                   </div>
 
-                  <div className="space-y-2">
+                  <div>
                     <Label>Description</Label>
                     <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
                   </div>
 
-                  <div className="space-y-2">
+                  <div>
                     <Label>Input Format</Label>
                     <Textarea value={inputFormat} onChange={(e) => setInputFormat(e.target.value)} />
                   </div>
 
-                  <div className="space-y-2">
+                  <div>
                     <Label>Output Format</Label>
                     <Textarea value={outputFormat} onChange={(e) => setOutputFormat(e.target.value)} />
                   </div>
 
-                  <div className="space-y-2">
+                  <div>
                     <Label>Constraints</Label>
                     <Textarea value={constraints} onChange={(e) => setConstraints(e.target.value)} />
                   </div>
                 </CardContent>
               </Card>
 
-              {/* ---------- SAMPLE TEST CASES ---------- */}
+              {/* SAMPLE TEST CASES */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Sample Test Cases</CardTitle>
+                  <CardTitle>Sample Test Cases</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {sampleTestCases.map((tc, i) => (
-                    <div key={tc.id} className="p-4 bg-muted/50 rounded-lg space-y-4">
+                    <div key={tc.id} className="p-4 bg-muted/50 rounded-lg space-y-3">
                       <div className="flex justify-between">
                         <span>Sample {i + 1}</span>
                         <Button
@@ -244,31 +275,36 @@ export default function TeacherContestCreationPage() {
                       <Textarea
                         placeholder="Input"
                         value={tc.input}
-                        onChange={(e) => updateSampleTestCase(tc.id, "input", e.target.value)}
+                        onChange={(e) =>
+                          updateSampleTestCase(tc.id, "input", e.target.value)
+                        }
                       />
 
                       <Textarea
                         placeholder="Output"
                         value={tc.output}
-                        onChange={(e) => updateSampleTestCase(tc.id, "output", e.target.value)}
+                        onChange={(e) =>
+                          updateSampleTestCase(tc.id, "output", e.target.value)
+                        }
                       />
                     </div>
                   ))}
 
                   <Button variant="outline" onClick={addSampleTestCase}>
-                    <Plus className="w-4 h-4 mr-2" /> Add Sample Test Case
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Sample Test Case
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* ---------- HIDDEN TEST CASES ---------- */}
+              {/* HIDDEN TEST CASES */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Hidden Test Cases</CardTitle>
+                  <CardTitle>Hidden Test Cases</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {hiddenTestCases.map((tc, i) => (
-                    <div key={tc.id} className="p-4 bg-muted/50 rounded-lg space-y-4">
+                    <div key={tc.id} className="p-4 bg-muted/50 rounded-lg space-y-3">
                       <div className="flex justify-between">
                         <span>Hidden {i + 1}</span>
                         <Button
@@ -284,19 +320,24 @@ export default function TeacherContestCreationPage() {
                       <Textarea
                         placeholder="Input"
                         value={tc.input}
-                        onChange={(e) => updateHiddenTestCase(tc.id, "input", e.target.value)}
+                        onChange={(e) =>
+                          updateHiddenTestCase(tc.id, "input", e.target.value)
+                        }
                       />
 
                       <Textarea
                         placeholder="Output"
                         value={tc.output}
-                        onChange={(e) => updateHiddenTestCase(tc.id, "output", e.target.value)}
+                        onChange={(e) =>
+                          updateHiddenTestCase(tc.id, "output", e.target.value)
+                        }
                       />
                     </div>
                   ))}
 
                   <Button variant="outline" onClick={addHiddenTestCase}>
-                    <Plus className="w-4 h-4 mr-2" /> Add Hidden Test Case
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Hidden Test Case
                   </Button>
                 </CardContent>
               </Card>

@@ -50,6 +50,7 @@ export default function TeacherQuizCreationPage() {
     },
   ])
 
+  // ---------------- HELPERS ----------------
   const addQuestion = () => {
     setQuestions([
       ...questions,
@@ -83,9 +84,31 @@ export default function TeacherQuizCreationPage() {
     )
   }
 
+  // ---------------- VALIDATION ----------------
+  const validate = () => {
+    for (const q of questions) {
+      if (
+        !q.question.trim() ||
+        !q.optionA.trim() ||
+        !q.optionB.trim() ||
+        !q.optionC.trim() ||
+        !q.optionD.trim() ||
+        !q.correctOption
+      ) {
+        return false
+      }
+    }
+    return true
+  }
+
   // ---------------- SAVE QUIZ ----------------
   const handleSave = async () => {
     if (!token) return
+
+    if (!validate()) {
+      setErrorMessage("All questions and options must be filled completely.")
+      return
+    }
 
     try {
       const payload = {
@@ -119,7 +142,7 @@ export default function TeacherQuizCreationPage() {
 
   return (
     <>
-      {/* ERROR POPUP */}
+      {/* ---------- ERROR POPUP ---------- */}
       {errorMessage && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <Card className="w-[360px]">
@@ -151,9 +174,7 @@ export default function TeacherQuizCreationPage() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              <h1 className="text-2xl font-bold text-foreground">
-                Create Quiz
-              </h1>
+              <h1 className="text-2xl font-bold">Create Quiz</h1>
             </div>
             <Button onClick={handleSave}>
               <Save className="w-4 h-4 mr-2" />
@@ -164,117 +185,53 @@ export default function TeacherQuizCreationPage() {
           <ScrollArea className="h-[calc(100vh-8rem)]">
             <div className="space-y-6 pr-4">
               {questions.map((question, index) => (
-                <Card key={question.id} className="relative">
+                <Card key={question.id}>
                   <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">
-                        Question {index + 1}
-                      </CardTitle>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Question {index + 1}</CardTitle>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => removeQuestion(question.id)}
                         disabled={questions.length === 1}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        className="text-destructive"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </CardHeader>
+
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor={`question-${question.id}`}>
-                        Question
-                      </Label>
+                      <Label>Question</Label>
                       <Input
-                        id={`question-${question.id}`}
-                        placeholder="Enter your question"
                         value={question.question}
                         onChange={(e) =>
-                          updateQuestion(
-                            question.id,
-                            "question",
-                            e.target.value
-                          )
+                          updateQuestion(question.id, "question", e.target.value)
                         }
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor={`optionA-${question.id}`}>
-                          Option A
-                        </Label>
-                        <Input
-                          id={`optionA-${question.id}`}
-                          placeholder="Enter option A"
-                          value={question.optionA}
-                          onChange={(e) =>
-                            updateQuestion(
-                              question.id,
-                              "optionA",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`optionB-${question.id}`}>
-                          Option B
-                        </Label>
-                        <Input
-                          id={`optionB-${question.id}`}
-                          placeholder="Enter option B"
-                          value={question.optionB}
-                          onChange={(e) =>
-                            updateQuestion(
-                              question.id,
-                              "optionB",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`optionC-${question.id}`}>
-                          Option C
-                        </Label>
-                        <Input
-                          id={`optionC-${question.id}`}
-                          placeholder="Enter option C"
-                          value={question.optionC}
-                          onChange={(e) =>
-                            updateQuestion(
-                              question.id,
-                              "optionC",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`optionD-${question.id}`}>
-                          Option D
-                        </Label>
-                        <Input
-                          id={`optionD-${question.id}`}
-                          placeholder="Enter option D"
-                          value={question.optionD}
-                          onChange={(e) =>
-                            updateQuestion(
-                              question.id,
-                              "optionD",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
+                      {(["A", "B", "C", "D"] as const).map((opt) => (
+                        <div key={opt} className="space-y-2">
+                          <Label>Option {opt}</Label>
+                          <Input
+                            value={(question as any)[`option${opt}`]}
+                            onChange={(e) =>
+                              updateQuestion(
+                                question.id,
+                                `option${opt}` as keyof Question,
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                      ))}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor={`correct-${question.id}`}>
-                        Correct Option
-                      </Label>
+                      <Label>Correct Option</Label>
                       <Select
                         value={question.correctOption}
                         onValueChange={(value) =>
@@ -285,7 +242,7 @@ export default function TeacherQuizCreationPage() {
                           )
                         }
                       >
-                        <SelectTrigger id={`correct-${question.id}`}>
+                        <SelectTrigger>
                           <SelectValue placeholder="Select correct option" />
                         </SelectTrigger>
                         <SelectContent>

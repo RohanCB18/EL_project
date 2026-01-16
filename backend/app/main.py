@@ -655,3 +655,33 @@ def classroom_info_api(
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+from app.models.quiz_submission import get_active_quiz_submissions_overview
+
+@app.get("/quizzes/submissions")
+def quiz_submissions_overview_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        return get_active_quiz_submissions_overview(
+            db=db,
+            teacher_id=current_user.id
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+from app.models.contest import get_active_contest_submissions_overview
+
+@app.get("/contests/submissions")
+def contest_submissions_overview_api(
+    current_user: user.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        return get_active_contest_submissions_overview(
+            db=db,
+            teacher_id=current_user.id
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
