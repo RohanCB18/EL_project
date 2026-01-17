@@ -67,8 +67,8 @@
 
 .nav-btn-student {
     color: var(--color-student-primary);
-    background: rgba(124, 58, 237, 0.08);
-    border: 1px solid rgba(124, 58, 237, 0.15);
+    background: rgba(26, 26, 46, 0.08);
+    border: 1px solid rgba(26, 26, 46, 0.15);
 }
 
 .nav-btn-student:hover,
@@ -77,7 +77,7 @@
     color: white;
     border-color: transparent;
     transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 14px rgba(26, 26, 46, 0.25);
 }
 
 .nav-btn-teacher {

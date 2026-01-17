@@ -15,13 +15,13 @@
 .upload-zone:hover,
 .upload-zone.dragging {
     border-color: var(--color-accent-primary);
-    background: rgba(124, 58, 237, 0.04);
+    background: rgba(26, 26, 46, 0.04);
 }
 
 .uploader-student .upload-zone:hover,
 .uploader-student .upload-zone.dragging {
     border-color: var(--color-student-primary);
-    background: rgba(124, 58, 237, 0.04);
+    background: rgba(26, 26, 46, 0.04);
 }
 
 .uploader-teacher .upload-zone:hover,
@@ -92,13 +92,13 @@
     width: 48px;
     height: 48px;
     padding: var(--spacing-sm);
-    background: rgba(124, 58, 237, 0.1);
+    background: rgba(26, 26, 46, 0.1);
     color: var(--color-accent-primary);
     border-radius: var(--radius-md);
 }
 
 .uploader-student .file-icon {
-    background: rgba(124, 58, 237, 0.1);
+    background: rgba(26, 26, 46, 0.1);
     color: var(--color-student-primary);
 }
 
