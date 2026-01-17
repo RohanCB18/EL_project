@@ -1,6 +1,6 @@
 # StudyGenius - AI PDF Study Companion
 
-An AI-powered study companion that transforms PDFs into interactive learning experiences. Built with **FastAPI** backend and **React** frontend, powered by **LangChain** and **Ollama**.
+An AI-powered study companion that transforms PDFs into interactive learning experiences. Built with **FastAPI** backend and **React** frontend, powered by **LangChain** and **OpenRouter**.
 
 ## Features
 
@@ -22,8 +22,9 @@ An AI-powered study companion that transforms PDFs into interactive learning exp
 ### Backend
 - **FastAPI** - High-performance Python web framework
 - **LangChain** - LLM application framework
-- **Ollama** - Local LLM inference (LLaMA 3)
+- **OpenRouter** - Cloud LLM API (supports various models including LLaMA, Gemma, etc.)
 - **FAISS** - Vector similarity search
+- **Sentence Transformers** - Text embeddings
 - **PyPDF2** - PDF text extraction
 
 ### Frontend
@@ -36,7 +37,7 @@ An AI-powered study companion that transforms PDFs into interactive learning exp
 ## Project Structure
 
 ```
-langchain_gemini/
+EL_project/
 ├── backend/                    # FastAPI Backend
 │   ├── app/
 │   │   ├── main.py            # FastAPI app entry point
@@ -44,7 +45,7 @@ langchain_gemini/
 │   │   ├── services/
 │   │   │   ├── pdf_service.py     # PDF processing
 │   │   │   ├── vector_store.py    # FAISS vector store
-│   │   │   └── llm_service.py     # LangChain + Ollama
+│   │   │   └── llm_service.py     # LangChain + OpenRouter
 │   │   ├── routers/
 │   │   │   ├── student.py     # Student API endpoints
 │   │   │   └── teacher.py     # Teacher API endpoints
@@ -70,9 +71,7 @@ langchain_gemini/
 ### Prerequisites
 - **Python 3.9+**
 - **Node.js 18+**
-- **Ollama** installed and running with:
-  - LLaMA 3: `ollama pull llama3:8b`
-  - Nomic Embed: `ollama pull nomic-embed-text`
+- **OpenRouter API Key** - Get your free API key from [OpenRouter](https://openrouter.ai/)
 
 ### Backend Setup
 
@@ -94,14 +93,19 @@ langchain_gemini/
    pip install -r requirements.txt
    ```
 
-4. Copy environment file:
+4. Copy environment file and configure your API key:
    ```bash
    copy .env.example .env  # Windows
    # or
    cp .env.example .env  # Linux/Mac
    ```
 
-5. Start the backend server:
+5. Edit the `.env` file and add your OpenRouter API key:
+   ```env
+   OPENROUTER_API_KEY=your_actual_api_key_here
+   ```
+
+6. Start the backend server:
    ```bash
    uvicorn app.main:app --reload
    ```
@@ -168,13 +172,26 @@ The application features a modern dark theme with:
 Edit `.env` in the backend directory:
 
 ```env
+# Server settings
 HOST=0.0.0.0
 PORT=8000
 DEBUG=True
-OLLAMA_MODEL=llama3:8b
-OLLAMA_EMBED_MODEL=nomic-embed-text
+
+# OpenRouter settings (REQUIRED)
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_MODEL=meta-llama/llama-3.1-8b-instruct:free
+
+# Vector store path
 VECTOR_STORE_PATH=./vector_stores
 ```
+
+### Available Free Models on OpenRouter
+You can change `OPENROUTER_MODEL` to use different models:
+- `meta-llama/llama-3.1-8b-instruct:free` (default)
+- `google/gemma-3-27b-it:free`
+- `mistralai/mistral-7b-instruct:free`
+
+Check [OpenRouter Models](https://openrouter.ai/models) for more options.
 
 ## License
 
