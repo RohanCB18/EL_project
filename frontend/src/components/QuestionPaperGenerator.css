@@ -22,8 +22,10 @@
 .form-group label {
     display: block;
     font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
     margin-bottom: var(--spacing-sm);
 }
 
@@ -97,9 +99,10 @@
     color: var(--color-text-muted);
     font-style: italic;
     padding: var(--spacing-md);
-    background: var(--color-bg-secondary);
+    background: var(--color-bg-primary);
     border-radius: var(--radius-md);
     margin-bottom: var(--spacing-xl);
+    border: 1px solid var(--color-border);
 }
 
 /* Preview Sections */
@@ -121,7 +124,7 @@
 .marks-badge {
     font-size: var(--font-size-xs);
     font-weight: normal;
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(16, 185, 129, 0.08);
     color: var(--color-teacher-primary);
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--radius-full);
@@ -135,8 +138,10 @@
 
 .question-item {
     padding: var(--spacing-md);
-    background: var(--color-bg-secondary);
+    background: var(--color-bg-primary);
     border-radius: var(--radius-md);
+    border-left: 3px solid var(--color-teacher-primary);
+    border: 1px solid var(--color-border);
     border-left: 3px solid var(--color-teacher-primary);
 }
 
@@ -160,7 +165,7 @@
     margin-top: var(--spacing-sm);
     padding-top: var(--spacing-sm);
     border-top: 1px dashed var(--color-border);
-    color: var(--color-teacher-secondary);
+    color: var(--color-teacher-primary);
     font-size: var(--font-size-sm);
 }
 

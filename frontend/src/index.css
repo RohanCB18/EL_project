@@ -1,39 +1,40 @@
 /* ================================
-   PDF Study Companion - Design System
+   StudyGenius - Professional Design System
+   Light Mode - Google/CRED Inspired
    ================================ */
 
 /* CSS Custom Properties (Design Tokens) */
 :root {
-  /* Colors - Dark Theme */
-  --color-bg-primary: #0a0a0f;
-  --color-bg-secondary: #12121a;
-  --color-bg-card: #1a1a24;
-  --color-bg-card-hover: #22222e;
+  /* Colors - Light Theme */
+  --color-bg-primary: #f5f5f7;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-card-hover: #fafafa;
   
-  /* Accent Colors */
-  --color-accent-primary: #6366f1;
+  /* Accent Colors - Purple/Violet */
+  --color-accent-primary: #7c3aed;
   --color-accent-secondary: #8b5cf6;
-  --color-accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-  --color-accent-glow: rgba(99, 102, 241, 0.4);
+  --color-accent-gradient: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  --color-accent-glow: rgba(124, 58, 237, 0.15);
   
-  /* Student Theme */
-  --color-student-primary: #3b82f6;
-  --color-student-secondary: #60a5fa;
-  --color-student-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  /* Student Theme - Purple */
+  --color-student-primary: #7c3aed;
+  --color-student-secondary: #8b5cf6;
+  --color-student-gradient: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
   
-  /* Teacher Theme */
+  /* Teacher Theme - Green */
   --color-teacher-primary: #10b981;
   --color-teacher-secondary: #34d399;
   --color-teacher-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   
   /* Text Colors */
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #9ca3af;
   
   /* Border Colors */
-  --color-border: rgba(148, 163, 184, 0.1);
-  --color-border-hover: rgba(148, 163, 184, 0.2);
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.15);
   
   /* Status Colors */
   --color-success: #10b981;
@@ -69,12 +70,12 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 40px var(--color-accent-glow);
+  /* Shadows - Subtle and Professional */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
   
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -153,18 +154,17 @@ a:hover {
 .text-left { text-align: left; }
 .text-right { text-align: right; }
 
-/* Glassmorphism Card */
+/* Card - Clean White with Subtle Shadow */
 .glass-card {
-  background: rgba(26, 26, 36, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
   transition: all var(--transition-base);
 }
 
 .glass-card:hover {
-  background: rgba(34, 34, 46, 0.8);
+  box-shadow: var(--shadow-lg);
   border-color: var(--color-border-hover);
   transform: translateY(-2px);
 }
@@ -188,34 +188,34 @@ a:hover {
 .btn-primary {
   background: var(--color-accent-gradient);
   color: white;
-  box-shadow: 0 4px 15px var(--color-accent-glow);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--color-accent-glow);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
 }
 
 .btn-student {
   background: var(--color-student-gradient);
   color: white;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
 }
 
 .btn-student:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
 }
 
 .btn-teacher {
   background: var(--color-teacher-gradient);
   color: white;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 }
 
 .btn-teacher:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
 .btn-outline {
@@ -227,6 +227,7 @@ a:hover {
 .btn-outline:hover {
   border-color: var(--color-accent-primary);
   color: var(--color-accent-primary);
+  background: rgba(124, 58, 237, 0.05);
 }
 
 .btn-lg {
@@ -245,7 +246,7 @@ a:hover {
   padding: var(--spacing-md) var(--spacing-lg);
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   outline: none;
@@ -254,7 +255,7 @@ a:hover {
 
 .input-field:focus {
   border-color: var(--color-accent-primary);
-  box-shadow: 0 0 0 3px var(--color-accent-glow);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
 .input-field::placeholder {
@@ -328,3 +329,4 @@ a:hover {
     padding: 0 var(--spacing-md);
   }
 }
+
