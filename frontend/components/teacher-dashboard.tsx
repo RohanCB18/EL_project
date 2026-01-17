@@ -30,6 +30,7 @@ import TeacherProjects from "@/components/teacher-projects";
 import FindStudents from "@/components/find-students";
 import TeacherProjectOpenings from "@/components/teacher-project-openings";
 
+const CURRENT_FACULTY_ID = "FAC101"; // temp
 type Page = "home" | "students" | "projects" | "openings";
 
 export default function TeacherDashboard() {
@@ -109,7 +110,7 @@ export default function TeacherDashboard() {
 
                 {/* Notifications icon/list */}
                 <div className="mt-4">
-                  <Notifications />
+                  <Notifications recipientType="teacher" recipientId={CURRENT_FACULTY_ID} />
                 </div>
               </div>
 

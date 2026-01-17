@@ -30,6 +30,7 @@ import FindMentors from "@/components/find-mentors";
 import StudyHub from "@/components/study-hub";
 import StudentProjects from "@/components/student-projects"; // ✅ make sure this file exists
 import ProjectOpenings from "@/components/project-openings";
+const CURRENT_USN = "1RV15CS001";
 
 type Page =
   | "home"
@@ -124,7 +125,8 @@ export default function StudentDashboard() {
 
                 {/* ✅ Notifications should be inside the component */}
                 <div className="mt-3">
-                  <Notifications />
+                  <Notifications recipientType="student" recipientId={CURRENT_USN} />
+
                 </div>
               </div>
 
