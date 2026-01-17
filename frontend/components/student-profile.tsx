@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Pencil, Save, XCircle, User } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -13,16 +16,126 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Save, User, Building, Code, Rocket, Eye } from "lucide-react";
+
 import { upsertStudentProfile } from "@/lib/student";
 
+const BASE_URL = "http://localhost:5000";
+const CURRENT_USN = "1RV15CS901"; // temp until auth
+
+const BRANCHES = ["CSE", "ISE", "AIML", "CY", "ECE", "EEE", "ME", "CE", "ETE", "BT", "MCA"];
+const YEARS = ["1", "2", "3", "4"];
+const GENDERS = ["male", "female", "other"];
+const RESIDENCE = ["hostellite", "pg", "day_scholar"];
+
+const ACHIEVEMENTS = ["none", "participant", "finalist", "winner"];
+
+const WORK_STYLES = [
+  "consistent_work",
+  "deadline_driven",
+  "weekend_sprinter",
+  "flexible_any_style"
+];
+
+const COMMITMENT_PREFS = [
+  "generally_available",
+  "extracurricular_commitments",
+  "technical_commitments",
+  "low_commitment"
+];
+
+function toArray(val: any): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") {
+    return val
+      .replaceAll("{", "")
+      .replaceAll("}", "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function ArrayInput({
+  label,
+  value,
+  disabled,
+  onChange
+}: {
+  label: string;
+  value: string[];
+  disabled?: boolean;
+  onChange: (v: string[]) => void;
+}) {
+  const [temp, setTemp] = useState("");
+
+  const addItem = () => {
+    const trimmed = temp.trim();
+    if (!trimmed) return;
+    if (value.includes(trimmed)) {
+      setTemp("");
+      return;
+    }
+    onChange([...value, trimmed]);
+    setTemp("");
+  };
+
+  const removeItem = (item: string) => {
+    onChange(value.filter((x) => x !== item));
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">{label}</Label>
+
+      <div className="flex gap-2">
+        <Input
+          className="flex-1 w-full"
+          value={temp}
+          disabled={disabled}
+          placeholder="Type and press Add"
+          onChange={(e) => setTemp(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addItem();
+            }
+          }}
+        />
+        <Button type="button" variant="outline" disabled={disabled} onClick={addItem}>
+          Add
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {value.map((item) => (
+          <Badge key={item} variant="secondary" className="flex items-center gap-2">
+            {item}
+            {!disabled && (
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-destructive"
+                onClick={() => removeItem(item)}
+              >
+                ✕
+              </button>
+            )}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function StudentProfile() {
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [profile, setProfile] = useState<any>({
     name: "",
-    usn: "",
+    usn: CURRENT_USN,
     rvce_email: "",
     branch: "",
     year: "",
@@ -39,14 +152,66 @@ export default function StudentProfile() {
     hackathon_achievement_level: "",
     project_completion_approach: "",
     commitment_preference: "",
-    is_visible_for_matching: true // ⭐ DEFAULT ON
+    is_visible_for_matching: true
   });
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+
+        const res = await fetch(`${BASE_URL}/api/student/${CURRENT_USN}`);
+        if (!res.ok) {
+          // no profile exists yet -> allow create mode
+          setEditMode(true);
+          return;
+        }
+
+        const data = await res.json();
+
+        setProfile((prev: any) => ({
+          ...prev,
+          ...data,
+          usn: data.usn || CURRENT_USN,
+          programming_languages: toArray(data.programming_languages),
+          tech_skills: toArray(data.tech_skills),
+          domain_interests: toArray(data.domain_interests),
+          past_projects: data.past_projects ?? ""
+        }));
+
+        // profile exists -> lock by default
+        setEditMode(false);
+      } catch (err) {
+        console.error("Failed to load student profile:", err);
+        setEditMode(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  const update = (key: string, value: any) => {
+    setProfile((prev: any) => ({ ...prev, [key]: value }));
+  };
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      await upsertStudentProfile(profile);
+
+      const payload = {
+        ...profile,
+        cgpa: profile.cgpa === "" ? null : Number(profile.cgpa),
+        average_el_marks: profile.average_el_marks === "" ? null : Number(profile.average_el_marks),
+        hackathon_participation_count: Number(profile.hackathon_participation_count) || 0,
+        year: profile.year === "" ? null : Number(profile.year)
+      };
+
+      await upsertStudentProfile(payload);
+
       alert("Profile saved successfully");
+      setEditMode(false);
     } catch (err) {
       console.error(err);
       alert("Failed to save profile");
@@ -55,179 +220,332 @@ export default function StudentProfile() {
     }
   };
 
+  const headerRight = useMemo(() => {
+    if (editMode) {
+      return (
+        <div className="flex gap-2">
+          <Button onClick={handleSave} disabled={isSaving}>
+            <Save className={`w-4 h-4 mr-2 ${isSaving ? "animate-spin" : ""}`} />
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => setEditMode(false)}
+            disabled={isSaving}
+          >
+            <XCircle className="w-4 h-4 mr-2" />
+            Cancel
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <Button variant="outline" onClick={() => setEditMode(true)}>
+        <Pencil className="w-4 h-4 mr-2" />
+        Edit Profile
+      </Button>
+    );
+  }, [editMode, isSaving]);
+
+  if (loading) return <div className="p-8">Loading student profile…</div>;
+
   return (
-    <div className="p-8 space-y-6 max-w-6xl mx-auto">
+    <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold flex items-center gap-3">
           <User className="w-8 h-8 text-primary" />
           Student Profile
         </h2>
+        {headerRight}
+      </div>
 
-        <div className="flex items-center gap-6">
-          {/* VISIBILITY TOGGLE */}
-          <div className="flex items-center gap-3">
-            <Eye className="w-5 h-5 text-muted-foreground" />
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                Profile Visibility
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Allow others to match with you
-              </span>
-            </div>
+      {/* BASIC / PERSONAL INFO */}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle>Personal Information</CardTitle>
+        </CardHeader>
+
+        <CardContent className="grid md:grid-cols-2 gap-4">
+          <div>
+            <Label>Full Name</Label>
+            <Input
+              className="w-full"
+              value={profile.name}
+              disabled={!editMode}
+              onChange={(e) => update("name", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>USN</Label>
+            <Input className="w-full" value={profile.usn} disabled />
+          </div>
+
+          <div>
+            <Label>RVCE Email</Label>
+            <Input
+              className="w-full"
+              value={profile.rvce_email}
+              disabled={!editMode}
+              onChange={(e) => update("rvce_email", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>Gender</Label>
+            <Select
+              value={profile.gender || ""}
+              onValueChange={(v) => update("gender", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select gender" />
+              </SelectTrigger>
+              <SelectContent>
+                {GENDERS.map((g) => (
+                  <SelectItem key={g} value={g}>
+                    {g}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Residence</Label>
+            <Select
+              value={profile.residence || ""}
+              onValueChange={(v) => update("residence", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select residence" />
+              </SelectTrigger>
+              <SelectContent>
+                {RESIDENCE.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-3 mt-6">
             <Switch
-              checked={profile.is_visible_for_matching}
-              onCheckedChange={(v) =>
-                setProfile({ ...profile, is_visible_for_matching: v })
+              checked={!!profile.is_visible_for_matching}
+              disabled={!editMode}
+              onCheckedChange={(v) => update("is_visible_for_matching", v)}
+            />
+            <Label>Visible for matching</Label>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ACADEMICS */}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle>Academic Information</CardTitle>
+        </CardHeader>
+
+        <CardContent className="grid md:grid-cols-3 gap-4">
+          <div>
+            <Label>Branch</Label>
+            <Select
+              value={profile.branch || ""}
+              onValueChange={(v) => update("branch", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {BRANCHES.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Year</Label>
+            <Select
+              value={profile.year ? String(profile.year) : ""}
+              onValueChange={(v) => update("year", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select year" />
+              </SelectTrigger>
+              <SelectContent>
+                {YEARS.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    Year {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Section</Label>
+            <Input
+              className="w-full"
+              value={profile.section}
+              disabled={!editMode}
+              onChange={(e) => update("section", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>CGPA</Label>
+            <Input
+              className="w-full"
+              type="number"
+              value={profile.cgpa ?? ""}
+              disabled={!editMode}
+              onChange={(e) => update("cgpa", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>Average EL Marks</Label>
+            <Input
+              className="w-full"
+              type="number"
+              value={profile.average_el_marks ?? ""}
+              disabled={!editMode}
+              onChange={(e) => update("average_el_marks", e.target.value)}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* TECHNICAL */}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle>Technical Profile</CardTitle>
+        </CardHeader>
+
+        <CardContent className="space-y-5">
+          <ArrayInput
+            label="Programming Languages"
+            value={toArray(profile.programming_languages)}
+            disabled={!editMode}
+            onChange={(v) => update("programming_languages", v)}
+          />
+
+          <ArrayInput
+            label="Tech Skills"
+            value={toArray(profile.tech_skills)}
+            disabled={!editMode}
+            onChange={(v) => update("tech_skills", v)}
+          />
+
+          <ArrayInput
+            label="Domain Interests"
+            value={toArray(profile.domain_interests)}
+            disabled={!editMode}
+            onChange={(v) => update("domain_interests", v)}
+          />
+        </CardContent>
+      </Card>
+
+      {/* PROJECTS & PREFERENCES */}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle>Projects & Preferences</CardTitle>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <div>
+            <Label>Past Projects</Label>
+            <Textarea
+              className="w-full"
+              value={profile.past_projects || ""}
+              disabled={!editMode}
+              placeholder="Describe your past projects"
+              onChange={(e) => update("past_projects", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>Hackathon Participation Count</Label>
+            <Input
+              className="w-full"
+              type="number"
+              value={profile.hackathon_participation_count ?? 0}
+              disabled={!editMode}
+              onChange={(e) =>
+                update("hackathon_participation_count", Number(e.target.value))
               }
             />
           </div>
 
-          {/* SAVE BUTTON */}
-          <Button size="lg" onClick={handleSave} disabled={isSaving}>
-            <Save className={`w-5 h-5 mr-2 ${isSaving ? "animate-spin" : ""}`} />
-            {isSaving ? "Saving..." : "Save Profile"}
-          </Button>
-        </div>
-      </div>
+          <div>
+            <Label>Hackathon Achievement Level</Label>
+            <Select
+              value={profile.hackathon_achievement_level || ""}
+              onValueChange={(v) => update("hackathon_achievement_level", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select achievement level" />
+              </SelectTrigger>
+              <SelectContent>
+                {ACHIEVEMENTS.map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {a}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* PERSONAL INFO */}
-      <Card>
-        <CardHeader><CardTitle>Personal Information</CardTitle></CardHeader>
-        <CardContent className="grid md:grid-cols-2 gap-4">
-          <Input placeholder="Full Name"
-            onChange={e => setProfile({ ...profile, name: e.target.value })} />
-          <Input placeholder="USN"
-            onChange={e => setProfile({ ...profile, usn: e.target.value })} />
-          <Input placeholder="RVCE Email"
-            onChange={e => setProfile({ ...profile, rvce_email: e.target.value })} />
+          <div>
+            <Label>Project Work Style</Label>
+            <Select
+              value={profile.project_completion_approach || ""}
+              onValueChange={(v) => update("project_completion_approach", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select work style" />
+              </SelectTrigger>
+              <SelectContent>
+                {WORK_STYLES.map((w) => (
+                  <SelectItem key={w} value={w}>
+                    {w}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Select value={profile.gender}
-            onValueChange={v => setProfile({ ...profile, gender: v })}>
-            <SelectTrigger><SelectValue placeholder="Gender" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
-
-      {/* ACADEMIC INFO */}
-      <Card>
-        <CardHeader><CardTitle>Academic Information</CardTitle></CardHeader>
-        <CardContent className="grid md:grid-cols-3 gap-4">
-          <Select value={profile.branch}
-            onValueChange={v => setProfile({ ...profile, branch: v })}>
-            <SelectTrigger><SelectValue placeholder="Branch" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="CSE">CSE</SelectItem>
-              <SelectItem value="ISE">ISE</SelectItem>
-              <SelectItem value="ECE">ECE</SelectItem>
-              <SelectItem value="ME">ME</SelectItem>
-              <SelectItem value="CIVIL">CIVIL</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={profile.year}
-            onValueChange={v => setProfile({ ...profile, year: v })}>
-            <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1</SelectItem>
-              <SelectItem value="2">2</SelectItem>
-              <SelectItem value="3">3</SelectItem>
-              <SelectItem value="4">4</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Input placeholder="Section"
-            onChange={e => setProfile({ ...profile, section: e.target.value })} />
-          <Input type="number" placeholder="CGPA"
-            onChange={e => setProfile({ ...profile, cgpa: e.target.value })} />
-          <Input type="number" placeholder="Average EL Marks"
-            onChange={e => setProfile({ ...profile, average_el_marks: e.target.value })} />
-
-          <Select value={profile.residence}
-            onValueChange={v => setProfile({ ...profile, residence: v })}>
-            <SelectTrigger><SelectValue placeholder="Residence" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="hostellite">Hostel</SelectItem>
-              <SelectItem value="pg">PG</SelectItem>
-              <SelectItem value="day_scholar">Day Scholar</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
-
-      {/* TECHNICAL SKILLS */}
-      <Card>
-        <CardHeader><CardTitle>Technical Profile</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          <Input placeholder="Programming Languages (comma separated)"
-            onChange={e => setProfile({
-              ...profile,
-              programming_languages: e.target.value.split(",").map(s => s.trim())
-            })} />
-          <Input placeholder="Tech Skills (comma separated)"
-            onChange={e => setProfile({
-              ...profile,
-              tech_skills: e.target.value.split(",").map(s => s.trim())
-            })} />
-          <Input placeholder="Domain Interests (comma separated)"
-            onChange={e => setProfile({
-              ...profile,
-              domain_interests: e.target.value.split(",").map(s => s.trim())
-            })} />
-        </CardContent>
-      </Card>
-
-      {/* PROJECTS & MATCHING PREFERENCES */}
-      <Card>
-        <CardHeader><CardTitle>Projects & Matching Preferences</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <Textarea placeholder="Describe past projects"
-            onChange={e => setProfile({ ...profile, past_projects: e.target.value })} />
-
-          <Input type="number" placeholder="Hackathon count"
-            onChange={e => setProfile({
-              ...profile,
-              hackathon_participation_count: Number(e.target.value)
-            })} />
-
-          <Select value={profile.hackathon_achievement_level}
-            onValueChange={v => setProfile({ ...profile, hackathon_achievement_level: v })}>
-            <SelectTrigger><SelectValue placeholder="Achievement Level" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="participant">Participant</SelectItem>
-              <SelectItem value="finalist">Finalist</SelectItem>
-              <SelectItem value="winner">Winner</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={profile.project_completion_approach}
-            onValueChange={v => setProfile({ ...profile, project_completion_approach: v })}>
-            <SelectTrigger><SelectValue placeholder="Project Work Style" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="consistent_work">Consistent</SelectItem>
-              <SelectItem value="deadline_driven">Deadline-driven</SelectItem>
-              <SelectItem value="weekend_sprinter">Weekend Sprinter</SelectItem>
-              <SelectItem value="flexible_any_style">Flexible</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={profile.commitment_preference}
-            onValueChange={v => setProfile({ ...profile, commitment_preference: v })}>
-            <SelectTrigger><SelectValue placeholder="Commitment Preference" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="generally_available">Generally Available</SelectItem>
-              <SelectItem value="extracurricular_commitments">Extracurricular</SelectItem>
-              <SelectItem value="technical_commitments">Technical</SelectItem>
-              <SelectItem value="low_commitment">Low Commitment</SelectItem>
-            </SelectContent>
-          </Select>
+          <div>
+            <Label>Commitment Preference</Label>
+            <Select
+              value={profile.commitment_preference || ""}
+              onValueChange={(v) => update("commitment_preference", v)}
+              disabled={!editMode}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select commitment preference" />
+              </SelectTrigger>
+              <SelectContent>
+                {COMMITMENT_PREFS.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
     </div>

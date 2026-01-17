@@ -7,11 +7,9 @@ import Notifications from "@/components/notifications";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   User,
-  FileText,
   Users,
   UserPlus,
   GraduationCap,
-  BookOpen,
   LogOut,
   Home,
   Sparkles,
@@ -23,24 +21,19 @@ import {
 } from "lucide-react";
 
 import StudentProfile from "@/components/student-profile";
-import AssessmentQuizzes from "@/components/assessment-quizzes";
-import JoinClassroom from "@/components/join-classroom";
 import FindTeammates from "@/components/find-teammates";
 import FindMentors from "@/components/find-mentors";
-import StudyHub from "@/components/study-hub";
-import StudentProjects from "@/components/student-projects"; // ✅ make sure this file exists
+import StudentProjects from "@/components/student-projects";
 import ProjectOpenings from "@/components/project-openings";
+
 const CURRENT_USN = "1RV15CS001";
 
 type Page =
   | "home"
   | "profile"
-  | "quizzes"
-  | "classroom"
   | "teammates"
   | "mentors"
-  | "study"
-  | "projects" // ✅ added projects
+  | "projects"
   | "openings";
 
 export default function StudentDashboard() {
@@ -49,14 +42,10 @@ export default function StudentDashboard() {
   const navItems = [
     { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
     { id: "profile" as Page, icon: User, label: "Profile", color: "text-secondary" },
-    { id: "quizzes" as Page, icon: FileText, label: "Assessment Quizzes", color: "text-accent" },
-    { id: "classroom" as Page, icon: BookOpen, label: "Join Classroom", color: "text-chart-4" },
     { id: "teammates" as Page, icon: Users, label: "Find EL Teammates", color: "text-chart-2" },
     { id: "mentors" as Page, icon: UserPlus, label: "Find Mentors", color: "text-chart-3" },
-    { id: "study" as Page, icon: GraduationCap, label: "Study Hub", color: "text-chart-5" },
-    { id: "projects" as Page, icon: FolderKanban, label: "Projects", color: "text-chart-1" }, // ✅ sidebar item
-    { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-1" },
-
+    { id: "projects" as Page, icon: FolderKanban, label: "Projects", color: "text-chart-1" },
+    { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-1" }
   ];
 
   return (
@@ -79,6 +68,7 @@ export default function StudentDashboard() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
+
             return (
               <button
                 key={item.id}
@@ -120,13 +110,11 @@ export default function StudentDashboard() {
               <div>
                 <h2 className="text-4xl font-bold text-foreground">Welcome back! 👋</h2>
                 <p className="text-muted-foreground mt-2">
-                  Here's what's happening with your learning journey
+                  Manage your profile, projects and connections
                 </p>
 
-                {/* ✅ Notifications should be inside the component */}
                 <div className="mt-3">
                   <Notifications recipientType="student" recipientId={CURRENT_USN} />
-
                 </div>
               </div>
 
@@ -144,29 +132,29 @@ export default function StudentDashboard() {
                   value: "8.5",
                   icon: Award,
                   color: "bg-primary/10 text-primary",
-                  hover: "hover:bg-primary/20",
-                },
-                {
-                  label: "Quizzes Pending",
-                  value: "3",
-                  icon: FileText,
-                  color: "bg-accent/10 text-accent",
-                  hover: "hover:bg-accent/20",
+                  hover: "hover:bg-primary/20"
                 },
                 {
                   label: "Active Teams",
                   value: "2",
                   icon: Users,
                   color: "bg-secondary/10 text-secondary",
-                  hover: "hover:bg-secondary/20",
+                  hover: "hover:bg-secondary/20"
+                },
+                {
+                  label: "Projects Posted",
+                  value: "3",
+                  icon: FolderKanban,
+                  color: "bg-chart-3/10 text-chart-3",
+                  hover: "hover:bg-chart-3/20"
                 },
                 {
                   label: "Match Score",
                   value: "85%",
                   icon: Target,
                   color: "bg-chart-2/10 text-chart-2",
-                  hover: "hover:bg-chart-2/20",
-                },
+                  hover: "hover:bg-chart-2/20"
+                }
               ].map((stat, i) => {
                 const Icon = stat.icon;
                 return (
@@ -180,7 +168,9 @@ export default function StudentDashboard() {
                           <p className="text-sm text-muted-foreground">{stat.label}</p>
                           <p className="text-3xl font-bold mt-2">{stat.value}</p>
                         </div>
-                        <div className={`p-3 rounded-lg ${stat.color} ${stat.hover} transition-colors duration-300`}>
+                        <div
+                          className={`p-3 rounded-lg ${stat.color} ${stat.hover} transition-colors duration-300`}
+                        >
                           <Icon className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
                         </div>
                       </div>
@@ -194,33 +184,26 @@ export default function StudentDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
-                  title: "Take Quiz",
-                  desc: "Complete pending assessments",
-                  page: "quizzes" as Page,
-                  icon: FileText,
-                  color: "from-accent to-accent/60",
-                },
-                {
                   title: "Find Teammates",
                   desc: "Connect with compatible peers",
                   page: "teammates" as Page,
                   icon: Users,
-                  color: "from-secondary to-secondary/60",
+                  color: "from-secondary to-secondary/60"
                 },
                 {
-                  title: "Study Hub",
-                  desc: "Upload & learn from documents",
-                  page: "study" as Page,
-                  icon: BookOpen,
-                  color: "from-primary to-primary/60",
+                  title: "Find Mentors",
+                  desc: "Discover faculty mentors",
+                  page: "mentors" as Page,
+                  icon: UserPlus,
+                  color: "from-primary to-primary/60"
                 },
                 {
                   title: "Projects",
-                  desc: "Find and manage your projects",
+                  desc: "Create & manage your projects",
                   page: "projects" as Page,
                   icon: FolderKanban,
-                  color: "from-chart-3 to-chart-3/60",
-                },
+                  color: "from-chart-3 to-chart-3/60"
+                }
               ].map((action) => {
                 const Icon = action.icon;
                 return (
@@ -264,23 +247,17 @@ export default function StudentDashboard() {
                 <div className="space-y-4">
                   {[
                     {
-                      action: "Completed Quiz",
-                      subject: "Data Structures",
-                      time: "2 hours ago",
-                      color: "bg-success/10 text-success",
-                    },
-                    {
-                      action: "Joined Classroom",
-                      subject: "Algorithm Design",
-                      time: "1 day ago",
-                      color: "bg-primary/10 text-primary",
-                    },
-                    {
                       action: "Found Teammate",
                       subject: "Project Match (92%)",
                       time: "2 days ago",
-                      color: "bg-secondary/10 text-secondary",
+                      color: "bg-secondary/10 text-secondary"
                     },
+                    {
+                      action: "Project Updated",
+                      subject: "EL Team Project",
+                      time: "3 days ago",
+                      color: "bg-primary/10 text-primary"
+                    }
                   ].map((activity, i) => (
                     <div
                       key={i}
@@ -305,14 +282,10 @@ export default function StudentDashboard() {
         )}
 
         {currentPage === "profile" && <StudentProfile />}
-        {currentPage === "quizzes" && <AssessmentQuizzes />}
-        {currentPage === "classroom" && <JoinClassroom />}
         {currentPage === "teammates" && <FindTeammates />}
         {currentPage === "mentors" && <FindMentors />}
-        {currentPage === "study" && <StudyHub />}
-        {currentPage === "projects" && <StudentProjects />} {/* ✅ projects page */}
+        {currentPage === "projects" && <StudentProjects />}
         {currentPage === "openings" && <ProjectOpenings />}
-
       </main>
     </div>
   );
