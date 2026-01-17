@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Quick Start Script for Quiz Proctoring System (Phase 5)
-Run this to start the integrated system
+Quick Start Script for Quiz Proctoring System
+Run this to start the integrated quiz management and proctoring system
 """
 import os
 import sys
@@ -9,7 +9,7 @@ import subprocess
 
 def main():
     print("="*60)
-    print("QUIZ PROCTORING SYSTEM - PHASE 5")
+    print("QUIZ PROCTORING SYSTEM")
     print("="*60)
     print("\nChecking dependencies...")
     
@@ -41,9 +41,11 @@ def main():
     print("\n" + "="*60)
     print("STARTING SERVER")
     print("="*60)
-    print("\n📱 Student Interface: http://localhost:8000/student")
-    print("👨‍🏫 Teacher Interface: http://localhost:8000/teacher")
+    print("\n🏠 Landing Page: http://localhost:8000/")
     print("📚 API Docs: http://localhost:8000/docs")
+    print("\nAfter selecting your role on the landing page:")
+    print("  • Students: Login/Register → Take Quizzes")
+    print("  • Teachers: Login/Register → Create & Review Quizzes")
     print("\nPress Ctrl+C to stop the server")
     print("="*60 + "\n")
     

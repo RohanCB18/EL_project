@@ -1,0 +1,312 @@
+[
+  {
+    "question": "Which gate is known as a universal gate?",
+    "options": ["AND", "OR", "NAND", "XOR"],
+    "answer": "NAND"
+  },
+  {
+    "question": "Which Boolean law states A + A = A?",
+    "options": [
+      "Idempotent Law",
+      "Associative Law",
+      "Distributive Law",
+      "Complement Law"
+    ],
+    "answer": "Idempotent Law"
+  },
+  {
+    "question": "The Boolean expression A + A' evaluates to:",
+    "options": ["0", "A", "1", "A'"],
+    "answer": "1"
+  },
+  {
+    "question": "Which gate output is true only when inputs are different?",
+    "options": ["AND", "OR", "XOR", "XNOR"],
+    "answer": "XOR"
+  },
+  {
+    "question": "A minterm corresponds to which output value of a Boolean function?",
+    "options": ["0", "1", "X", "Depends on variables"],
+    "answer": "1"
+  },
+  {
+    "question": "How many cells are there in a 4-variable Karnaugh Map?",
+    "options": ["8", "12", "16", "32"],
+    "answer": "16"
+  },
+  {
+    "question": "In K-maps, grouping is always done in powers of:",
+    "options": ["2", "3", "4", "10"],
+    "answer": "2"
+  },
+  {
+    "question": "Which representation lists all minterms where function output is 1?",
+    "options": ["POS", "SOP", "Canonical POS", "Product term"],
+    "answer": "SOP"
+  },
+  {
+    "question": "Which gate implementation uses only NAND gates?",
+    "options": ["NOT", "OR", "AND", "All of the above"],
+    "answer": "All of the above"
+  },
+  {
+    "question": "What does SOP stand for?",
+    "options": [
+      "Sum of Products",
+      "Set of Products",
+      "Standard Output Process",
+      "Sum of Powers"
+    ],
+    "answer": "Sum of Products"
+  },
+  {
+    "question": "Which flip-flop has no invalid state?",
+    "options": ["SR", "D", "JK", "T"],
+    "answer": "JK"
+  },
+  {
+    "question": "The forbidden state in SR latch using NOR gates is:",
+    "options": ["S=0, R=0", "S=0, R=1", "S=1, R=0", "S=1, R=1"],
+    "answer": "S=1, R=1"
+  },
+  {
+    "question": "Which flip-flop toggles its output on every clock pulse?",
+    "options": ["D", "SR", "JK", "T"],
+    "answer": "T"
+  },
+  {
+    "question": "Race-around condition occurs in which flip-flop?",
+    "options": ["SR", "D", "JK", "T"],
+    "answer": "JK"
+  },
+  {
+    "question": "Master-Slave flip-flop is used to eliminate:",
+    "options": [
+      "Propagation delay",
+      "Race-around condition",
+      "Clock skew",
+      "Fan-out"
+    ],
+    "answer": "Race-around condition"
+  },
+  {
+    "question": "Which register holds the address of the next instruction?",
+    "options": ["IR", "PC", "SP", "MAR"],
+    "answer": "PC"
+  },
+  {
+    "question": "Instruction Register (IR) stores:",
+    "options": [
+      "Next instruction address",
+      "Current instruction",
+      "Operand value",
+      "Stack address"
+    ],
+    "answer": "Current instruction"
+  },
+  {
+    "question": "The basic performance equation is:",
+    "options": ["T = N / R", "T = (N × S) / R", "T = R / (N × S)", "T = S / N"],
+    "answer": "T = (N × S) / R"
+  },
+  {
+    "question": "Which factor does NOT directly affect processor performance?",
+    "options": [
+      "Clock rate",
+      "Instruction set",
+      "Compiler",
+      "Monitor resolution"
+    ],
+    "answer": "Monitor resolution"
+  },
+  {
+    "question": "Pipelining improves performance by:",
+    "options": [
+      "Increasing clock speed",
+      "Reducing instruction size",
+      "Overlapping instruction execution",
+      "Reducing memory size"
+    ],
+    "answer": "Overlapping instruction execution"
+  },
+  {
+    "question": "Which organization executes multiple cores on a single chip?",
+    "options": ["Multiprocessor", "Multicore", "Distributed system", "Cluster"],
+    "answer": "Multicore"
+  },
+  {
+    "question": "SPEC benchmarks are used to measure:",
+    "options": [
+      "Memory size",
+      "Power consumption",
+      "Computer performance",
+      "Network speed"
+    ],
+    "answer": "Computer performance"
+  },
+  {
+    "question": "In little-endian format, the least significant byte is stored at:",
+    "options": [
+      "Lowest address",
+      "Highest address",
+      "Middle address",
+      "Random address"
+    ],
+    "answer": "Lowest address"
+  },
+  {
+    "question": "Intel processors use which endian format?",
+    "options": ["Big-endian", "Little-endian", "Bi-endian", "Middle-endian"],
+    "answer": "Little-endian"
+  },
+  {
+    "question": "Word alignment means:",
+    "options": [
+      "Words start at even addresses",
+      "Words start at addresses multiple of word size",
+      "Words are contiguous",
+      "Words are byte-aligned only"
+    ],
+    "answer": "Words start at addresses multiple of word size"
+  },
+  {
+    "question": "Byte-addressable memory assigns one address to:",
+    "options": ["1 bit", "4 bits", "8 bits", "16 bits"],
+    "answer": "8 bits"
+  },
+  {
+    "question": "Which assembler directive reserves memory space?",
+    "options": ["ORIGIN", "EQU", "RESERVE", "END"],
+    "answer": "RESERVE"
+  },
+  {
+    "question": "Which directive defines a constant?",
+    "options": ["DATAWORD", "EQU", "ORG", "MOVE"],
+    "answer": "EQU"
+  },
+  {
+    "question": "Which instruction transfers control to a subroutine?",
+    "options": ["JMP", "CALL", "RET", "BRANCH"],
+    "answer": "CALL"
+  },
+  {
+    "question": "Return address is stored in which register?",
+    "options": ["PC", "IR", "Link Register", "MAR"],
+    "answer": "Link Register"
+  },
+  {
+    "question": "Subroutine nesting uses which data structure?",
+    "options": ["Queue", "Array", "Stack", "Heap"],
+    "answer": "Stack"
+  },
+  {
+    "question": "Stack follows which principle?",
+    "options": ["FIFO", "LIFO", "LILO", "FILO"],
+    "answer": "LIFO"
+  },
+  {
+    "question": "PUSH operation in stack typically:",
+    "options": [
+      "Increments SP",
+      "Decrements SP",
+      "Resets SP",
+      "Does nothing to SP"
+    ],
+    "answer": "Decrements SP"
+  },
+  {
+    "question": "POP operation in stack typically:",
+    "options": [
+      "Decrements SP",
+      "Increments SP",
+      "Clears SP",
+      "Does nothing to SP"
+    ],
+    "answer": "Increments SP"
+  },
+  {
+    "question": "Queues operate on which principle?",
+    "options": ["LIFO", "FIFO", "Random", "Priority"],
+    "answer": "FIFO"
+  },
+  {
+    "question": "How many pointers are required to implement a queue?",
+    "options": ["0", "1", "2", "3"],
+    "answer": "2"
+  },
+  {
+    "question": "Circular buffer is used in queues to:",
+    "options": [
+      "Increase speed",
+      "Reduce memory",
+      "Reuse memory space",
+      "Avoid stack overflow"
+    ],
+    "answer": "Reuse memory space"
+  },
+  {
+    "question": "Which addressing mode uses register contents as address?",
+    "options": ["Immediate", "Direct", "Indirect", "Indexed"],
+    "answer": "Indirect"
+  },
+  {
+    "question": "Immediate addressing mode provides:",
+    "options": [
+      "Memory address",
+      "Register address",
+      "Constant value",
+      "Pointer"
+    ],
+    "answer": "Constant value"
+  },
+  {
+    "question": "Assembly language is translated using:",
+    "options": ["Compiler", "Interpreter", "Assembler", "Linker"],
+    "answer": "Assembler"
+  },
+  {
+    "question": "Which flag indicates result is zero?",
+    "options": ["Carry", "Overflow", "Zero", "Sign"],
+    "answer": "Zero"
+  },
+  {
+    "question": "Overflow flag is set when:",
+    "options": [
+      "Carry occurs",
+      "Result is zero",
+      "Signed arithmetic exceeds range",
+      "Unsigned addition exceeds range"
+    ],
+    "answer": "Signed arithmetic exceeds range"
+  },
+  {
+    "question": "Sign flag represents:",
+    "options": ["Carry", "MSB of result", "Parity", "Zero"],
+    "answer": "MSB of result"
+  },
+  {
+    "question": "Which unit coordinates all activities in a computer?",
+    "options": ["ALU", "Memory", "Control Unit", "I/O Unit"],
+    "answer": "Control Unit"
+  },
+  {
+    "question": "Which unit performs arithmetic and logic operations?",
+    "options": ["Control Unit", "ALU", "Memory Unit", "Input Unit"],
+    "answer": "ALU"
+  },
+  {
+    "question": "A program is defined as:",
+    "options": [
+      "Collection of data",
+      "List of instructions",
+      "Set of registers",
+      "Hardware component"
+    ],
+    "answer": "List of instructions"
+  },
+  {
+    "question": "Machine instructions are encoded in:",
+    "options": ["ASCII", "Decimal", "Binary", "BCD"],
+    "answer": "Binary"
+  }
+]

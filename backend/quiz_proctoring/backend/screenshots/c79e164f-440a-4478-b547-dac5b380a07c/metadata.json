@@ -1,0 +1,44 @@
+[
+  {
+    "confidence": 0.8977928400039673,
+    "path": "backend/screenshots\\c79e164f-440a-4478-b547-dac5b380a07c\\gaze_aversion_20260117_141039_387462.jpg",
+    "reason": "Gaze away for 9.0s (>5s threshold)",
+    "event_type": "GAZE_AVERSION",
+    "timestamp": "2026-01-17T14:10:39.387462Z"
+  },
+  {
+    "confidence": 0.8652851422627766,
+    "path": "backend/screenshots\\c79e164f-440a-4478-b547-dac5b380a07c\\gaze_aversion_20260117_141043_389803.jpg",
+    "reason": "Gaze away for 13.0s (>10s threshold)",
+    "event_type": "GAZE_AVERSION",
+    "timestamp": "2026-01-17T14:10:43.389803Z"
+  },
+  {
+    "confidence": 0.891239857673645,
+    "path": "backend/screenshots\\c79e164f-440a-4478-b547-dac5b380a07c\\gaze_aversion_20260117_141056_369964.jpg",
+    "reason": "Gaze away for 8.9s (>5s threshold)",
+    "event_type": "GAZE_AVERSION",
+    "timestamp": "2026-01-17T14:10:56.369964Z"
+  },
+  {
+    "confidence": 0.990985107421875,
+    "path": "backend/screenshots\\c79e164f-440a-4478-b547-dac5b380a07c\\gaze_aversion_20260117_141057_367443.jpg",
+    "reason": "Gaze away for 9.9s (>5s threshold)",
+    "event_type": "GAZE_AVERSION",
+    "timestamp": "2026-01-17T14:10:57.367443Z"
+  },
+  {
+    "confidence": 0.8615422248840332,
+    "path": "backend/screenshots\\c79e164f-440a-4478-b547-dac5b380a07c\\gaze_aversion_20260117_141100_380450.jpg",
+    "reason": "Gaze away for 12.9s (>10s threshold)",
+    "event_type": "GAZE_AVERSION",
+    "timestamp": "2026-01-17T14:11:00.380450Z"
+  },
+  {
+    "confidence": 0.9296284039815267,
+    "path": "backend/screenshots\\c79e164f-440a-4478-b547-dac5b380a07c\\gaze_aversion_20260117_141101_400992.jpg",
+    "reason": "Gaze away for 13.9s (>10s threshold)",
+    "event_type": "GAZE_AVERSION",
+    "timestamp": "2026-01-17T14:11:01.400992Z"
+  }
+]

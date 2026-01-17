@@ -1,0 +1,334 @@
+[
+  {
+    "question": "What is the primary purpose of the base register in memory management?",
+    "options": [
+      "Stores the size of memory",
+      "Stores the smallest legal physical address",
+      "Stores logical address",
+      "Stores page number"
+    ],
+    "answer": "Stores the smallest legal physical address"
+  },
+  {
+    "question": "What does the limit register specify?",
+    "options": [
+      "Starting address of memory",
+      "Ending address of memory",
+      "Size of the address range",
+      "Physical address"
+    ],
+    "answer": "Size of the address range"
+  },
+  {
+    "question": "Which hardware component maps logical addresses to physical addresses?",
+    "options": ["CPU", "Cache", "Memory Management Unit", "TLB"],
+    "answer": "Memory Management Unit"
+  },
+  {
+    "question": "Logical addresses are also called?",
+    "options": [
+      "Physical addresses",
+      "Real addresses",
+      "Virtual addresses",
+      "Cache addresses"
+    ],
+    "answer": "Virtual addresses"
+  },
+  {
+    "question": "In which address binding scheme do logical and physical addresses differ?",
+    "options": ["Compile-time", "Load-time", "Execution-time", "Link-time"],
+    "answer": "Execution-time"
+  },
+  {
+    "question": "Dynamic loading primarily improves?",
+    "options": [
+      "CPU utilization",
+      "Memory-space utilization",
+      "Disk throughput",
+      "Cache hit ratio"
+    ],
+    "answer": "Memory-space utilization"
+  },
+  {
+    "question": "Which feature allows system libraries to be shared among multiple processes?",
+    "options": ["Static linking", "Dynamic linking", "Paging", "Segmentation"],
+    "answer": "Dynamic linking"
+  },
+  {
+    "question": "What is a stub in dynamic linking?",
+    "options": [
+      "Main function",
+      "Loader routine",
+      "Placeholder code",
+      "Page table entry"
+    ],
+    "answer": "Placeholder code"
+  },
+  {
+    "question": "Which storage is used as backing store during swapping?",
+    "options": ["Cache", "Registers", "Disk", "TLB"],
+    "answer": "Disk"
+  },
+  {
+    "question": "Swapping primarily increases?",
+    "options": [
+      "Page faults",
+      "Degree of multiprogramming",
+      "Cache misses",
+      "TLB hits"
+    ],
+    "answer": "Degree of multiprogramming"
+  },
+  {
+    "question": "Which memory allocation strategy allocates the first hole that is big enough?",
+    "options": ["Best fit", "Worst fit", "First fit", "Next fit"],
+    "answer": "First fit"
+  },
+  {
+    "question": "Best fit strategy minimizes?",
+    "options": [
+      "Search time",
+      "Internal fragmentation",
+      "External fragmentation",
+      "CPU time"
+    ],
+    "answer": "Internal fragmentation"
+  },
+  {
+    "question": "Which allocation strategy results in the largest remaining hole?",
+    "options": ["First fit", "Best fit", "Worst fit", "Paging"],
+    "answer": "Worst fit"
+  },
+  {
+    "question": "Internal fragmentation occurs when?",
+    "options": [
+      "Memory is scattered",
+      "Allocated memory is partially unused",
+      "Pages are swapped",
+      "Processes are terminated"
+    ],
+    "answer": "Allocated memory is partially unused"
+  },
+  {
+    "question": "External fragmentation occurs due to?",
+    "options": [
+      "Paging",
+      "Segmentation",
+      "Non-contiguous free memory",
+      "Cache misses"
+    ],
+    "answer": "Non-contiguous free memory"
+  },
+  {
+    "question": "Which technique removes external fragmentation?",
+    "options": ["Compaction", "Paging", "Swapping", "Caching"],
+    "answer": "Paging"
+  },
+  {
+    "question": "Segmentation divides memory based on?",
+    "options": [
+      "Fixed-size blocks",
+      "Logical program structure",
+      "Physical memory size",
+      "Cache lines"
+    ],
+    "answer": "Logical program structure"
+  },
+  {
+    "question": "A segment table contains?",
+    "options": [
+      "Page number and frame number",
+      "Segment base and limit",
+      "Logical and physical address",
+      "Offset and page size"
+    ],
+    "answer": "Segment base and limit"
+  },
+  {
+    "question": "Paging eliminates which type of fragmentation?",
+    "options": ["Internal", "External", "Both", "None"],
+    "answer": "External"
+  },
+  {
+    "question": "In paging, logical memory is divided into?",
+    "options": ["Frames", "Segments", "Pages", "Blocks"],
+    "answer": "Pages"
+  },
+
+  {
+    "question": "In paging, physical memory is divided into?",
+    "options": ["Pages", "Segments", "Frames", "Blocks"],
+    "answer": "Frames"
+  },
+
+  {
+    "question": "What structure stores page-to-frame mappings?",
+    "options": ["TLB", "Cache", "Page table", "Segment table"],
+    "answer": "Page table"
+  },
+
+  {
+    "question": "TLB is used to reduce?",
+    "options": ["Page size", "Memory accesses", "Disk latency", "CPU time"],
+    "answer": "Memory accesses"
+  },
+
+  {
+    "question": "TLB stands for?",
+    "options": [
+      "Translation Lookaside Buffer",
+      "Temporary Lookup Buffer",
+      "Table Lookup Block",
+      "Transfer Logic Block"
+    ],
+    "answer": "Translation Lookaside Buffer"
+  },
+
+  {
+    "question": "TLB hit ratio represents?",
+    "options": [
+      "Cache hits",
+      "Page faults",
+      "Percentage of TLB hits",
+      "Frame size"
+    ],
+    "answer": "Percentage of TLB hits"
+  },
+
+  {
+    "question": "Valid-invalid bit is used to detect?",
+    "options": ["Cache miss", "Page fault", "TLB miss", "Segmentation fault"],
+    "answer": "Page fault"
+  },
+
+  {
+    "question": "A page fault occurs when?",
+    "options": [
+      "Page is in cache",
+      "Page is in memory",
+      "Page is not in memory",
+      "TLB hit occurs"
+    ],
+    "answer": "Page is not in memory"
+  },
+
+  {
+    "question": "Demand paging loads pages?",
+    "options": [
+      "All at once",
+      "At compile time",
+      "Only when needed",
+      "During linking"
+    ],
+    "answer": "Only when needed"
+  },
+
+  {
+    "question": "Which bit indicates whether a page has been modified?",
+    "options": ["Valid bit", "Reference bit", "Dirty bit", "Execute bit"],
+    "answer": "Dirty bit"
+  },
+
+  {
+    "question": "Which page replacement algorithm may suffer from Belady’s anomaly?",
+    "options": ["FIFO", "LRU", "Optimal", "Second chance"],
+    "answer": "FIFO"
+  },
+
+  {
+    "question": "Optimal page replacement replaces the page that?",
+    "options": [
+      "Was least recently used",
+      "Will not be used for longest time",
+      "Was first loaded",
+      "Has smallest page number"
+    ],
+    "answer": "Will not be used for longest time"
+  },
+
+  {
+    "question": "LRU page replacement is based on?",
+    "options": ["Future knowledge", "Random choice", "Past usage", "Page size"],
+    "answer": "Past usage"
+  },
+
+  {
+    "question": "Second chance algorithm is an improvement over?",
+    "options": ["Optimal", "LRU", "FIFO", "Clock"],
+    "answer": "FIFO"
+  },
+
+  {
+    "question": "Copy-on-write improves?",
+    "options": [
+      "Disk speed",
+      "Process creation efficiency",
+      "Cache performance",
+      "TLB size"
+    ],
+    "answer": "Process creation efficiency"
+  },
+
+  {
+    "question": "Which memory pages are shared initially in copy-on-write?",
+    "options": ["Modified pages", "Code pages", "Stack pages", "Heap pages"],
+    "answer": "Code pages"
+  },
+
+  {
+    "question": "Virtual memory allows?",
+    "options": [
+      "Only RAM usage",
+      "Programs larger than physical memory",
+      "No paging",
+      "No swapping"
+    ],
+    "answer": "Programs larger than physical memory"
+  },
+
+  {
+    "question": "Which file allocation method uses a linked list?",
+    "options": [
+      "Contiguous allocation",
+      "Linked allocation",
+      "Indexed allocation",
+      "Bitmap allocation"
+    ],
+    "answer": "Linked allocation"
+  },
+
+  {
+    "question": "Which file system structure stores metadata of files?",
+    "options": ["Directory", "Inode", "Superblock", "Bitmap"],
+    "answer": "Inode"
+  },
+
+  {
+    "question": "Which allocation method suffers from external fragmentation?",
+    "options": [
+      "Linked allocation",
+      "Indexed allocation",
+      "Contiguous allocation",
+      "Paging"
+    ],
+    "answer": "Contiguous allocation"
+  },
+
+  {
+    "question": "Which directory structure supports hierarchical organization?",
+    "options": ["Single-level", "Two-level", "Tree-structured", "Flat"],
+    "answer": "Tree-structured"
+  },
+
+  {
+    "question": "Which system call is used to open a file?",
+    "options": ["read()", "open()", "write()", "close()"],
+    "answer": "open()"
+  },
+
+  {
+    "question": "Which file attribute defines access rights?",
+    "options": ["Size", "Protection", "Owner", "Timestamp"],
+    "answer": "Protection"
+  }
+]

@@ -17,7 +17,7 @@ FRONTEND_DIR = os.path.join(BASE_DIR, "frontend_stub")
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 
 # Import API routes
-from api.routes import router
+from api.routes import router, auth_router, quiz_router
 from database.models import init_database
 
 # Initialize database
@@ -40,13 +40,25 @@ app.add_middleware(
 )
 
 # Include API routes
-app.include_router(router)
+app.include_router(router)  # Proctoring routes with /proctor prefix
+app.include_router(auth_router)  # Auth routes with /auth prefix
+app.include_router(quiz_router)  # Quiz routes with /quiz prefix
 
 # Serve frontend pages
 @app.get("/")
 async def root():
-    """Redirect to student page."""
-    return FileResponse(os.path.join(FRONTEND_DIR, "student.html"))
+    """Landing page - Student or Teacher selection."""
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+
+@app.get("/student_auth")
+async def student_auth_page():
+    """Student authentication page."""
+    return FileResponse(os.path.join(FRONTEND_DIR, "student_auth.html"))
+
+@app.get("/teacher_auth")
+async def teacher_auth_page():
+    """Teacher authentication page."""
+    return FileResponse(os.path.join(FRONTEND_DIR, "teacher_auth.html"))
 
 @app.get("/student")
 async def student_page():

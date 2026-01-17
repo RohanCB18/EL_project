@@ -1,0 +1,327 @@
+[
+  {
+    "question": "A heap is a special case of which data structure?",
+    "options": ["Binary Tree", "Binary Search Tree", "Graph", "Linked List"],
+    "answer": "Binary Tree"
+  },
+  {
+    "question": "Which property ensures that a heap is almost complete?",
+    "options": [
+      "Structural property",
+      "Heap order property",
+      "Search property",
+      "Balance property"
+    ],
+    "answer": "Structural property"
+  },
+  {
+    "question": "In a max-heap, the value of a parent node is always:",
+    "options": [
+      "Less than children",
+      "Equal to children",
+      "Greater than or equal to children",
+      "Unrelated to children"
+    ],
+    "answer": "Greater than or equal to children"
+  },
+  {
+    "question": "In a min-heap, the root node contains:",
+    "options": [
+      "Maximum element",
+      "Minimum element",
+      "Median element",
+      "Random element"
+    ],
+    "answer": "Minimum element"
+  },
+  {
+    "question": "Which array index represents the left child of index i in a heap?",
+    "options": ["i+1", "2i", "2i+1", "2i-1"],
+    "answer": "2i"
+  },
+  {
+    "question": "Which array index represents the right child of index i in a heap?",
+    "options": ["2i", "2i+1", "i-1", "i+2"],
+    "answer": "2i+1"
+  },
+  {
+    "question": "Which index represents the parent of node at index i in a heap?",
+    "options": ["i/2", "2i", "i+1", "i-1"],
+    "answer": "i/2"
+  },
+  {
+    "question": "Bottom-up heap construction starts heapifying from:",
+    "options": ["Root node", "Leaf nodes", "Last non-leaf node", "Middle node"],
+    "answer": "Last non-leaf node"
+  },
+  {
+    "question": "The index of the last non-leaf node in a heap of size n is:",
+    "options": ["n", "n/2", "(n/2)-1", "(n/2)+1"],
+    "answer": "(n/2)-1"
+  },
+  {
+    "question": "Top-down heap construction inserts elements:",
+    "options": [
+      "From leaves to root",
+      "From root to leaves",
+      "Randomly",
+      "Level-wise"
+    ],
+    "answer": "From root to leaves"
+  },
+  {
+    "question": "Which application commonly uses heaps?",
+    "options": ["Priority queue", "Stack", "Queue", "Linked list"],
+    "answer": "Priority queue"
+  },
+  {
+    "question": "In a priority queue implemented using heap, which element is dequeued first?",
+    "options": ["Oldest", "Newest", "Highest priority", "Lowest priority"],
+    "answer": "Highest priority"
+  },
+  {
+    "question": "Heap sort is based on which type of heap?",
+    "options": ["Min heap", "Max heap", "Binary search tree", "AVL tree"],
+    "answer": "Max heap"
+  },
+  {
+    "question": "The time complexity of building a heap using bottom-up method is:",
+    "options": ["O(n log n)", "O(log n)", "O(n)", "O(n^2)"],
+    "answer": "O(n)"
+  },
+  {
+    "question": "An AVL tree is a type of:",
+    "options": ["Binary Tree", "Binary Search Tree", "Heap", "Graph"],
+    "answer": "Binary Search Tree"
+  },
+  {
+    "question": "Who invented AVL trees?",
+    "options": [
+      "Knuth and Floyd",
+      "Adelson-Velsky and Landis",
+      "Tarjan and Hopcroft",
+      "Cormen and Rivest"
+    ],
+    "answer": "Adelson-Velsky and Landis"
+  },
+  {
+    "question": "The balance factor of an AVL tree node is defined as:",
+    "options": [
+      "Height of left subtree",
+      "Height of right subtree",
+      "Height(left) - Height(right)",
+      "Height(right) - Height(left)"
+    ],
+    "answer": "Height(left) - Height(right)"
+  },
+  {
+    "question": "Valid balance factor values in AVL tree are:",
+    "options": ["-2, -1, 0", "-1, 0, 1", "0, 1, 2", "-1, 1, 2"],
+    "answer": "-1, 0, 1"
+  },
+  {
+    "question": "Which rotation is used to fix LL imbalance?",
+    "options": [
+      "Single left rotation",
+      "Single right rotation",
+      "Double LR rotation",
+      "Double RL rotation"
+    ],
+    "answer": "Single right rotation"
+  },
+  {
+    "question": "Which rotation is used to fix RR imbalance?",
+    "options": [
+      "Single left rotation",
+      "Single right rotation",
+      "Double LR rotation",
+      "Double RL rotation"
+    ],
+    "answer": "Single left rotation"
+  },
+  {
+    "question": "LR imbalance is corrected using:",
+    "options": [
+      "Single right rotation",
+      "Single left rotation",
+      "Double LR rotation",
+      "Double RL rotation"
+    ],
+    "answer": "Double LR rotation"
+  },
+  {
+    "question": "RL imbalance is corrected using:",
+    "options": [
+      "Single right rotation",
+      "Single left rotation",
+      "Double RL rotation",
+      "Double LR rotation"
+    ],
+    "answer": "Double RL rotation"
+  },
+  {
+    "question": "Which traversal gives sorted order in a BST or AVL tree?",
+    "options": ["Preorder", "Postorder", "Inorder", "Level order"],
+    "answer": "Inorder"
+  },
+  {
+    "question": "Time complexity of search operation in AVL tree is:",
+    "options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+    "answer": "O(log n)"
+  },
+  {
+    "question": "Which data structure is non-linear?",
+    "options": ["Array", "Stack", "Graph", "Queue"],
+    "answer": "Graph"
+  },
+  {
+    "question": "A graph is represented as G = (V, E) where V stands for:",
+    "options": ["Edges", "Vertices", "Weights", "Paths"],
+    "answer": "Vertices"
+  },
+  {
+    "question": "An edge that connects a vertex to itself is called:",
+    "options": ["Parallel edge", "Cycle", "Self-loop", "Arc"],
+    "answer": "Self-loop"
+  },
+  {
+    "question": "A graph without self-loops and parallel edges is called:",
+    "options": [
+      "Directed graph",
+      "Simple graph",
+      "Weighted graph",
+      "Complete graph"
+    ],
+    "answer": "Simple graph"
+  },
+  {
+    "question": "The degree of a vertex is defined as:",
+    "options": [
+      "Number of vertices connected",
+      "Number of edges incident",
+      "Number of paths",
+      "Number of cycles"
+    ],
+    "answer": "Number of edges incident"
+  },
+  {
+    "question": "In an undirected graph, sum of degrees of all vertices equals:",
+    "options": ["E", "2E", "V", "V+E"],
+    "answer": "2E"
+  },
+  {
+    "question": "The number of vertices with odd degree in a graph is always:",
+    "options": ["Odd", "Even", "Prime", "Zero"],
+    "answer": "Even"
+  },
+  {
+    "question": "Which graph representation uses an nxn matrix?",
+    "options": [
+      "Adjacency list",
+      "Adjacency matrix",
+      "Sequential representation",
+      "Multilist"
+    ],
+    "answer": "Adjacency matrix"
+  },
+  {
+    "question": "Adjacency matrix is most efficient for:",
+    "options": [
+      "Sparse graphs",
+      "Dense graphs",
+      "Trees",
+      "Directed acyclic graphs"
+    ],
+    "answer": "Dense graphs"
+  },
+  {
+    "question": "Adjacency list representation is efficient for:",
+    "options": [
+      "Dense graphs",
+      "Sparse graphs",
+      "Complete graphs",
+      "Weighted graphs"
+    ],
+    "answer": "Sparse graphs"
+  },
+  {
+    "question": "In adjacency matrix, row sum represents:",
+    "options": ["Indegree", "Outdegree", "Total degree", "Weight"],
+    "answer": "Outdegree"
+  },
+  {
+    "question": "In adjacency matrix, column sum represents:",
+    "options": ["Indegree", "Outdegree", "Total degree", "Weight"],
+    "answer": "Indegree"
+  },
+  {
+    "question": "Hashing is primarily used to achieve:",
+    "options": ["Sorting", "Searching", "Fast access", "Traversal"],
+    "answer": "Fast access"
+  },
+  {
+    "question": "A collision occurs when:",
+    "options": [
+      "Table is full",
+      "Two keys map to same address",
+      "Hash function fails",
+      "Table size is prime"
+    ],
+    "answer": "Two keys map to same address"
+  },
+  {
+    "question": "Separate chaining uses which structure?",
+    "options": ["Array", "Stack", "Linked list", "Queue"],
+    "answer": "Linked list"
+  },
+  {
+    "question": "Linear probing suffers from which problem?",
+    "options": [
+      "Secondary clustering",
+      "Primary clustering",
+      "Overflow",
+      "Rehashing"
+    ],
+    "answer": "Primary clustering"
+  },
+  {
+    "question": "Quadratic probing reduces:",
+    "options": [
+      "Primary clustering",
+      "Secondary clustering",
+      "Rehashing",
+      "Collisions"
+    ],
+    "answer": "Primary clustering"
+  },
+  {
+    "question": "Double hashing uses:",
+    "options": [
+      "One hash function",
+      "Two hash functions",
+      "Three hash functions",
+      "Random probing"
+    ],
+    "answer": "Two hash functions"
+  },
+  {
+    "question": "In double hashing, the second hash function must:",
+    "options": ["Be zero", "Be non-zero", "Be prime", "Be constant"],
+    "answer": "Be non-zero"
+  },
+  {
+    "question": "Rehashing is done when:",
+    "options": [
+      "Table is empty",
+      "Table is full",
+      "No collisions",
+      "Keys are sorted"
+    ],
+    "answer": "Table is full"
+  },
+  {
+    "question": "Preferred size of hash table during rehashing is:",
+    "options": ["Even number", "Prime number", "Power of two", "Square number"],
+    "answer": "Prime number"
+  }
+]
