@@ -96,12 +96,20 @@ export const ProjectModel = {
   
   async findOpenings(currentStudentUSN) {
   const mentorProjectsQuery = `
-    SELECT *
-    FROM projects
-    WHERE owner_type = 'teacher'
-      AND is_active = TRUE
-    ORDER BY created_at DESC
-  `;
+  SELECT *
+  FROM projects
+  WHERE owner_type = 'teacher'
+    AND is_active = TRUE
+    AND looking_for IN ('mentor', 'both')
+  ORDER BY 
+    CASE 
+      WHEN looking_for = 'both' THEN 1
+      WHEN looking_for = 'mentor' THEN 2
+      ELSE 3
+    END,
+    created_at DESC;
+`;
+
 
   const studentOpeningsQuery = `
     SELECT *
@@ -128,7 +136,57 @@ export const ProjectModel = {
     mentorProjects: mentorProjects.rows,
     studentOpenings: studentOpenings.rows
   };
+},
+
+async findOpeningsForTeacher(facultyId) {
+  // 1) Teacher projects posted by OTHER teachers that want colleagues/mentors
+  const colleagueProjectsQuery = `
+  SELECT *
+  FROM projects
+  WHERE owner_type = 'teacher'
+    AND owner_id <> $1
+    AND is_active = TRUE
+    AND looking_for IN ('mentor', 'both')
+  ORDER BY 
+    CASE 
+      WHEN looking_for = 'both' THEN 1
+      WHEN looking_for = 'mentor' THEN 2
+      ELSE 3
+    END,
+    created_at DESC;
+`;
+
+
+  // 2) Student projects posted by students (not me obviously)
+  // that are looking for students/both
+  const studentOpeningsQuery = `
+  SELECT *
+  FROM projects
+  WHERE owner_type = 'student'
+    AND is_active = TRUE
+    AND looking_for IN ('teammates', 'both')
+  ORDER BY 
+    CASE 
+      WHEN looking_for = 'both' THEN 1
+      WHEN looking_for = 'teammates' THEN 2
+      ELSE 3
+    END,
+    created_at DESC;
+`;
+
+
+  const colleagueProjects = await matchmakingPool.query(colleagueProjectsQuery, [
+    facultyId
+  ]);
+
+  const studentOpenings = await matchmakingPool.query(studentOpeningsQuery);
+
+  return {
+    colleagueProjects: colleagueProjects.rows,
+    studentOpenings: studentOpenings.rows
+  };
 }
+
 
 
 };

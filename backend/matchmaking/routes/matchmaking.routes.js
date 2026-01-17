@@ -6,6 +6,8 @@ import { NotificationModel } from "../models/Notification.model.js";
 import { StudentModel } from "../models/Student.model.js";
 import { TeacherModel } from "../models/Teacher.model.js";
 import { ProjectModel } from "../models/Project.model.js";
+import { teacherStudentMatch } from "../services/teacherStudentMatch.service.js";
+
 
 const router = express.Router();
 
@@ -48,6 +50,21 @@ router.get("/projects/:type/:id", async (req, res) => {
     return res.json([]); // ✅ Always return array
   }
 });
+
+/**
+ * TEACHER ↔ STUDENT MATCHES
+ */
+router.get("/teacher/:id/students", async (req, res) => {
+  try {
+    const facultyId = req.params.id;
+    const results = await teacherStudentMatch(facultyId);
+    return res.json(results || []);
+  } catch (err) {
+    console.error("Teacher-Student Match Error:", err.message);
+    return res.json([]);
+  }
+});
+
 
 /**
  * FETCH NOTIFICATIONS (Unread)

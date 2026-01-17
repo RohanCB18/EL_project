@@ -32,6 +32,23 @@ router.get("/student/:usn", async (req, res) => {
   }
 });
 
+
+/**
+ * GET /api/projects/teacher/:id
+ * Fetch all projects owned by teacher
+ */
+router.get("/teacher/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const projects = await ProjectModel.findByOwner("teacher", id);
+    res.json(projects);
+  } catch (err) {
+    console.error("Fetch teacher projects error:", err);
+    res.status(500).json({ error: "Failed to fetch teacher projects" });
+  }
+});
+
+
 /**
  * PUT /api/projects/:projectId
  * Update a project
@@ -67,7 +84,29 @@ router.delete("/:projectId", async (req, res) => {
 });
 
 /**
- * GET /api/projects/openings
+ * GET /api/projects/openings/teacher/:facultyId
+ * Fetch openings for teacher view:
+ * - colleagueProjects (teacher-owned, not mine, looking_for mentor/both)
+ * - studentOpenings (student-owned, looking_for teammates/both)
+ */
+router.get("/openings/teacher/:facultyId", async (req, res) => {
+  try {
+    const { facultyId } = req.params;
+
+    const data = await ProjectModel.findOpeningsForTeacher(facultyId);
+
+    return res.json({
+      colleagueProjects: data.colleagueProjects || [],
+      studentOpenings: data.studentOpenings || []
+    });
+  } catch (err) {
+    console.error("Fetch teacher project openings error:", err);
+    return res.status(500).json({ error: "Failed to fetch teacher openings" });
+  }
+});
+
+/**
+ * GET /api/projects/openings/:usn
  * Returns mentor openings + student openings
  */
 router.get("/openings/:usn", async (req, res) => {
@@ -80,6 +119,8 @@ router.get("/openings/:usn", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch openings" });
   }
 });
+
+
 
 
 export default router;

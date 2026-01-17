@@ -1,37 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
-  User,
-  FileText,
-  BookOpen,
-  Users,
-  LogOut,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+
+import {
   Home,
+  Users,
+  Bell,
+  FileText,
+  LogOut,
+  GraduationCap,
   Sparkles,
   TrendingUp,
   Target,
-  GraduationCap,
-} from "lucide-react"
-import TeacherProfile from "@/components/teacher-profile"
-import AssessedQuiz from "@/components/assessed-quiz"
-import TeacherClassroom from "@/components/teacher-classroom"
-import StudentConnect from "@/components/student-connect"
+  Award,
+  UserPlus,
+  Briefcase
+} from "lucide-react";
 
-type Page = "home" | "profile" | "quiz" | "classroom" | "connect"
+import Notifications from "@/components/notifications";
+import TeacherProjects from "@/components/teacher-projects";
+import FindStudents from "@/components/find-students";
+import TeacherProjectOpenings from "@/components/teacher-project-openings";
+
+type Page = "home" | "students" | "projects" | "openings";
 
 export default function TeacherDashboard() {
-  const [currentPage, setCurrentPage] = useState<Page>("home")
+  const [currentPage, setCurrentPage] = useState<Page>("home");
 
   const navItems = [
     { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
-    { id: "profile" as Page, icon: User, label: "Profile", color: "text-secondary" },
-    { id: "quiz" as Page, icon: FileText, label: "Assessed Quiz", color: "text-accent" },
-    { id: "classroom" as Page, icon: BookOpen, label: "Classroom", color: "text-chart-4" },
-    { id: "connect" as Page, icon: Users, label: "Student Connect", color: "text-chart-2" },
-  ]
+    { id: "students" as Page, icon: Users, label: "Connect with Students", color: "text-chart-2" },
+    { id: "projects" as Page, icon: FileText, label: "Projects", color: "text-chart-3" },
+    { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-2" }
+  ];
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -51,8 +60,9 @@ export default function TeacherDashboard() {
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = currentPage === item.id
+            const Icon = item.icon;
+            const isActive = currentPage === item.id;
+
             return (
               <button
                 key={item.id}
@@ -64,11 +74,13 @@ export default function TeacherDashboard() {
                 }`}
               >
                 <Icon
-                  className={`w-5 h-5 transition-all duration-300 ${isActive ? item.color : "group-hover:scale-110"}`}
+                  className={`w-5 h-5 transition-all duration-300 ${
+                    isActive ? item.color : "group-hover:scale-110"
+                  }`}
                 />
                 <span>{item.label}</span>
               </button>
-            )
+            );
           })}
         </nav>
 
@@ -84,18 +96,26 @@ export default function TeacherDashboard() {
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* Main */}
       <main className="flex-1 overflow-y-auto">
         {currentPage === "home" && (
           <div className="p-8 space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-4xl font-bold text-foreground">Welcome, Professor! 👨‍🏫</h2>
-                <p className="text-muted-foreground mt-2">Manage your classes, quizzes, and student connections</p>
+                <h2 className="text-4xl font-bold text-foreground">Welcome back 👋</h2>
+                <p className="text-muted-foreground mt-2">
+                  Manage mentorships, projects and student connections
+                </p>
+
+                {/* Notifications icon/list */}
+                <div className="mt-4">
+                  <Notifications />
+                </div>
               </div>
+
               <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium animate-pulse-subtle">
                 <Sparkles className="w-4 h-4" />
-                Active Faculty
+                Active Mentor
               </div>
             </div>
 
@@ -103,35 +123,27 @@ export default function TeacherDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  label: "Active Classes",
+                  label: "Active Projects",
+                  value: "2",
+                  icon: Target
+                },
+                {
+                  label: "New Requests",
                   value: "5",
-                  icon: BookOpen,
-                  color: "bg-primary/10 text-primary",
-                  hover: "hover:bg-primary/20",
+                  icon: Bell
                 },
                 {
-                  label: "Total Quizzes",
-                  value: "12",
-                  icon: FileText,
-                  color: "bg-accent/10 text-accent",
-                  hover: "hover:bg-accent/20",
+                  label: "Student Matches",
+                  value: "10",
+                  icon: Users
                 },
                 {
-                  label: "Students",
-                  value: "156",
-                  icon: Users,
-                  color: "bg-secondary/10 text-secondary",
-                  hover: "hover:bg-secondary/20",
-                },
-                {
-                  label: "Avg Score",
-                  value: "78%",
-                  icon: Target,
-                  color: "bg-chart-2/10 text-chart-2",
-                  hover: "hover:bg-chart-2/20",
-                },
+                  label: "Mentorship Score",
+                  value: "88%",
+                  icon: Award
+                }
               ].map((stat, i) => {
-                const Icon = stat.icon
+                const Icon = stat.icon;
                 return (
                   <Card
                     key={i}
@@ -143,13 +155,13 @@ export default function TeacherDashboard() {
                           <p className="text-sm text-muted-foreground">{stat.label}</p>
                           <p className="text-3xl font-bold mt-2">{stat.value}</p>
                         </div>
-                        <div className={`p-3 rounded-lg ${stat.color} ${stat.hover} transition-colors duration-300`}>
+                        <div className="p-3 rounded-lg bg-primary/10 text-primary">
                           <Icon className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
 
@@ -157,28 +169,28 @@ export default function TeacherDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
-                  title: "Create Quiz",
-                  desc: "Design new assessments",
-                  page: "quiz" as Page,
+                  title: "Connect Students",
+                  desc: "Find compatible students",
+                  page: "students" as Page,
+                  icon: UserPlus,
+                  color: "from-secondary to-secondary/60"
+                },
+                {
+                  title: "Manage Projects",
+                  desc: "Post & edit projects",
+                  page: "projects" as Page,
                   icon: FileText,
-                  color: "from-accent to-accent/60",
+                  color: "from-primary to-primary/60"
                 },
                 {
-                  title: "Manage Classroom",
-                  desc: "Create contests & quizzes",
-                  page: "classroom" as Page,
-                  icon: BookOpen,
-                  color: "from-primary to-primary/60",
-                },
-                {
-                  title: "Find Students",
-                  desc: "Connect with mentees",
-                  page: "connect" as Page,
-                  icon: Users,
-                  color: "from-secondary to-secondary/60",
-                },
+                  title: "Project Openings",
+                  desc: "Find colleagues & student openings",
+                  page: "openings" as Page,
+                  icon: Briefcase,
+                  color: "from-accent to-accent/60"
+                }
               ].map((action) => {
-                const Icon = action.icon
+                const Icon = action.icon;
                 return (
                   <Card
                     key={action.page}
@@ -196,13 +208,15 @@ export default function TeacherDashboard() {
                           <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <CardTitle className="group-hover:text-primary transition-colors">{action.title}</CardTitle>
+                          <CardTitle className="group-hover:text-primary transition-colors">
+                            {action.title}
+                          </CardTitle>
                           <CardDescription>{action.desc}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                   </Card>
-                )
+                );
               })}
             </div>
 
@@ -217,37 +231,16 @@ export default function TeacherDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    {
-                      action: "Created Quiz",
-                      subject: "Data Structures Final",
-                      time: "3 hours ago",
-                      color: "bg-success/10 text-success",
-                    },
-                    {
-                      action: "New Classroom",
-                      subject: "Advanced Algorithms",
-                      time: "1 day ago",
-                      color: "bg-primary/10 text-primary",
-                    },
-                    {
-                      action: "Student Match",
-                      subject: "Mentorship Request (88%)",
-                      time: "2 days ago",
-                      color: "bg-secondary/10 text-secondary",
-                    },
+                    { action: "New Mentorship Request", subject: "AI Project", time: "1 hour ago" },
+                    { action: "Project Updated", subject: "Hackathon Team", time: "1 day ago" }
                   ].map((activity, i) => (
                     <div
                       key={i}
                       className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted hover:shadow-md hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
                     >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-2 h-2 rounded-full ${activity.color} group-hover:scale-150 transition-transform duration-300`}
-                        />
-                        <div>
-                          <p className="font-medium">{activity.action}</p>
-                          <p className="text-sm text-muted-foreground">{activity.subject}</p>
-                        </div>
+                      <div>
+                        <p className="font-medium">{activity.action}</p>
+                        <p className="text-sm text-muted-foreground">{activity.subject}</p>
                       </div>
                       <span className="text-sm text-muted-foreground">{activity.time}</span>
                     </div>
@@ -257,11 +250,11 @@ export default function TeacherDashboard() {
             </Card>
           </div>
         )}
-        {currentPage === "profile" && <TeacherProfile />}
-        {currentPage === "quiz" && <AssessedQuiz />}
-        {currentPage === "classroom" && <TeacherClassroom />}
-        {currentPage === "connect" && <StudentConnect />}
+
+        {currentPage === "students" && <FindStudents />}
+        {currentPage === "projects" && <TeacherProjects />}
+        {currentPage === "openings" && <TeacherProjectOpenings />}
       </main>
     </div>
-  )
+  );
 }
