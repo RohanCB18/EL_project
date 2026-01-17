@@ -1,8 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import Notifications from "@/components/notifications";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   User,
   FileText,
@@ -16,18 +18,32 @@ import {
   TrendingUp,
   Award,
   Target,
-} from "lucide-react"
-import StudentProfile from "@/components/student-profile"
-import AssessmentQuizzes from "@/components/assessment-quizzes"
-import JoinClassroom from "@/components/join-classroom"
-import FindTeammates from "@/components/find-teammates"
-import FindMentors from "@/components/find-mentors"
-import StudyHub from "@/components/study-hub"
+  FolderKanban,
+  Briefcase
+} from "lucide-react";
 
-type Page = "home" | "profile" | "quizzes" | "classroom" | "teammates" | "mentors" | "study"
+import StudentProfile from "@/components/student-profile";
+import AssessmentQuizzes from "@/components/assessment-quizzes";
+import JoinClassroom from "@/components/join-classroom";
+import FindTeammates from "@/components/find-teammates";
+import FindMentors from "@/components/find-mentors";
+import StudyHub from "@/components/study-hub";
+import StudentProjects from "@/components/student-projects"; // ✅ make sure this file exists
+import ProjectOpenings from "@/components/project-openings";
+
+type Page =
+  | "home"
+  | "profile"
+  | "quizzes"
+  | "classroom"
+  | "teammates"
+  | "mentors"
+  | "study"
+  | "projects" // ✅ added projects
+  | "openings";
 
 export default function StudentDashboard() {
-  const [currentPage, setCurrentPage] = useState<Page>("home")
+  const [currentPage, setCurrentPage] = useState<Page>("home");
 
   const navItems = [
     { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
@@ -37,7 +53,10 @@ export default function StudentDashboard() {
     { id: "teammates" as Page, icon: Users, label: "Find EL Teammates", color: "text-chart-2" },
     { id: "mentors" as Page, icon: UserPlus, label: "Find Mentors", color: "text-chart-3" },
     { id: "study" as Page, icon: GraduationCap, label: "Study Hub", color: "text-chart-5" },
-  ]
+    { id: "projects" as Page, icon: FolderKanban, label: "Projects", color: "text-chart-1" }, // ✅ sidebar item
+    { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-1" },
+
+  ];
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -57,8 +76,8 @@ export default function StudentDashboard() {
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = currentPage === item.id
+            const Icon = item.icon;
+            const isActive = currentPage === item.id;
             return (
               <button
                 key={item.id}
@@ -70,11 +89,13 @@ export default function StudentDashboard() {
                 }`}
               >
                 <Icon
-                  className={`w-5 h-5 transition-all duration-300 ${isActive ? item.color : "group-hover:scale-110"}`}
+                  className={`w-5 h-5 transition-all duration-300 ${
+                    isActive ? item.color : "group-hover:scale-110"
+                  }`}
                 />
                 <span>{item.label}</span>
               </button>
-            )
+            );
           })}
         </nav>
 
@@ -97,8 +118,16 @@ export default function StudentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-4xl font-bold text-foreground">Welcome back! 👋</h2>
-                <p className="text-muted-foreground mt-2">Here's what's happening with your learning journey</p>
+                <p className="text-muted-foreground mt-2">
+                  Here's what's happening with your learning journey
+                </p>
+
+                {/* ✅ Notifications should be inside the component */}
+                <div className="mt-3">
+                  <Notifications />
+                </div>
               </div>
+
               <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium animate-pulse-subtle">
                 <Sparkles className="w-4 h-4" />
                 Active Student
@@ -137,7 +166,7 @@ export default function StudentDashboard() {
                   hover: "hover:bg-chart-2/20",
                 },
               ].map((stat, i) => {
-                const Icon = stat.icon
+                const Icon = stat.icon;
                 return (
                   <Card
                     key={i}
@@ -155,7 +184,7 @@ export default function StudentDashboard() {
                       </div>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
 
@@ -183,8 +212,15 @@ export default function StudentDashboard() {
                   icon: BookOpen,
                   color: "from-primary to-primary/60",
                 },
+                {
+                  title: "Projects",
+                  desc: "Find and manage your projects",
+                  page: "projects" as Page,
+                  icon: FolderKanban,
+                  color: "from-chart-3 to-chart-3/60",
+                },
               ].map((action) => {
-                const Icon = action.icon
+                const Icon = action.icon;
                 return (
                   <Card
                     key={action.page}
@@ -202,13 +238,15 @@ export default function StudentDashboard() {
                           <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <CardTitle className="group-hover:text-primary transition-colors">{action.title}</CardTitle>
+                          <CardTitle className="group-hover:text-primary transition-colors">
+                            {action.title}
+                          </CardTitle>
                           <CardDescription>{action.desc}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                   </Card>
-                )
+                );
               })}
             </div>
 
@@ -263,13 +301,17 @@ export default function StudentDashboard() {
             </Card>
           </div>
         )}
+
         {currentPage === "profile" && <StudentProfile />}
         {currentPage === "quizzes" && <AssessmentQuizzes />}
         {currentPage === "classroom" && <JoinClassroom />}
         {currentPage === "teammates" && <FindTeammates />}
         {currentPage === "mentors" && <FindMentors />}
         {currentPage === "study" && <StudyHub />}
+        {currentPage === "projects" && <StudentProjects />} {/* ✅ projects page */}
+        {currentPage === "openings" && <ProjectOpenings />}
+
       </main>
     </div>
-  )
+  );
 }

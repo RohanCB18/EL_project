@@ -8,11 +8,7 @@ export const MatchModel = {
         target_type, target_id,
         match_score, match_reason
       )
-      VALUES (
-        $1,$2,
-        $3,$4,
-        $5,$6
-      )
+      VALUES ($1,$2,$3,$4,$5,$6)
       RETURNING *;
     `;
 
@@ -22,20 +18,10 @@ export const MatchModel = {
       match.target_type,
       match.target_id,
       match.match_score,
-      match.match_reason
+      match.match_reason || [] // ✅ send array directly (NOT JSON.stringify)
     ];
 
     const { rows } = await matchmakingPool.query(query, values);
     return rows[0];
-  },
-
-  async findBySource(sourceType, sourceId) {
-    const { rows } = await matchmakingPool.query(
-      `SELECT * FROM matches
-       WHERE source_type = $1 AND source_id = $2
-       ORDER BY match_score DESC`,
-      [sourceType, sourceId]
-    );
-    return rows;
   }
 };

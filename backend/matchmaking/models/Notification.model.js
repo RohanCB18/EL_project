@@ -32,15 +32,25 @@ export const NotificationModel = {
     return rows[0];
   },
 
-  async findUnread(recipientType, recipientId) {
-    const { rows } = await matchmakingPool.query(
-      `SELECT * FROM notifications
-       WHERE recipient_type = $1
-         AND recipient_id = $2
-         AND is_read = FALSE
-       ORDER BY created_at DESC`,
-      [recipientType, recipientId]
-    );
-    return rows;
-  }
+  async findForRecipient(type, id) {
+  const { rows } = await matchmakingPool.query(
+    `SELECT * FROM notifications
+     WHERE recipient_type = $1
+       AND recipient_id = $2
+     ORDER BY created_at DESC`,
+    [type, id]
+  );
+  return rows;
+},
+
+async markAsRead(notificationId) {
+  await matchmakingPool.query(
+    `UPDATE notifications
+     SET is_read = TRUE
+     WHERE notification_id = $1`,
+    [notificationId]
+  );
+}
+
+
 };

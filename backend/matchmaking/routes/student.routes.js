@@ -16,4 +16,19 @@ router.post("/profile", async (req, res) => {
   }
 });
 
+router.get("/:usn", async (req, res) => {
+  try {
+    const student = await StudentModel.findByUSN(req.params.usn);
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    res.json(student);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;

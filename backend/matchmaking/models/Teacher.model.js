@@ -1,6 +1,9 @@
 import { matchmakingPool } from "../../config/db.js";
 
 export const TeacherModel = {
+  // =========================
+  // CREATE TEACHER
+  // =========================
   async create(teacher) {
     const query = `
       INSERT INTO teachers (
@@ -44,13 +47,9 @@ export const TeacherModel = {
     return rows[0];
   },
 
-  async findVisible() {
-    const { rows } = await matchmakingPool.query(
-      `SELECT * FROM teachers WHERE is_visible_for_matching = TRUE`
-    );
-    return rows;
-  },
-
+  // =========================
+  // FIND BY FACULTY ID
+  // =========================
   async findByFacultyId(facultyId) {
     const { rows } = await matchmakingPool.query(
       `SELECT * FROM teachers WHERE faculty_id = $1`,
@@ -58,8 +57,30 @@ export const TeacherModel = {
     );
     return rows[0];
   },
-  
-    async updateVisibility(facultyId, isVisible) {
+
+  // alias (so we can use TeacherModel.findById too)
+  async findById(faculty_id) {
+    const { rows } = await matchmakingPool.query(
+      `SELECT * FROM teachers WHERE faculty_id = $1`,
+      [faculty_id]
+    );
+    return rows[0];
+  },
+
+  // =========================
+  // FIND ALL VISIBLE TEACHERS
+  // =========================
+  async findVisible() {
+    const { rows } = await matchmakingPool.query(
+      `SELECT * FROM teachers WHERE is_visible_for_matching = TRUE`
+    );
+    return rows;
+  },
+
+  // =========================
+  // UPDATE VISIBILITY
+  // =========================
+  async updateVisibility(facultyId, isVisible) {
     await matchmakingPool.query(
       `UPDATE teachers
        SET is_visible_for_matching = $1

@@ -38,18 +38,14 @@ export const studentTeacherMatch = async (studentUSN) => {
     const reasons = [];
 
     // 1️⃣ Preferred student year
-    if (
-      teacher.preferred_student_years?.includes(
-        String(student.year)
-      )
-    ) {
+    if (teacher.preferred_student_years?.includes(String(student.year))) {
       ruleScore += 15;
       reasons.push("Preferred student year for mentoring");
     }
 
     // 2️⃣ Domain interest overlap
     const domainOverlap =
-      student.domain_interests?.filter(d =>
+      student.domain_interests?.filter((d) =>
         teacher.domains_interested_to_mentor?.includes(d)
       ).length || 0;
 
@@ -68,11 +64,11 @@ export const studentTeacherMatch = async (studentUSN) => {
     // SEMANTIC SCORE
     // ------------------
     const teacherSemanticText = buildTeacherText(teacher);
-    const semanticScore =
-      await SemanticSimilarityService.semanticScore(
-        studentSemanticText,
-        teacherSemanticText
-      );
+
+    const semanticScore = await SemanticSimilarityService.semanticScore(
+      studentSemanticText,
+      teacherSemanticText
+    );
 
     if (semanticScore > 60) {
       reasons.push("High semantic alignment with mentor expertise");
@@ -81,9 +77,7 @@ export const studentTeacherMatch = async (studentUSN) => {
     // ------------------
     // FINAL FUSION
     // ------------------
-    const finalScore = Math.round(
-      0.6 * ruleScore + 0.4 * semanticScore
-    );
+    const finalScore = Math.round(0.6 * ruleScore + 0.4 * semanticScore);
 
     if (finalScore > 0) {
       results.push({
@@ -92,15 +86,26 @@ export const studentTeacherMatch = async (studentUSN) => {
         target_type: "teacher",
         target_id: teacher.faculty_id,
         match_score: finalScore,
-        match_reason: reasons
+        match_reason: reasons,
+
+        // ✅ IMPORTANT: add full teacher object
+        teacher: teacher
       });
     }
   }
 
   results.sort((a, b) => b.match_score - a.match_score);
 
+  // Store matches in DB
   for (const match of results) {
-    await MatchModel.create(match);
+    await MatchModel.create({
+      source_type: match.source_type,
+      source_id: match.source_id,
+      target_type: match.target_type,
+      target_id: match.target_id,
+      match_score: match.match_score,
+      match_reason: match.match_reason
+    });
   }
 
   return results;

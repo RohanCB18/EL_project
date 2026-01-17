@@ -2,7 +2,7 @@ import { matchmakingPool } from "../../config/db.js";
 
 export const StudentModel = {
   // =========================
-  // CREATE (unchanged)
+  // CREATE
   // =========================
   async create(student) {
     const query = `
@@ -24,37 +24,34 @@ export const StudentModel = {
       RETURNING *;
     `;
 
-const values = [
-  student.usn,
-  student.name,
-  student.rvce_email,
-  student.branch,
-  student.year,
-  student.section,
-  student.cgpa,
-  student.average_el_marks,
-  student.gender,
-  student.residence,
-  student.project_completion_approach,
-  student.commitment_preference,
-
-  student.programming_languages || [],
-  student.tech_skills || [],
-  student.domain_interests || [],
-  JSON.stringify(student.past_projects || {}),
-
-  student.hackathon_participation_count,
-  student.hackathon_achievement_level
-];
-
-
+    const values = [
+      student.usn,
+      student.name,
+      student.rvce_email,
+      student.branch,
+      student.year,
+      student.section,
+      student.cgpa,
+      student.average_el_marks,
+      student.gender,
+      student.residence,
+      student.project_completion_approach,
+      student.commitment_preference,
+      student.programming_languages || [],
+      student.tech_skills || [],
+      student.domain_interests || [],
+      JSON.stringify(student.past_projects || {}),
+      student.hackathon_participation_count,
+      student.hackathon_achievement_level,
+      student.is_visible_for_matching ?? true
+    ];
 
     const { rows } = await matchmakingPool.query(query, values);
     return rows[0];
   },
 
   // =========================
-  // UPSERT (FINAL & FIXED)
+  // UPSERT
   // =========================
   async upsert(student) {
     const query = `
@@ -71,7 +68,7 @@ const values = [
         $7,$8,$9,$10,
         $11,$12,
         $13,$14,$15,
-        $16,$17,$18, TRUE
+        $16,$17,$18,$19
       )
       ON CONFLICT (usn) DO UPDATE SET
         name = EXCLUDED.name,
@@ -90,33 +87,31 @@ const values = [
         domain_interests = EXCLUDED.domain_interests,
         past_projects = EXCLUDED.past_projects,
         hackathon_participation_count = EXCLUDED.hackathon_participation_count,
-        hackathon_achievement_level = EXCLUDED.hackathon_achievement_level;
+        hackathon_achievement_level = EXCLUDED.hackathon_achievement_level,
+        is_visible_for_matching = EXCLUDED.is_visible_for_matching;
     `;
 
-const values = [
-  student.usn,
-  student.name,
-  student.rvce_email,
-  student.branch,
-  student.year,
-  student.section,
-  student.cgpa,
-  student.average_el_marks,
-  student.gender,
-  student.residence,
-  student.project_completion_approach,
-  student.commitment_preference,
-
-  student.programming_languages || [],
-  student.tech_skills || [],
-  student.domain_interests || [],
-  JSON.stringify(student.past_projects || {}),
-
-  student.hackathon_participation_count,
-  student.hackathon_achievement_level
-];
-
-
+    const values = [
+      student.usn,
+      student.name,
+      student.rvce_email,
+      student.branch,
+      student.year,
+      student.section,
+      student.cgpa,
+      student.average_el_marks,
+      student.gender,
+      student.residence,
+      student.project_completion_approach,
+      student.commitment_preference,
+      student.programming_languages || [],
+      student.tech_skills || [],
+      student.domain_interests || [],
+      JSON.stringify(student.past_projects || {}),
+      student.hackathon_participation_count,
+      student.hackathon_achievement_level,
+      student.is_visible_for_matching ?? true
+    ];
 
     await matchmakingPool.query(query, values);
   },

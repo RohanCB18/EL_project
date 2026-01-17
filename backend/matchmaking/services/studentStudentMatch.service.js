@@ -115,22 +115,48 @@ export const studentStudentMatch = async (currentStudentUSN) => {
     );
 
     if (finalScore > 0) {
-      results.push({
+      const match = {
         source_type: "student",
         source_id: current.usn,
         target_type: "student",
         target_id: other.usn,
         match_score: finalScore,
-        match_reason: reasons
-      });
+        match_reason: reasons,
+
+        // ⭐ ENRICHED STUDENT DATA FOR FRONTEND
+        student: {
+          usn: other.usn,
+          name: other.name,
+          rvce_email: other.rvce_email,
+          gender: other.gender,
+          branch: other.branch,
+          year: other.year,
+          section: other.section,
+          cgpa: other.cgpa,
+          average_el_marks: other.average_el_marks,
+          programming_languages: other.programming_languages,
+          tech_skills: other.tech_skills,
+          domain_interests: other.domain_interests,
+          past_projects: other.past_projects,
+          hackathon_participation_count:
+            other.hackathon_participation_count,
+          hackathon_achievement_level:
+            other.hackathon_achievement_level,
+          project_completion_approach:
+            other.project_completion_approach,
+          commitment_preference:
+            other.commitment_preference
+        }
+      };
+
+      results.push(match);
     }
   }
 
   results.sort((a, b) => b.match_score - a.match_score);
-
-  for (const match of results) {
-    await MatchModel.create(match);
-  }
+  for (const m of results) {
+  await MatchModel.create(m);
+}
 
   return results;
 };
