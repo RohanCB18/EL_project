@@ -124,7 +124,7 @@
 .marks-badge {
     font-size: var(--font-size-xs);
     font-weight: normal;
-    background: rgba(16, 185, 129, 0.08);
+    background: rgba(26, 26, 46, 0.08);
     color: var(--color-teacher-primary);
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--radius-full);

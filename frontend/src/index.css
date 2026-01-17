@@ -22,10 +22,10 @@
   --color-student-secondary: #2d2d44;
   --color-student-gradient: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
 
-  /* Teacher Theme - Green */
-  --color-teacher-primary: #10b981;
-  --color-teacher-secondary: #34d399;
-  --color-teacher-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  /* Teacher Theme - Black (same as student) */
+  --color-teacher-primary: #1a1a2e;
+  --color-teacher-secondary: #2d2d44;
+  --color-teacher-gradient: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
 
   /* Text Colors */
   --color-text-primary: #1a1a2e;
@@ -240,12 +240,12 @@ a:hover {
 .btn-teacher {
   background: var(--color-teacher-gradient);
   color: white;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 14px rgba(26, 26, 46, 0.25);
 }
 
 .btn-teacher:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 20px rgba(26, 26, 46, 0.35);
 }
 
 .btn-outline {

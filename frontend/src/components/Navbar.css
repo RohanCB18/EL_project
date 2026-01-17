@@ -82,8 +82,8 @@
 
 .nav-btn-teacher {
     color: var(--color-teacher-primary);
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.15);
+    background: rgba(26, 26, 46, 0.08);
+    border: 1px solid rgba(26, 26, 46, 0.15);
 }
 
 .nav-btn-teacher:hover,
@@ -92,7 +92,7 @@
     color: white;
     border-color: transparent;
     transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 14px rgba(26, 26, 46, 0.25);
 }
 
 @media (max-width: 640px) {

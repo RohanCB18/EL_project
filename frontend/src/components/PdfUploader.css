@@ -27,7 +27,7 @@
 .uploader-teacher .upload-zone:hover,
 .uploader-teacher .upload-zone.dragging {
     border-color: var(--color-teacher-primary);
-    background: rgba(16, 185, 129, 0.04);
+    background: rgba(26, 26, 46, 0.04);
 }
 
 .upload-zone.has-file {
@@ -103,7 +103,7 @@
 }
 
 .uploader-teacher .file-icon {
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(26, 26, 46, 0.1);
     color: var(--color-teacher-primary);
 }
 
