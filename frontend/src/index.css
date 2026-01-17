@@ -22,10 +22,10 @@
   --color-student-secondary: #2d2d44;
   --color-student-gradient: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
 
-  /* Teacher Theme - Black (same as student) */
-  --color-teacher-primary: #1a1a2e;
-  --color-teacher-secondary: #2d2d44;
-  --color-teacher-gradient: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+  /* Teacher Theme - Dark Blue */
+  --color-teacher-primary: #1e3a5f;
+  --color-teacher-secondary: #2c5282;
+  --color-teacher-gradient: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
 
   /* Text Colors */
   --color-text-primary: #1a1a2e;
