@@ -196,7 +196,7 @@ export default function TeacherQuizCreationPage() {
                 </div>
                 {inClassroom && (
                   <Button onClick={activateTemplate} className="h-14 px-8 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-lg shadow-indigo-200 hover:translate-y-[-2px] transition-all">
-                    <Play className="w-4 h-4 mr-2" /> Activate Quiz
+                    <Play className="w-4 h-4 mr-2" /> Load Quiz to Classroom
                   </Button>
                 )}
               </div>

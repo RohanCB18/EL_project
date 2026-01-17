@@ -200,7 +200,7 @@ export default function TeacherContestCreationPage() {
             {templates.length === 0 ? (
               <div className="col-span-full py-24 text-center space-y-6">
                 <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-sm border border-black/5">
-                   <Code2 className="w-10 h-10 text-black/10" />
+                  <Code2 className="w-10 h-10 text-black/10" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-lg font-black uppercase tracking-tight">No Templates Yet</h3>
@@ -232,13 +232,13 @@ export default function TeacherContestCreationPage() {
           <div className="max-w-3xl mx-auto animate-in fade-in scale-in-95 duration-500">
             <Card className="bg-white border-none shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] rounded-[3rem] overflow-hidden">
               <div className="p-10 border-b border-black/5 bg-[#FBFBFC] flex items-center gap-6">
-                 <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center shadow-xl">
+                <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center shadow-xl">
                     <Code2 className="w-6 h-6 text-white" />
-                 </div>
-                 <div>
+                </div>
+                <div>
                     <p className="text-[10px] uppercase font-black tracking-widest text-black/20">Template Overview</p>
                     <h2 className="text-3xl font-black tracking-tighter uppercase">{selected.title}</h2>
-                 </div>
+                </div>
               </div>
               <CardContent className="p-10 space-y-10">
                 {[
@@ -258,7 +258,7 @@ export default function TeacherContestCreationPage() {
                 <div className="pt-6">
                   {inClassroom ? (
                     <Button onClick={activateTemplate} className="w-full h-16 bg-black text-white rounded-[2rem] font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl hover:translate-y-[-2px] transition-all">
-                      <Play className="w-4 h-4 mr-2" /> Activate Contest in Classroom
+                      <Play className="w-4 h-4 mr-2" /> Load contest to Classroom
                     </Button>
                   ) : (
                     <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 flex items-center gap-4 text-amber-900">
@@ -276,13 +276,13 @@ export default function TeacherContestCreationPage() {
         {mode === "create" && (
           <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
             <Card className="bg-white border-none shadow-xl rounded-[2.5rem] overflow-hidden">
-               <div className="p-8 border-b border-black/5 bg-[#FBFBFC] flex items-center gap-4">
+              <div className="p-8 border-b border-black/5 bg-[#FBFBFC] flex items-center gap-4">
                   <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-xl font-black uppercase tracking-tight">Problem Details</h2>
-               </div>
-               <CardContent className="p-8 space-y-6">
+              </div>
+              <CardContent className="p-8 space-y-6">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-1">Problem Title</Label>
                     <Input placeholder="e.g., Two Sum Problem" value={title} onChange={e => setTitle(e.target.value)} className="h-14 bg-[#F4F4F7] border-none rounded-2xl px-6 focus-visible:ring-1 focus-visible:ring-black" />
@@ -299,13 +299,13 @@ export default function TeacherContestCreationPage() {
                     <Label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-1">Constraints</Label>
                     <Textarea placeholder="Define limits..." value={constraints} onChange={e => setConstraints(e.target.value)} className="min-h-[100px] bg-[#F4F4F7] border-none rounded-2xl p-6 focus-visible:ring-1 focus-visible:ring-black" />
                   </div>
-               </CardContent>
+              </CardContent>
             </Card>
 
             {/* Test Case Modules */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <TestCaseModule title="Sample Test Cases" icon={Eye} color="text-green-600" bg="bg-green-50/50" cases={sampleTestCases} onAdd={addSampleTestCase} onRemove={removeSampleTestCase} onUpdate={updateSampleTestCase} />
-               <TestCaseModule title="Hidden Test Cases" icon={EyeOff} color="text-purple-600" bg="bg-purple-50/50" cases={hiddenTestCases} onAdd={addHiddenTestCase} onRemove={removeHiddenTestCase} onUpdate={updateHiddenTestCase} />
+              <TestCaseModule title="Sample Test Cases" icon={Eye} color="text-green-600" bg="bg-green-50/50" cases={sampleTestCases} onAdd={addSampleTestCase} onRemove={removeSampleTestCase} onUpdate={updateSampleTestCase} />
+              <TestCaseModule title="Hidden Test Cases" icon={EyeOff} color="text-purple-600" bg="bg-purple-50/50" cases={hiddenTestCases} onAdd={addHiddenTestCase} onRemove={removeHiddenTestCase} onUpdate={updateHiddenTestCase} />
             </div>
 
             <Button onClick={handleSaveTemplate} disabled={isSaving} className="w-full h-20 bg-black text-white rounded-[2.5rem] font-black uppercase text-[12px] tracking-[0.3em] shadow-2xl hover:translate-y-[-2px] transition-all">
@@ -321,18 +321,18 @@ export default function TeacherContestCreationPage() {
 function TestCaseModule({ title, icon: Icon, color, bg, cases, onAdd, onRemove, onUpdate }: any) {
   return (
     <Card className="bg-white border-none shadow-xl rounded-[2.5rem] overflow-hidden flex flex-col">
-       <div className={`p-8 border-b border-black/5 ${bg} flex items-center justify-between`}>
+      <div className={`p-8 border-b border-black/5 ${bg} flex items-center justify-between`}>
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm"><Icon className={`w-4 h-4 ${color}`} /></div>
-             <h2 className="text-xs font-black uppercase tracking-widest">{title}</h2>
+            <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm"><Icon className={`w-4 h-4 ${color}`} /></div>
+            <h2 className="text-xs font-black uppercase tracking-widest">{title}</h2>
           </div>
           <Button variant="ghost" size="icon" onClick={onAdd} className="rounded-full bg-white shadow-sm border border-black/5"><Plus className="w-4 h-4" /></Button>
-       </div>
-       <CardContent className="p-8 space-y-6">
+      </div>
+      <CardContent className="p-8 space-y-6">
           {cases.map((tc: any, i: number) => (
             <div key={tc.id} className="p-6 bg-[#F4F4F7] rounded-3xl space-y-4 relative group">
-               <Button variant="ghost" size="icon" onClick={() => onRemove(tc.id)} className="absolute top-4 right-4 text-black/10 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></Button>
-               <div className="space-y-3">
+              <Button variant="ghost" size="icon" onClick={() => onRemove(tc.id)} className="absolute top-4 right-4 text-black/10 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></Button>
+              <div className="space-y-3">
                   <div className="space-y-1">
                     <Label className="text-[9px] font-black uppercase text-black/30 ml-1">Input Instance {i+1}</Label>
                     <Textarea value={tc.input} onChange={e => onUpdate(tc.id, "input", e.target.value)} className="min-h-[60px] bg-white border-none rounded-xl text-xs" />
@@ -341,10 +341,10 @@ function TestCaseModule({ title, icon: Icon, color, bg, cases, onAdd, onRemove, 
                     <Label className="text-[9px] font-black uppercase text-black/30 ml-1">Expected Result</Label>
                     <Textarea value={tc.output} onChange={e => onUpdate(tc.id, "output", e.target.value)} className="min-h-[60px] bg-white border-none rounded-xl text-xs" />
                   </div>
-               </div>
+              </div>
             </div>
           ))}
-       </CardContent>
+      </CardContent>
     </Card>
   )
 }
