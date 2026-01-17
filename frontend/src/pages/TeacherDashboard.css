@@ -1,0 +1,162 @@
+.teacher-dashboard {
+    min-height: 100vh;
+    background: var(--color-bg-primary);
+}
+
+.teacher-header h1 {
+    background: var(--color-teacher-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.teacher-badge {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+    color: var(--color-teacher-primary) !important;
+}
+
+/* Grid Layout */
+.teacher-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+/* Upload Section */
+.upload-section {
+    padding: var(--spacing-xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-header-inline {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teacher-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-teacher-primary);
+}
+
+.section-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.section-header h3,
+.section-header-inline h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-primary);
+}
+
+.section-header p,
+.section-header-inline p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+/* Upload Success */
+.upload-success {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-lg);
+    color: var(--color-teacher-primary);
+    font-size: var(--font-size-sm);
+}
+
+.upload-success svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.upload-success strong {
+    color: var(--color-text-primary);
+}
+
+/* Features Info */
+.teacher-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-3xl);
+    padding-top: var(--spacing-2xl);
+    border-top: 1px solid var(--color-border);
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+}
+
+.feature-icon-sm {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-teacher-primary);
+}
+
+.feature-icon-sm svg {
+    width: 20px;
+    height: 20px;
+}
+
+.feature-item h4 {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-primary);
+}
+
+.feature-item p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+/* Generator Section */
+.generator-section {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+
+    .section-header,
+    .section-header-inline {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+}
