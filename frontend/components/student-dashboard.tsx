@@ -35,7 +35,13 @@ const BASE_URL = "http://localhost:5000";
 
 type Page = "home" | "profile" | "teammates" | "mentors" | "projects" | "openings";
 
-export default function StudentDashboard({ usn }: { usn: string }) {
+export default function StudentDashboard({
+  usn,
+  onLogout
+}: {
+  usn: string;
+  onLogout: () => void;
+}) {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
   // ---- Dashboard Stats ----
@@ -203,7 +209,7 @@ export default function StudentDashboard({ usn }: { usn: string }) {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive hover:scale-[1.02] transition-all duration-300"
-            onClick={() => window.location.reload()}
+            onClick={onLogout}
           >
             <LogOut className="w-5 h-5" />
             Sign Out
@@ -419,11 +425,10 @@ export default function StudentDashboard({ usn }: { usn: string }) {
         )}
 
         {currentPage === "profile" && <StudentProfile usn={usn} />}
-{currentPage === "teammates" && <FindTeammates usn={usn} />}
-{currentPage === "mentors" && <FindMentors usn={usn} />}
-{currentPage === "projects" && <StudentProjects usn={usn} />}
-{currentPage === "openings" && <ProjectOpenings usn={usn} />}
-
+        {currentPage === "teammates" && <FindTeammates usn={usn} />}
+        {currentPage === "mentors" && <FindMentors usn={usn} />}
+        {currentPage === "projects" && <StudentProjects usn={usn} />}
+        {currentPage === "openings" && <ProjectOpenings usn={usn} />}
       </main>
     </div>
   );

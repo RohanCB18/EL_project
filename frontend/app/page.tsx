@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +30,8 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
+const BASE_URL = "http://localhost:5000";
+
 export default function Home() {
   const [userType, setUserType] = useState<"student" | "teacher" | null>(null);
 
@@ -41,19 +43,123 @@ export default function Home() {
   // Forgot password popup
   const [forgotOpen, setForgotOpen] = useState(false);
 
-  const handleLogin = () => {
-    if (id && password && userType) {
+  // NEW: login/signup toggle
+  const [mode, setMode] = useState<"login" | "signup">("login");
+
+  // NEW: loading state
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Auto-login if session exists
+  useEffect(() => {
+    const savedType = localStorage.getItem("userType") as
+      | "student"
+      | "teacher"
+      | null;
+    const savedId = localStorage.getItem("userId");
+
+    if (savedType && savedId) {
+      setUserType(savedType);
+      setId(savedId);
       setIsLoggedIn(true);
+    }
+  }, []);
+
+  // ---------------- AUTH HELPERS ----------------
+  const handleLogin = async () => {
+    if (!id || !password || !userType) return;
+
+    try {
+      setLoading(true);
+
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_type: userType,
+          user_id: id,
+          password
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.ok) {
+        alert(data?.error || "Login failed");
+        return;
+      }
+
+      // ✅ Save session
+      localStorage.setItem("userType", userType);
+      localStorage.setItem("userId", id);
+
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error(err);
+      alert("Server not reachable. Is backend running?");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (isLoggedIn && userType === "student") {
-    return <StudentDashboard usn={id} />;
-  }
+  const handleSignup = async () => {
+    if (!id || !password || !userType) return;
 
-  if (isLoggedIn && userType === "teacher") {
-    return <TeacherDashboard facultyId={id}/>;
-  }
+    try {
+      setLoading(true);
+
+      const res = await fetch(`${BASE_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_type: userType,
+          user_id: id,
+          password
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data?.error || "Signup failed");
+        return;
+      }
+
+      alert("Account created! Now sign in.");
+
+      // switch to login mode after signup
+      setMode("login");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+      alert("Server not reachable. Is backend running?");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+  // clear session
+  localStorage.removeItem("userType");
+  localStorage.removeItem("userId");
+
+  // reset state
+  setIsLoggedIn(false);
+  setUserType(null);
+  setId("");
+  setPassword("");
+  setMode("login");
+};
+
+
+  // ---------------- DASHBOARD ROUTING ----------------
+if (isLoggedIn && userType === "student") {
+  return <StudentDashboard usn={id} onLogout={handleLogout} />;
+}
+
+if (isLoggedIn && userType === "teacher") {
+  return <TeacherDashboard facultyId={id} onLogout={handleLogout} />;
+}
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 flex items-center justify-center p-4">
@@ -104,14 +210,36 @@ export default function Home() {
         <Card className="shadow-2xl border-2 hover:border-primary/20 transition-all duration-300">
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold text-center">
-              Sign In
+              {mode === "login" ? "Sign In" : "Create Account"}
             </CardTitle>
             <CardDescription className="text-center">
-              Choose your role and enter your credentials
+              {mode === "login"
+                ? "Choose your role and enter your credentials"
+                : "Choose your role and create a password"}
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
+            {/* NEW: mode switch */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={mode === "login" ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setMode("login")}
+              >
+                Sign In
+              </Button>
+              <Button
+                type="button"
+                variant={mode === "signup" ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setMode("signup")}
+              >
+                Sign Up
+              </Button>
+            </div>
+
             {/* User type selection */}
             <div className="space-y-3">
               <Label>I am a</Label>
@@ -127,9 +255,7 @@ export default function Home() {
                   onClick={() => setUserType("student")}
                 >
                   <GraduationCap
-                    className={`w-6 h-6 ${
-                      userType === "student" ? "animate-bounce" : ""
-                    }`}
+                    className={`w-6 h-6 ${userType === "student" ? "animate-bounce" : ""}`}
                   />
                   <span className="font-semibold">Student</span>
                 </Button>
@@ -145,9 +271,7 @@ export default function Home() {
                   onClick={() => setUserType("teacher")}
                 >
                   <BookOpen
-                    className={`w-6 h-6 ${
-                      userType === "teacher" ? "animate-bounce" : ""
-                    }`}
+                    className={`w-6 h-6 ${userType === "teacher" ? "animate-bounce" : ""}`}
                   />
                   <span className="font-semibold">Teacher</span>
                 </Button>
@@ -182,30 +306,31 @@ export default function Home() {
               />
             </div>
 
-            {/* Login button */}
+            {/* Main button */}
             <Button
               className="w-full h-12 text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
-              onClick={handleLogin}
-              disabled={!userType || !id || !password}
+              onClick={mode === "login" ? handleLogin : handleSignup}
+              disabled={!userType || !id || !password || loading}
             >
-              Sign In as{" "}
-              {userType === "student"
-                ? "Student"
-                : userType === "teacher"
-                ? "Teacher"
-                : "User"}
+              {loading
+                ? "Please wait..."
+                : mode === "login"
+                ? `Sign In as ${userType === "student" ? "Student" : "Teacher"}`
+                : `Create ${userType === "student" ? "Student" : "Teacher"} Account`}
             </Button>
 
             {/* Forgot password */}
-            <div className="text-center text-sm text-muted-foreground">
-              <button
-                type="button"
-                className="hover:text-primary hover:underline transition-colors"
-                onClick={() => setForgotOpen(true)}
-              >
-                Forgot password?
-              </button>
-            </div>
+            {mode === "login" && (
+              <div className="text-center text-sm text-muted-foreground">
+                <button
+                  type="button"
+                  className="hover:text-primary hover:underline transition-colors"
+                  onClick={() => setForgotOpen(true)}
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

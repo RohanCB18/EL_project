@@ -46,7 +46,13 @@ async function safeJson(res: Response) {
   }
 }
 
-export default function TeacherDashboard({ facultyId }: { facultyId: string }) {
+export default function TeacherDashboard({
+  facultyId,
+  onLogout
+}: {
+  facultyId: string;
+  onLogout: () => void;
+}) {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
   // Notifications modal control
@@ -112,7 +118,9 @@ export default function TeacherDashboard({ facultyId }: { facultyId: string }) {
           if (matchRes.ok) {
             const matchData = await safeJson(matchRes);
             const list = Array.isArray(matchData) ? matchData : [];
-            setStudentMatchesCount(list.filter((m: any) => (m.match_score ?? 0) > 60).length);
+            setStudentMatchesCount(
+              list.filter((m: any) => (m.match_score ?? 0) > 60).length
+            );
           } else {
             setStudentMatchesCount(0);
           }
@@ -224,7 +232,7 @@ export default function TeacherDashboard({ facultyId }: { facultyId: string }) {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive hover:scale-[1.02] transition-all duration-300"
-            onClick={() => window.location.reload()}
+            onClick={onLogout}
           >
             <LogOut className="w-5 h-5" />
             Sign Out
@@ -315,7 +323,7 @@ export default function TeacherDashboard({ facultyId }: { facultyId: string }) {
                 {
                   title: "Find Mentors",
                   desc: "Connect with colleagues",
-                  page: "openings" as Page, // or create a new colleagues page later
+                  page: "openings" as Page,
                   icon: UserPlus,
                   color: "from-primary to-primary/60"
                 },
