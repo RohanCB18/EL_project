@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './ChatInterface.css';
 
-function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
+function ChatInterface({ sessionId, onAsk, isLoading }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
@@ -45,53 +45,6 @@ function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
         }
     };
 
-    const handleQuickAction = async (action) => {
-        if (isLoading) return;
-
-        let actionMessage, result;
-
-        try {
-            if (action === 'summary') {
-                actionMessage = {
-                    id: Date.now(),
-                    type: 'user',
-                    content: '📝 Generate a summary of this document',
-                };
-                setMessages((prev) => [...prev, actionMessage]);
-
-                result = await onSummary();
-                const aiMessage = {
-                    id: Date.now() + 1,
-                    type: 'ai',
-                    content: result.summary,
-                };
-                setMessages((prev) => [...prev, aiMessage]);
-            } else if (action === 'quiz') {
-                actionMessage = {
-                    id: Date.now(),
-                    type: 'user',
-                    content: '📋 Generate a practice quiz',
-                };
-                setMessages((prev) => [...prev, actionMessage]);
-
-                result = await onQuiz();
-                const quizMessage = {
-                    id: Date.now() + 1,
-                    type: 'quiz',
-                    content: result.quiz,
-                };
-                setMessages((prev) => [...prev, quizMessage]);
-            }
-        } catch (error) {
-            const errorMessage = {
-                id: Date.now() + 1,
-                type: 'error',
-                content: error.message || 'Failed to perform action',
-            };
-            setMessages((prev) => [...prev, errorMessage]);
-        }
-    };
-
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -104,7 +57,7 @@ function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
             {/* Chat Header */}
             <div className="chat-header">
                 <p className="chat-tagline">
-                    ✨ Ask questions, get summaries, generate quizzes, clear doubts & more!
+                    ✨ Ask anything - questions, summaries, quizzes, explanations & more!
                 </p>
             </div>
 
@@ -118,7 +71,7 @@ function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
                             </svg>
                         </div>
                         <h3>Start a Conversation</h3>
-                        <p>Ask questions about your PDF or use the quick actions above</p>
+                        <p>Ask questions about your PDF - try "summarize this" or "create a quiz"</p>
                     </div>
                 ) : (
                     <div className="messages">
@@ -140,30 +93,7 @@ function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
                                     </div>
                                 )}
                                 <div className="message-content">
-                                    {message.type === 'quiz' ? (
-                                        <div className="quiz-content">
-                                            <h4>📋 Practice Quiz</h4>
-                                            {message.content.map((q, idx) => (
-                                                <div key={idx} className="quiz-question">
-                                                    <p className="question-text">
-                                                        <strong>Q{idx + 1}:</strong> {q.question}
-                                                    </p>
-                                                    {q.options && (
-                                                        <ul className="options-list">
-                                                            {q.options.map((opt, i) => (
-                                                                <li key={i}>{opt}</li>
-                                                            ))}
-                                                        </ul>
-                                                    )}
-                                                    <details className="answer-reveal">
-                                                        <summary>Show Answer</summary>
-                                                        <p><strong>Answer:</strong> {q.correct_answer}</p>
-                                                        {q.explanation && <p><em>{q.explanation}</em></p>}
-                                                    </details>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : message.type === 'ai' ? (
+                                    {message.type === 'ai' ? (
                                         <ReactMarkdown>{message.content}</ReactMarkdown>
                                     ) : (
                                         <p>{message.content}</p>
@@ -197,7 +127,7 @@ function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
                 <input
                     type="text"
                     className="chat-input input-field"
-                    placeholder={sessionId ? "Ask a question about your PDF..." : "Upload a PDF first to start chatting"}
+                    placeholder={sessionId ? "Ask anything about your PDF..." : "Upload a PDF first to start chatting"}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -218,3 +148,4 @@ function ChatInterface({ sessionId, onAsk, onSummary, onQuiz, isLoading }) {
 }
 
 export default ChatInterface;
+

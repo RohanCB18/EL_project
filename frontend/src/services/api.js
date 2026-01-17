@@ -31,6 +31,8 @@ const api = {
 
   /**
    * Ask a question about the uploaded PDF
+   * Students can ask any type of question including requests for summaries,
+   * explanations, quizzes, or any other study-related queries.
    * @param {string} sessionId - Session ID from upload
    * @param {string} question - User's question
    * @returns {Promise<{success: boolean, answer: string, sources: string[]}>}
@@ -50,60 +52,6 @@ const api = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.detail || 'Failed to get answer');
-    }
-
-    return response.json();
-  },
-
-  /**
-   * Generate a summary of the uploaded PDF
-   * @param {string} sessionId - Session ID from upload
-   * @param {number} maxLength - Maximum summary length
-   * @returns {Promise<{success: boolean, summary: string}>}
-   */
-  async getSummary(sessionId, maxLength = 500) {
-    const response = await fetch(`${API_BASE_URL}/student/summary`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        session_id: sessionId,
-        max_length: maxLength,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to generate summary');
-    }
-
-    return response.json();
-  },
-
-  /**
-   * Generate a quiz from the uploaded PDF
-   * @param {string} sessionId - Session ID from upload
-   * @param {number} numQuestions - Number of questions
-   * @param {string} difficulty - Difficulty level
-   * @returns {Promise<{success: boolean, quiz: Array}>}
-   */
-  async generateQuiz(sessionId, numQuestions = 5, difficulty = 'medium') {
-    const response = await fetch(`${API_BASE_URL}/student/quiz`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        session_id: sessionId,
-        num_questions: numQuestions,
-        difficulty: difficulty,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to generate quiz');
     }
 
     return response.json();
@@ -151,3 +99,4 @@ const api = {
 };
 
 export default api;
+

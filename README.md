@@ -137,11 +137,10 @@ EL_project/
 |--------|----------|-------------|
 | GET | `/health` | Health check |
 | POST | `/student/upload` | Upload PDF for student |
-| POST | `/student/ask` | Ask question about PDF |
-| POST | `/student/summary` | Generate summary |
-| POST | `/student/quiz` | Generate practice quiz |
+| POST | `/student/ask` | Ask any question (queries, summaries, quizzes, etc.) |
 | POST | `/teacher/upload` | Upload topic material |
 | POST | `/teacher/generate-paper` | Generate question paper |
+
 
 ## Design
 

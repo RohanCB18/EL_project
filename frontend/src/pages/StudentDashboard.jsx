@@ -37,26 +37,6 @@ function StudentDashboard() {
         }
     };
 
-    const handleSummary = async () => {
-        setIsChatLoading(true);
-        try {
-            const result = await api.getSummary(sessionId);
-            return result;
-        } finally {
-            setIsChatLoading(false);
-        }
-    };
-
-    const handleQuiz = async () => {
-        setIsChatLoading(true);
-        try {
-            const result = await api.generateQuiz(sessionId, 5, 'medium');
-            return result;
-        } finally {
-            setIsChatLoading(false);
-        }
-    };
-
     return (
         <div className="student-dashboard">
             <Navbar />
@@ -124,9 +104,9 @@ function StudentDashboard() {
                                 <h3>💡 Tips</h3>
                                 <ul>
                                     <li>Ask specific questions for better answers</li>
-                                    <li>Use "Summary" for quick overview</li>
-                                    <li>Generate quizzes to test yourself</li>
-                                    <li>Clear doubts on complex topics</li>
+                                    <li>Request "summarize this document" for overview</li>
+                                    <li>Ask to "create a quiz" to test yourself</li>
+                                    <li>Get explanations on complex topics</li>
                                 </ul>
                             </div>
                         </aside>
@@ -136,8 +116,6 @@ function StudentDashboard() {
                             <ChatInterface
                                 sessionId={sessionId}
                                 onAsk={handleAsk}
-                                onSummary={handleSummary}
-                                onQuiz={handleQuiz}
                                 isLoading={isChatLoading}
                             />
                         </section>
@@ -149,3 +127,4 @@ function StudentDashboard() {
 }
 
 export default StudentDashboard;
+
