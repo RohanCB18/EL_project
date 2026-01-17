@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,8 +13,6 @@ import {
 import {
   Home,
   Users,
-  Bell,
-  FileText,
   LogOut,
   GraduationCap,
   Sparkles,
@@ -22,7 +20,10 @@ import {
   Target,
   Award,
   UserPlus,
-  Briefcase
+  Briefcase,
+  FileText,
+  Bell,
+  FolderKanban
 } from "lucide-react";
 
 import Notifications from "@/components/notifications";
@@ -31,12 +32,32 @@ import TeacherProjects from "@/components/teacher-projects";
 import FindStudents from "@/components/find-students";
 import TeacherProjectOpenings from "@/components/teacher-project-openings";
 
+const BASE_URL = "http://localhost:5000";
 const CURRENT_FACULTY_ID = "FAC101"; // temp
+
 type Page = "home" | "students" | "projects" | "openings" | "profile";
 
+async function safeJson(res: Response) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    console.error("❌ Non-JSON response:", text);
+    throw new Error("Server returned non-JSON response");
+  }
+}
 
 export default function TeacherDashboard() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
+
+  // Notifications modal control
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+
+  // Stats
+  const [projectsCount, setProjectsCount] = useState(0);
+  const [studentMatchesCount, setStudentMatchesCount] = useState(0);
+  const [openingsCount, setOpeningsCount] = useState(0);
 
   const navItems = [
     { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
@@ -46,8 +67,120 @@ export default function TeacherDashboard() {
     { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-2" }
   ];
 
+  // ---------- Load dashboard stats + unread notifications ----------
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        // 1) Unread notifications count
+        try {
+          const notifRes = await fetch(
+            `${BASE_URL}/api/notifications/teacher/${CURRENT_FACULTY_ID}`
+          );
+          if (notifRes.ok) {
+            const notifData = await safeJson(notifRes);
+            const list = Array.isArray(notifData) ? notifData : [];
+            setUnreadNotifCount(list.filter((n: any) => !n.is_read).length);
+          } else {
+            setUnreadNotifCount(0);
+          }
+        } catch (e) {
+          console.error("Unread notif fetch failed:", e);
+          setUnreadNotifCount(0);
+        }
+
+        // 2) Projects posted by teacher
+        try {
+          const projRes = await fetch(
+            `${BASE_URL}/api/projects/teacher/${CURRENT_FACULTY_ID}`
+          );
+          if (projRes.ok) {
+            const projData = await safeJson(projRes);
+            setProjectsCount(Array.isArray(projData) ? projData.length : 0);
+          } else {
+            setProjectsCount(0);
+          }
+        } catch (e) {
+          console.error("Teacher projects count fetch failed:", e);
+          setProjectsCount(0);
+        }
+
+        // 3) Student matches > 60%
+        // (Assumes your existing route is working for teachers)
+        try {
+          const matchRes = await fetch(
+            `${BASE_URL}/api/matchmaking/teacher/${CURRENT_FACULTY_ID}/students`
+          );
+          if (matchRes.ok) {
+            const matchData = await safeJson(matchRes);
+            const list = Array.isArray(matchData) ? matchData : [];
+            setStudentMatchesCount(list.filter((m: any) => (m.match_score ?? 0) > 60).length);
+          } else {
+            setStudentMatchesCount(0);
+          }
+        } catch (e) {
+          console.error("Teacher-student matches fetch failed:", e);
+          setStudentMatchesCount(0);
+        }
+
+        // 4) Project openings count for teacher view:
+        // colleagueProjects + studentOpenings
+        try {
+          const openRes = await fetch(
+            `${BASE_URL}/api/projects/openings/teacher/${CURRENT_FACULTY_ID}`
+          );
+          if (openRes.ok) {
+            const openData = await safeJson(openRes);
+            const colleague = Array.isArray(openData?.colleagueProjects)
+              ? openData.colleagueProjects.length
+              : 0;
+            const students = Array.isArray(openData?.studentOpenings)
+              ? openData.studentOpenings.length
+              : 0;
+            setOpeningsCount(colleague + students);
+          } else {
+            setOpeningsCount(0);
+          }
+        } catch (e) {
+          console.error("Teacher openings count fetch failed:", e);
+          setOpeningsCount(0);
+        }
+      } catch (err) {
+        console.error("Teacher dashboard stats load failed:", err);
+      }
+    };
+
+    if (currentPage === "home") loadStats();
+  }, [currentPage]);
+
+  const quickStats = useMemo(
+    () => [
+      {
+        label: "Projects Posted",
+        value: String(projectsCount),
+        icon: FolderKanban,
+        color: "bg-chart-3/10 text-chart-3",
+        hover: "hover:bg-chart-3/20"
+      },
+      {
+        label: "Student Matches > 60%",
+        value: String(studentMatchesCount),
+        icon: Users,
+        color: "bg-secondary/10 text-secondary",
+        hover: "hover:bg-secondary/20"
+      },
+      {
+        label: "Project Openings",
+        value: String(openingsCount),
+        icon: Briefcase,
+        color: "bg-accent/10 text-accent",
+        hover: "hover:bg-accent/20"
+      }
+    ],
+    [projectsCount, studentMatchesCount, openingsCount]
+  );
+
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Sidebar */}
       <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col shadow-lg">
         <div className="p-6 border-b border-sidebar-border">
@@ -101,52 +234,51 @@ export default function TeacherDashboard() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 w-full overflow-y-auto">
         {currentPage === "home" && (
-          <div className="p-8 space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="p-8 space-y-6 w-full">
+            {/* Top header row */}
+            <div className="flex items-start justify-between gap-6">
               <div>
                 <h2 className="text-4xl font-bold text-foreground">Welcome back 👋</h2>
                 <p className="text-muted-foreground mt-2">
                   Manage mentorships, projects and student connections
                 </p>
-
-                {/* Notifications icon/list */}
-                <div className="mt-4">
-                  <Notifications recipientType="teacher" recipientId={CURRENT_FACULTY_ID} />
-                </div>
               </div>
 
-              <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium animate-pulse-subtle">
-                <Sparkles className="w-4 h-4" />
-                Active Mentor
+              {/* Right side: Notifications + Active chip */}
+              <div className="flex items-center gap-3">
+                {/* 🔔 Big notifications icon on right */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="relative rounded-2xl w-12 h-12 shadow-sm"
+                  onClick={() => setNotifOpen(true)}
+                >
+                  <Bell className="w-6 h-6" />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full" />
+                  )}
+                </Button>
+
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium">
+                  <Sparkles className="w-4 h-4" />
+                  Active Mentor
+                </div>
               </div>
             </div>
 
+            {/* Notifications modal component (modal-only now) */}
+            <Notifications
+              recipientType="teacher"
+              recipientId={CURRENT_FACULTY_ID}
+              open={notifOpen}
+              setOpen={setNotifOpen}
+            />
+
             {/* Quick stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  label: "Active Projects",
-                  value: "2",
-                  icon: Target
-                },
-                {
-                  label: "New Requests",
-                  value: "5",
-                  icon: Bell
-                },
-                {
-                  label: "Student Matches",
-                  value: "10",
-                  icon: Users
-                },
-                {
-                  label: "Mentorship Score",
-                  value: "88%",
-                  icon: Award
-                }
-              ].map((stat, i) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {quickStats.map((stat, i) => {
                 const Icon = stat.icon;
                 return (
                   <Card
@@ -159,7 +291,9 @@ export default function TeacherDashboard() {
                           <p className="text-sm text-muted-foreground">{stat.label}</p>
                           <p className="text-3xl font-bold mt-2">{stat.value}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                        <div
+                          className={`p-3 rounded-lg ${stat.color} ${stat.hover} transition-colors duration-300`}
+                        >
                           <Icon className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
                         </div>
                       </div>
@@ -170,34 +304,41 @@ export default function TeacherDashboard() {
             </div>
 
             {/* Quick actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
                   title: "Connect Students",
                   desc: "Find compatible students",
                   page: "students" as Page,
-                  icon: UserPlus,
+                  icon: Users,
                   color: "from-secondary to-secondary/60"
                 },
                 {
-                  title: "Manage Projects",
-                  desc: "Post & edit projects",
-                  page: "projects" as Page,
-                  icon: FileText,
+                  title: "Find Mentors",
+                  desc: "Connect with colleagues",
+                  page: "openings" as Page, // or create a new colleagues page later
+                  icon: UserPlus,
                   color: "from-primary to-primary/60"
                 },
                 {
-                  title: "Project Openings",
-                  desc: "Find colleagues & student openings",
-                  page: "openings" as Page,
-                  icon: Briefcase,
+                  title: "Create Project Opening",
+                  desc: "Post a new project",
+                  page: "projects" as Page,
+                  icon: FileText,
+                  color: "from-chart-3 to-chart-3/60"
+                },
+                {
+                  title: "View Projects",
+                  desc: "Manage your projects",
+                  page: "projects" as Page,
+                  icon: FolderKanban,
                   color: "from-accent to-accent/60"
                 }
               ].map((action) => {
                 const Icon = action.icon;
                 return (
                   <Card
-                    key={action.page}
+                    key={action.title}
                     className="border-2 hover:border-primary/30 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group overflow-hidden relative"
                     onClick={() => setCurrentPage(action.page)}
                   >
@@ -259,7 +400,6 @@ export default function TeacherDashboard() {
         {currentPage === "projects" && <TeacherProjects />}
         {currentPage === "openings" && <TeacherProjectOpenings />}
         {currentPage === "profile" && <TeacherProfile />}
-
       </main>
     </div>
   );
