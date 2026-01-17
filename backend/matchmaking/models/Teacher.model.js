@@ -1,6 +1,15 @@
 import { matchmakingPool } from "../../config/db.js";
 
 export const TeacherModel = {
+
+  async setPasswordHash(faculty_id, password_hash) {
+  const { rows } = await matchmakingPool.query(
+    `UPDATE teachers SET password_hash = $1 WHERE faculty_id = $2 RETURNING faculty_id, name`,
+    [password_hash, faculty_id]
+  );
+  return rows[0];
+},
+
   async create(teacher) {
     const query = `
       INSERT INTO teachers (

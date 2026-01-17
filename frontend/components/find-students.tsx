@@ -16,7 +16,7 @@ async function fetchMyTeacherProfile() {
   return res.json();
 }
 
-export default function FindStudents() {
+export default function FindStudents({ facultyId }: { facultyId: string }) {
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);

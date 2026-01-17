@@ -20,7 +20,7 @@ import {
 import { upsertStudentProfile } from "@/lib/student";
 
 const BASE_URL = "http://localhost:5000";
-const CURRENT_USN = "1RV15CS901"; // temp until auth
+// ❌ removed hardcoded CURRENT_USN
 
 const BRANCHES = ["CSE", "ISE", "AIML", "CY", "ECE", "EEE", "ME", "CE", "ETE", "BT", "MCA"];
 const YEARS = ["1", "2", "3", "4"];
@@ -128,14 +128,14 @@ function ArrayInput({
   );
 }
 
-export default function StudentProfile() {
+export default function StudentProfile({ usn }: { usn: string }) {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [profile, setProfile] = useState<any>({
     name: "",
-    usn: CURRENT_USN,
+    usn: usn,
     rvce_email: "",
     branch: "",
     year: "",
@@ -160,7 +160,7 @@ export default function StudentProfile() {
       try {
         setLoading(true);
 
-        const res = await fetch(`${BASE_URL}/api/student/${CURRENT_USN}`);
+        const res = await fetch(`${BASE_URL}/api/student/${usn}`);
         if (!res.ok) {
           // no profile exists yet -> allow create mode
           setEditMode(true);
@@ -172,7 +172,7 @@ export default function StudentProfile() {
         setProfile((prev: any) => ({
           ...prev,
           ...data,
-          usn: data.usn || CURRENT_USN,
+          usn: data.usn || usn,
           programming_languages: toArray(data.programming_languages),
           tech_skills: toArray(data.tech_skills),
           domain_interests: toArray(data.domain_interests),
@@ -190,7 +190,7 @@ export default function StudentProfile() {
     };
 
     load();
-  }, []);
+  }, []); // (keeping as-is)
 
   const update = (key: string, value: any) => {
     setProfile((prev: any) => ({ ...prev, [key]: value }));
@@ -202,6 +202,7 @@ export default function StudentProfile() {
 
       const payload = {
         ...profile,
+        usn: usn, // ✅ ensure correct logged-in usn always saved
         cgpa: profile.cgpa === "" ? null : Number(profile.cgpa),
         average_el_marks: profile.average_el_marks === "" ? null : Number(profile.average_el_marks),
         hackathon_participation_count: Number(profile.hackathon_participation_count) || 0,

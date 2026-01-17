@@ -13,14 +13,8 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
-const CURRENT_USN = "1RV15CS001"; // temp (until auth)
 
-/* ---------------- FETCH CURRENT STUDENT ---------------- */
-async function fetchMyProfile() {
-  const res = await fetch(`http://localhost:5000/api/student/${CURRENT_USN}`);
-  if (!res.ok) throw new Error("Failed to fetch student profile");
-  return res.json();
-}
+
 
 /* ---------------- SAFE ARRAY PARSER ---------------- */
 function toArray(val: any): string[] {
@@ -39,7 +33,7 @@ function toArray(val: any): string[] {
   return [];
 }
 
-export default function FindMentors() {
+export default function FindMentors({ usn }: { usn: string }) {
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
@@ -51,7 +45,7 @@ export default function FindMentors() {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/api/matchmaking/student/${CURRENT_USN}/teachers`
+          `http://localhost:5000/api/matchmaking/student/${usn}/teachers`
         );
 
         const data = await res.json();
@@ -73,7 +67,7 @@ export default function FindMentors() {
     };
 
     fetchMatches();
-  }, []);
+  }, [usn]);
 
   /* ---------------- MATCH COLOR ---------------- */
   const getMatchColor = (score: number) => {
@@ -98,6 +92,13 @@ export default function FindMentors() {
       indicator: "bg-destructive"
     };
   };
+
+  const fetchMyProfile = async () => {
+  const res = await fetch(`http://localhost:5000/api/student/${usn}`);
+  if (!res.ok) throw new Error("Failed to fetch student profile");
+  return res.json();
+};
+
 
   /* ---------------- CONNECT EMAIL + NOTIFICATION ---------------- */
   const handleConnectEmail = async (teacher: any) => {
@@ -138,9 +139,9 @@ ${me.rvce_email}
           recipient_type: "teacher",
           recipient_id: teacher.faculty_id,
           sender_type: "student",
-          sender_id: CURRENT_USN,
+          sender_id: usn,
           entity_type: "profile",
-          entity_id: CURRENT_USN,
+          entity_id: usn,
           message: `${me.name} (${me.usn}) requested mentorship`
         })
       });

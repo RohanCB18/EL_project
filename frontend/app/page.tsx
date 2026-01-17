@@ -1,32 +1,58 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { GraduationCap, BookOpen, Users, Sparkles } from "lucide-react"
-import StudentDashboard from "@/components/student-dashboard"
-import TeacherDashboard from "@/components/teacher-dashboard"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  GraduationCap,
+  Users,
+  Sparkles,
+  FolderKanban,
+  UserPlus,
+  BookOpen
+} from "lucide-react";
+
+import StudentDashboard from "@/components/student-dashboard";
+import TeacherDashboard from "@/components/teacher-dashboard";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 
 export default function Home() {
-  const [userType, setUserType] = useState<"student" | "teacher" | null>(null)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userType, setUserType] = useState<"student" | "teacher" | null>(null);
+
+  const [id, setId] = useState(""); // USN / Faculty ID
+  const [password, setPassword] = useState("");
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Forgot password popup
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const handleLogin = () => {
-    if (email && password && userType) {
-      setIsLoggedIn(true)
+    if (id && password && userType) {
+      setIsLoggedIn(true);
     }
-  }
+  };
 
   if (isLoggedIn && userType === "student") {
-    return <StudentDashboard />
+    return <StudentDashboard usn={id} />;
   }
 
   if (isLoggedIn && userType === "teacher") {
-    return <TeacherDashboard />
+    return <TeacherDashboard facultyId={id}/>;
   }
 
   return (
@@ -36,33 +62,40 @@ export default function Home() {
         <div className="space-y-6 text-center lg:text-left">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium animate-float">
             <Sparkles className="w-4 h-4" />
-            Welcome to RVCE Learning Hub
+            Welcome to EduConnect
           </div>
+
           <h1 className="text-5xl lg:text-6xl font-bold text-balance bg-gradient-to-br from-primary via-secondary to-accent bg-clip-text text-transparent">
-            Learn, Connect, Excel
+            Connect, Collaborate, Build
           </h1>
+
           <p className="text-xl text-muted-foreground text-pretty">
-            Your comprehensive platform for assessments, mentorship, and collaborative learning at RVCE
+            Find teammates, connect with mentors, and explore projects — all in one place.
           </p>
 
           <div className="grid grid-cols-3 gap-4 pt-4">
-            <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
-              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <BookOpen className="w-6 h-6 text-primary" />
-              </div>
-              <span className="text-sm font-medium">Quizzes</span>
-            </div>
+            {/* Teams */}
             <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-secondary/50 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
               <div className="p-3 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
                 <Users className="w-6 h-6 text-secondary" />
               </div>
               <span className="text-sm font-medium">Teams</span>
             </div>
+
+            {/* Mentors */}
             <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-accent/50 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
               <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
-                <GraduationCap className="w-6 h-6 text-accent" />
+                <UserPlus className="w-6 h-6 text-accent" />
               </div>
               <span className="text-sm font-medium">Mentors</span>
+            </div>
+
+            {/* Projects */}
+            <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/50 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
+              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <FolderKanban className="w-6 h-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium">Projects</span>
             </div>
           </div>
         </div>
@@ -70,9 +103,14 @@ export default function Home() {
         {/* Right side - Login form */}
         <Card className="shadow-2xl border-2 hover:border-primary/20 transition-all duration-300">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">Sign In</CardTitle>
-            <CardDescription className="text-center">Choose your role and enter your credentials</CardDescription>
+            <CardTitle className="text-3xl font-bold text-center">
+              Sign In
+            </CardTitle>
+            <CardDescription className="text-center">
+              Choose your role and enter your credentials
+            </CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-6">
             {/* User type selection */}
             <div className="space-y-3">
@@ -88,9 +126,14 @@ export default function Home() {
                   }`}
                   onClick={() => setUserType("student")}
                 >
-                  <GraduationCap className={`w-6 h-6 ${userType === "student" ? "animate-bounce" : ""}`} />
+                  <GraduationCap
+                    className={`w-6 h-6 ${
+                      userType === "student" ? "animate-bounce" : ""
+                    }`}
+                  />
                   <span className="font-semibold">Student</span>
                 </Button>
+
                 <Button
                   type="button"
                   variant={userType === "teacher" ? "default" : "outline"}
@@ -101,26 +144,32 @@ export default function Home() {
                   }`}
                   onClick={() => setUserType("teacher")}
                 >
-                  <BookOpen className={`w-6 h-6 ${userType === "teacher" ? "animate-bounce" : ""}`} />
+                  <BookOpen
+                    className={`w-6 h-6 ${
+                      userType === "teacher" ? "animate-bounce" : ""
+                    }`}
+                  />
                   <span className="font-semibold">Teacher</span>
                 </Button>
               </div>
             </div>
 
-            {/* Email input */}
+            {/* USN / Faculty ID */}
             <div className="space-y-2">
-              <Label htmlFor="email">RVCE Email</Label>
+              <Label htmlFor="id">
+                {userType === "teacher" ? "Faculty ID" : "USN"}
+              </Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="name@rvce.edu.in"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="id"
+                type="text"
+                placeholder={userType === "teacher" ? "FAC101" : "1RVXXCS001"}
+                value={id}
+                onChange={(e) => setId(e.target.value)}
                 className="transition-all duration-300 focus:scale-[1.02] focus:shadow-lg"
               />
             </div>
 
-            {/* Password input */}
+            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -137,17 +186,45 @@ export default function Home() {
             <Button
               className="w-full h-12 text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               onClick={handleLogin}
-              disabled={!userType || !email || !password}
+              disabled={!userType || !id || !password}
             >
-              Sign In as {userType === "student" ? "Student" : userType === "teacher" ? "Teacher" : "User"}
+              Sign In as{" "}
+              {userType === "student"
+                ? "Student"
+                : userType === "teacher"
+                ? "Teacher"
+                : "User"}
             </Button>
 
+            {/* Forgot password */}
             <div className="text-center text-sm text-muted-foreground">
-              <button className="hover:text-primary hover:underline transition-colors">Forgot password?</button>
+              <button
+                type="button"
+                className="hover:text-primary hover:underline transition-colors"
+                onClick={() => setForgotOpen(true)}
+              >
+                Forgot password?
+              </button>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Forgot password modal (Option A) */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Forgot Password</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Password reset isn’t available yet. Please contact the admin / department
+            coordinator to reset your password.
+          </p>
+          <div className="flex justify-end pt-2">
+            <Button onClick={() => setForgotOpen(false)}>Okay</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
-  )
+  );
 }

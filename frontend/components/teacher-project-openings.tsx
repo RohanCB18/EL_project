@@ -13,11 +13,10 @@ import {
 import { Briefcase, Users, Eye, Mail } from "lucide-react";
 
 const BASE_URL = "http://localhost:5000";
-const CURRENT_FACULTY_ID = "FAC102"; // temp until auth
 
 /* ---------------- FETCH CURRENT TEACHER ---------------- */
-async function fetchMyTeacherProfile() {
-  const res = await fetch(`${BASE_URL}/api/teacher/${CURRENT_FACULTY_ID}`);
+async function fetchMyTeacherProfile(facultyId: string) {
+  const res = await fetch(`${BASE_URL}/api/teacher/${facultyId}`);
   if (!res.ok) throw new Error("Failed to fetch teacher profile");
   return res.json();
 }
@@ -41,7 +40,7 @@ async function fetchOwnerEmail(ownerType: string, ownerId: string) {
   throw new Error("Unknown owner type");
 }
 
-export default function TeacherProjectOpenings() {
+export default function TeacherProjectOpenings({ facultyId }: { facultyId: string }) {
   const [colleagueProjects, setColleagueProjects] = useState<any[]>([]);
   const [studentOpenings, setStudentOpenings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +52,7 @@ export default function TeacherProjectOpenings() {
     const fetchOpenings = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/api/projects/openings/teacher/${CURRENT_FACULTY_ID}`
+          `${BASE_URL}/api/projects/openings/teacher/${facultyId}`
         );
         const data = await res.json();
 
@@ -74,7 +73,7 @@ export default function TeacherProjectOpenings() {
     try {
       setConnecting(true);
 
-      const me = await fetchMyTeacherProfile();
+      const me = await fetchMyTeacherProfile(facultyId);
       const ownerEmail = await fetchOwnerEmail(
         project.owner_type,
         project.owner_id
@@ -88,7 +87,7 @@ export default function TeacherProjectOpenings() {
           recipient_type: project.owner_type,
           recipient_id: project.owner_id,
           sender_type: "teacher",
-          sender_id: CURRENT_FACULTY_ID,
+          sender_id: facultyId,
           entity_type: "project",
           entity_id: String(project.project_id),
           message: `${me.name} (${me.faculty_id}) is interested in your project "${project.title}"`

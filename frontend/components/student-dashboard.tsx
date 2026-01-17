@@ -4,7 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Notifications from "@/components/notifications";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import {
   User,
   Users,
@@ -26,11 +32,10 @@ import StudentProjects from "@/components/student-projects";
 import ProjectOpenings from "@/components/project-openings";
 
 const BASE_URL = "http://localhost:5000";
-const CURRENT_USN = "1RV15CS001";
 
 type Page = "home" | "profile" | "teammates" | "mentors" | "projects" | "openings";
 
-export default function StudentDashboard() {
+export default function StudentDashboard({ usn }: { usn: string }) {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
   // ---- Dashboard Stats ----
@@ -47,21 +52,22 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchUnread = async () => {
       try {
-        const res = await fetch(
-          `${BASE_URL}/api/notifications/student/${CURRENT_USN}`
-        );
+        const res = await fetch(`${BASE_URL}/api/notifications/student/${usn}`);
         if (!res.ok) return;
 
         const data = await res.json();
-        const unread = Array.isArray(data) ? data.some((n: any) => !n.is_read) : false;
+        const unread = Array.isArray(data)
+          ? data.some((n: any) => !n.is_read)
+          : false;
+
         setHasUnreadNotifications(unread);
       } catch (err) {
         console.error("Failed to fetch notifications:", err);
       }
     };
 
-    fetchUnread();
-  }, []);
+    if (usn) fetchUnread();
+  }, [usn]);
 
   // ✅ Load stats when on Home
   useEffect(() => {
@@ -72,28 +78,32 @@ export default function StudentDashboard() {
         setStatsLoading(true);
 
         // 1) Projects posted by me
-        const projRes = await fetch(`${BASE_URL}/api/projects/student/${CURRENT_USN}`);
+        const projRes = await fetch(`${BASE_URL}/api/projects/student/${usn}`);
         if (!projRes.ok) throw new Error("Failed to fetch projects");
         const projData = await projRes.json();
         setProjectsPosted(Array.isArray(projData) ? projData.length : 0);
 
         // 2) Student matches (> 60)
         const teamRes = await fetch(
-          `${BASE_URL}/api/matchmaking/student/${CURRENT_USN}/students`
+          `${BASE_URL}/api/matchmaking/student/${usn}/students`
         );
         if (!teamRes.ok) throw new Error("Failed to fetch student matches");
         const teamData = await teamRes.json();
         const teamArr = Array.isArray(teamData) ? teamData : [];
-        setStudentMatches60(teamArr.filter((m: any) => Number(m.match_score) >= 60).length);
+        setStudentMatches60(
+          teamArr.filter((m: any) => Number(m.match_score) >= 60).length
+        );
 
         // 3) Mentor matches (> 50)
         const mentorRes = await fetch(
-          `${BASE_URL}/api/matchmaking/student/${CURRENT_USN}/teachers`
+          `${BASE_URL}/api/matchmaking/student/${usn}/teachers`
         );
         if (!mentorRes.ok) throw new Error("Failed to fetch mentor matches");
         const mentorData = await mentorRes.json();
         const mentorArr = Array.isArray(mentorData) ? mentorData : [];
-        setMentorMatches50(mentorArr.filter((m: any) => Number(m.match_score) >= 50).length);
+        setMentorMatches50(
+          mentorArr.filter((m: any) => Number(m.match_score) >= 50).length
+        );
       } catch (err) {
         console.error("Failed to load dashboard stats:", err);
       } finally {
@@ -101,8 +111,8 @@ export default function StudentDashboard() {
       }
     };
 
-    loadStats();
-  }, [currentPage]);
+    if (usn) loadStats();
+  }, [currentPage, usn]);
 
   const navItems = [
     { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
@@ -221,7 +231,6 @@ export default function StudentDashboard() {
                 </div>
               </div>
 
-
               {/* ✅ ONLY ICON BUTTON */}
               <Button
                 variant="ghost"
@@ -235,12 +244,11 @@ export default function StudentDashboard() {
                 )}
               </Button>
 
-
               {/* Notifications modal */}
               {notifOpen && (
                 <Notifications
                   recipientType="student"
-                  recipientId={CURRENT_USN}
+                  recipientId={usn}
                   open={notifOpen}
                   setOpen={(v: boolean) => {
                     setNotifOpen(v);
@@ -250,7 +258,7 @@ export default function StudentDashboard() {
                       (async () => {
                         try {
                           const res = await fetch(
-                            `${BASE_URL}/api/notifications/student/${CURRENT_USN}`
+                            `${BASE_URL}/api/notifications/student/${usn}`
                           );
                           if (!res.ok) return;
 
@@ -410,11 +418,12 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        {currentPage === "profile" && <StudentProfile />}
-        {currentPage === "teammates" && <FindTeammates />}
-        {currentPage === "mentors" && <FindMentors />}
-        {currentPage === "projects" && <StudentProjects />}
-        {currentPage === "openings" && <ProjectOpenings />}
+        {currentPage === "profile" && <StudentProfile usn={usn} />}
+{currentPage === "teammates" && <FindTeammates usn={usn} />}
+{currentPage === "mentors" && <FindMentors usn={usn} />}
+{currentPage === "projects" && <StudentProjects usn={usn} />}
+{currentPage === "openings" && <ProjectOpenings usn={usn} />}
+
       </main>
     </div>
   );

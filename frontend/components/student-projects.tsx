@@ -30,7 +30,7 @@ import {
   RefreshCw
 } from "lucide-react";
 
-const CURRENT_USN = "1RV15CS001"; // temp until auth
+// ❌ removed hardcoded CURRENT_USN
 const BASE_URL = "http://localhost:5000";
 
 type Project = {
@@ -59,7 +59,7 @@ const emptyProjectForm = {
   is_active: true
 };
 
-export default function StudentProjects() {
+export default function StudentProjects({ usn }: { usn: string }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -83,7 +83,7 @@ export default function StudentProjects() {
   const fetchMyProjects = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${BASE_URL}/api/projects/student/${CURRENT_USN}`);
+      const res = await fetch(`${BASE_URL}/api/projects/student/${usn}`);
       if (!res.ok) throw new Error("Failed to fetch projects");
       const data = await res.json();
       setProjects(Array.isArray(data) ? data : []);
@@ -103,7 +103,7 @@ export default function StudentProjects() {
         title: newProject.title,
         description: newProject.description,
         owner_type: "student",
-        owner_id: CURRENT_USN,
+        owner_id: usn,
         domain: newProject.domain,
         tech_stack: newProject.tech_stack,
         project_type: newProject.project_type,
@@ -199,7 +199,7 @@ export default function StudentProjects() {
   /* ------------------------- LOAD ON MOUNT ------------------------- */
   useEffect(() => {
     fetchMyProjects();
-  }, []);
+  }, []); // (keeping as-is)
 
   /* ------------------------- UI HELPERS ------------------------- */
   const getStatusBadge = (active: boolean) => {

@@ -33,7 +33,6 @@ import FindStudents from "@/components/find-students";
 import TeacherProjectOpenings from "@/components/teacher-project-openings";
 
 const BASE_URL = "http://localhost:5000";
-const CURRENT_FACULTY_ID = "FAC101"; // temp
 
 type Page = "home" | "students" | "projects" | "openings" | "profile";
 
@@ -47,7 +46,7 @@ async function safeJson(res: Response) {
   }
 }
 
-export default function TeacherDashboard() {
+export default function TeacherDashboard({ facultyId }: { facultyId: string }) {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
   // Notifications modal control
@@ -74,7 +73,7 @@ export default function TeacherDashboard() {
         // 1) Unread notifications count
         try {
           const notifRes = await fetch(
-            `${BASE_URL}/api/notifications/teacher/${CURRENT_FACULTY_ID}`
+            `${BASE_URL}/api/notifications/teacher/${facultyId}`
           );
           if (notifRes.ok) {
             const notifData = await safeJson(notifRes);
@@ -91,7 +90,7 @@ export default function TeacherDashboard() {
         // 2) Projects posted by teacher
         try {
           const projRes = await fetch(
-            `${BASE_URL}/api/projects/teacher/${CURRENT_FACULTY_ID}`
+            `${BASE_URL}/api/projects/teacher/${facultyId}`
           );
           if (projRes.ok) {
             const projData = await safeJson(projRes);
@@ -108,7 +107,7 @@ export default function TeacherDashboard() {
         // (Assumes your existing route is working for teachers)
         try {
           const matchRes = await fetch(
-            `${BASE_URL}/api/matchmaking/teacher/${CURRENT_FACULTY_ID}/students`
+            `${BASE_URL}/api/matchmaking/teacher/${facultyId}/students`
           );
           if (matchRes.ok) {
             const matchData = await safeJson(matchRes);
@@ -126,7 +125,7 @@ export default function TeacherDashboard() {
         // colleagueProjects + studentOpenings
         try {
           const openRes = await fetch(
-            `${BASE_URL}/api/projects/openings/teacher/${CURRENT_FACULTY_ID}`
+            `${BASE_URL}/api/projects/openings/teacher/${facultyId}`
           );
           if (openRes.ok) {
             const openData = await safeJson(openRes);
@@ -271,7 +270,7 @@ export default function TeacherDashboard() {
             {/* Notifications modal component (modal-only now) */}
             <Notifications
               recipientType="teacher"
-              recipientId={CURRENT_FACULTY_ID}
+              recipientId={facultyId}
               open={notifOpen}
               setOpen={setNotifOpen}
             />
@@ -396,10 +395,11 @@ export default function TeacherDashboard() {
           </div>
         )}
 
-        {currentPage === "students" && <FindStudents />}
-        {currentPage === "projects" && <TeacherProjects />}
-        {currentPage === "openings" && <TeacherProjectOpenings />}
-        {currentPage === "profile" && <TeacherProfile />}
+        {/* SAME STYLE AS STUDENT DASHBOARD */}
+        {currentPage === "students" && <FindStudents facultyId={facultyId} />}
+        {currentPage === "projects" && <TeacherProjects facultyId={facultyId} />}
+        {currentPage === "openings" && <TeacherProjectOpenings facultyId={facultyId} />}
+        {currentPage === "profile" && <TeacherProfile facultyId={facultyId} />}
       </main>
     </div>
   );

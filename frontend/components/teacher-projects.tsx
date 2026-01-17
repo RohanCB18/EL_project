@@ -30,7 +30,6 @@ import {
   RefreshCw
 } from "lucide-react";
 
-const CURRENT_FACULTY_ID = "FAC101"; // temp until auth
 const BASE_URL = "http://localhost:5000";
 
 type Project = {
@@ -59,7 +58,7 @@ const emptyProjectForm = {
   is_active: true
 };
 
-export default function StudentProjects() {
+export default function TeacherProjects({ facultyId }: { facultyId: string }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -83,7 +82,7 @@ export default function StudentProjects() {
   const fetchMyProjects = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${BASE_URL}/api/projects/teacher/${CURRENT_FACULTY_ID}`);
+      const res = await fetch(`${BASE_URL}/api/projects/teacher/${facultyId}`);
       if (!res.ok) throw new Error("Failed to fetch projects");
       const data = await res.json();
       setProjects(Array.isArray(data) ? data : []);
@@ -103,7 +102,7 @@ export default function StudentProjects() {
         title: newProject.title,
         description: newProject.description,
         owner_type: "teacher",
-        owner_id: CURRENT_FACULTY_ID,
+        owner_id: facultyId,
         domain: newProject.domain,
         tech_stack: newProject.tech_stack,
         project_type: newProject.project_type,

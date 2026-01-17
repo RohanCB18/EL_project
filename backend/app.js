@@ -7,6 +7,8 @@ import studentRoutes from "./matchmaking/routes/student.routes.js";
 import notificationRoutes from "./matchmaking/routes/notification.routes.js";
 import projectRoutes from "./matchmaking/routes/project.routes.js";
 import teacherRoutes from "./matchmaking/routes/teacher.routes.js";
+import authRoutes from "./matchmaking/routes/auth.routes.js";
+
 
 
 dotenv.config();
@@ -29,6 +31,7 @@ app.get("/", (req, res) => {
   res.send("EduConnect Backend Running");
 });
 
+app.use("/api/auth", authRoutes);
 // Matchmaking APIs
 app.use("/api/matchmaking", matchmakingRoutes);
 app.use("/api/student", studentRoutes);

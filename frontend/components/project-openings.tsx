@@ -13,11 +13,11 @@ import {
 import { Briefcase, Users, Eye, Mail } from "lucide-react";
 
 const BASE_URL = "http://localhost:5000";
-const CURRENT_USN = "1RV24CY029"; // temp until auth
+// ❌ removed hardcoded CURRENT_USN
 
 /* ---------------- FETCH CURRENT STUDENT ---------------- */
-async function fetchMyProfile() {
-  const res = await fetch(`${BASE_URL}/api/student/${CURRENT_USN}`);
+async function fetchMyProfile(usn: string) {
+  const res = await fetch(`${BASE_URL}/api/student/${usn}`);
   if (!res.ok) throw new Error("Failed to fetch student profile");
   return res.json();
 }
@@ -41,7 +41,7 @@ async function fetchOwnerEmail(ownerType: string, ownerId: string) {
   throw new Error("Unknown owner type");
 }
 
-export default function ProjectOpenings() {
+export default function ProjectOpenings({ usn }: { usn: string }) {
   const [mentorProjects, setMentorProjects] = useState<any[]>([]);
   const [studentOpenings, setStudentOpenings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ export default function ProjectOpenings() {
     const fetchOpenings = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/api/projects/openings/${CURRENT_USN}`
+          `${BASE_URL}/api/projects/openings/${usn}`
         );
         const data = await res.json();
 
@@ -67,14 +67,14 @@ export default function ProjectOpenings() {
     };
 
     fetchOpenings();
-  }, []);
+  }, []); // keeping as-is
 
   /* ---------------- CONNECT OWNER (MAIL + NOTIF) ---------------- */
   const connectOwner = async (project: any) => {
     try {
       setConnecting(true);
 
-      const me = await fetchMyProfile();
+      const me = await fetchMyProfile(usn);
       const ownerEmail = await fetchOwnerEmail(
         project.owner_type,
         project.owner_id
@@ -88,7 +88,7 @@ export default function ProjectOpenings() {
           recipient_type: project.owner_type,
           recipient_id: project.owner_id,
           sender_type: "student",
-          sender_id: CURRENT_USN,
+          sender_id: usn,
           entity_type: "project",
           entity_id: String(project.project_id),
           message: `${me.name} (${me.usn}) is interested in your project "${project.title}"`

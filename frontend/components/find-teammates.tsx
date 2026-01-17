@@ -13,18 +13,19 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
-const CURRENT_USN = "1RV15CS001"; // temp
+// ✅ removed hardcoded CURRENT_USN
 
-async function fetchMyProfile() {
-  const res = await fetch(`http://localhost:5000/api/student/${CURRENT_USN}`);
-  if (!res.ok) throw new Error("Failed to fetch current student profile");
-  return res.json();
-}
-
-export default function FindTeammates() {
+export default function FindTeammates({ usn }: { usn: string }) {
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
+
+  // ✅ moved inside component so it can use `usn`
+  const fetchMyProfile = async () => {
+    const res = await fetch(`http://localhost:5000/api/student/${usn}`);
+    if (!res.ok) throw new Error("Failed to fetch current student profile");
+    return res.json();
+  };
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -32,7 +33,7 @@ export default function FindTeammates() {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/api/matchmaking/student/${CURRENT_USN}/students`
+          `http://localhost:5000/api/matchmaking/student/${usn}/students`
         );
 
         const data = await res.json();
@@ -54,7 +55,7 @@ export default function FindTeammates() {
     };
 
     fetchMatches();
-  }, []);
+  }, [usn]); // ✅ important
 
   const getMatchColor = (score: number) => {
     if (score >= 80)
@@ -114,9 +115,9 @@ ${me.rvce_email}
           recipient_type: "student",
           recipient_id: targetStudent.usn,
           sender_type: "student",
-          sender_id: CURRENT_USN,
+          sender_id: usn,
           entity_type: "profile",
-          entity_id: CURRENT_USN,
+          entity_id: usn,
           message: `${me.name} (${me.usn}) wants to connect with you`
         })
       });
@@ -198,9 +199,11 @@ ${me.rvce_email}
 
                       {/* Top 3 reasons */}
                       <ul className="list-disc ml-5 text-sm text-muted-foreground mb-4">
-                        {(match.match_reason || []).slice(0, 3).map((r: string, i: number) => (
-                          <li key={i}>{r}</li>
-                        ))}
+                        {(match.match_reason || [])
+                          .slice(0, 3)
+                          .map((r: string, i: number) => (
+                            <li key={i}>{r}</li>
+                          ))}
                       </ul>
 
                       {/* Actions */}

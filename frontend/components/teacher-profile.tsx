@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/select";
 
 const BASE_URL = "http://localhost:5000";
-const CURRENT_FACULTY_ID = "FAC009"; // temp until auth
 
 // ------------------ Dropdown Options ------------------
 const DEPARTMENTS = [
@@ -159,12 +158,12 @@ function ArrayInput({
   );
 }
 
-export default function TeacherProfile() {
+export default function TeacherProfile({ facultyId }: { facultyId: string }) {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
 
   const [profile, setProfile] = useState<any>({
-    faculty_id: CURRENT_FACULTY_ID,
+    faculty_id: facultyId,
     name: "",
     rvce_email: "",
     department: "",
@@ -185,7 +184,7 @@ export default function TeacherProfile() {
       try {
         setLoading(true);
 
-        const res = await fetch(`${BASE_URL}/api/teacher/${CURRENT_FACULTY_ID}`);
+        const res = await fetch(`${BASE_URL}/api/teacher/${facultyId}`);
 
         // if no profile exists yet
         if (!res.ok) {
@@ -197,6 +196,7 @@ export default function TeacherProfile() {
 
         setProfile({
           ...data,
+          faculty_id: data.faculty_id || facultyId,
           areas_of_expertise: normalizeStringArray(data.areas_of_expertise),
           domains_interested_to_mentor: normalizeStringArray(data.domains_interested_to_mentor),
           prominent_projects_or_publications: normalizeStringArray(
@@ -245,6 +245,7 @@ export default function TeacherProfile() {
 
       const payload = {
         ...profile,
+        faculty_id: facultyId,
         years_of_experience: Number(profile.years_of_experience) || 0,
         publication_and_count: Number(profile.publication_and_count) || 0,
         max_projects_capacity: Number(profile.max_projects_capacity) || 0,
@@ -451,8 +452,6 @@ export default function TeacherProfile() {
                 ))}
               </SelectContent>
             </Select>
-
-            
           </div>
 
           {/* Preferred Student Years */}
