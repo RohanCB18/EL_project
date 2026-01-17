@@ -40,8 +40,8 @@ async def health_check():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "ollama_model": settings.OLLAMA_MODEL,
-        "embed_model": settings.OLLAMA_EMBED_MODEL
+        "llm_provider": "openrouter",
+        "model": settings.OPENROUTER_MODEL
     }
 
 

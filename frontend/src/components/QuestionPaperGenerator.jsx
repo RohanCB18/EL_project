@@ -6,6 +6,7 @@ function QuestionPaperGenerator({ sessionId, onGenerate, isLoading }) {
     const [topic, setTopic] = useState('');
     const [numQuestions, setNumQuestions] = useState(10);
     const [difficulty, setDifficulty] = useState('medium');
+    const [testMode, setTestMode] = useState('mcq');
     const [includeAnswers, setIncludeAnswers] = useState(false);
     const [generatedPaper, setGeneratedPaper] = useState(null);
     const [error, setError] = useState('');
@@ -23,6 +24,7 @@ function QuestionPaperGenerator({ sessionId, onGenerate, isLoading }) {
                 topic,
                 numQuestions,
                 difficulty,
+                testMode,
                 includeAnswers,
             });
             setGeneratedPaper(result);
@@ -100,8 +102,11 @@ function QuestionPaperGenerator({ sessionId, onGenerate, isLoading }) {
                             doc.addPage();
                             y = 20;
                         }
-                        doc.text(`    ${opt}`, margin, y);
-                        y += 5;
+                        // Wrap long option text
+                        const optionText = `    ${opt}`;
+                        const splitOption = doc.splitTextToSize(optionText, pageWidth - 2 * margin - 10);
+                        doc.text(splitOption, margin, y);
+                        y += splitOption.length * 5;
                     });
                     y += 3;
                 }
@@ -174,6 +179,21 @@ function QuestionPaperGenerator({ sessionId, onGenerate, isLoading }) {
                             <option value="hard">Hard</option>
                         </select>
                     </div>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="testMode">Test Mode</label>
+                    <select
+                        id="testMode"
+                        className="input-field"
+                        value={testMode}
+                        onChange={(e) => setTestMode(e.target.value)}
+                        disabled={!sessionId}
+                    >
+                        <option value="mcq">MCQ Only (1 mark each)</option>
+                        <option value="theory">Theory - Short (2 marks) + Long (5 marks)</option>
+                        <option value="hybrid">Hybrid - MCQ + Short + Long</option>
+                    </select>
                 </div>
 
                 <div className="form-group checkbox-group">

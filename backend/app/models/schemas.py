@@ -32,6 +32,7 @@ class QuestionPaperRequest(BaseModel):
     num_questions: int = 10
     difficulty: str = "medium"
     include_answers: bool = False
+    test_mode: str = "mcq"  # mcq, theory (short+long), hybrid
     question_types: Optional[List[str]] = ["mcq", "short_answer", "long_answer"]
 
 
@@ -81,6 +82,7 @@ class QuestionPaperResponse(BaseModel):
     instructions: str
     sections: List[dict]
     total_marks: int
+    duration: Optional[str] = None
 
 
 class ErrorResponse(BaseModel):

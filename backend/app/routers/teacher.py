@@ -66,6 +66,7 @@ async def generate_paper(request: QuestionPaperRequest):
             num_questions=request.num_questions,
             difficulty=request.difficulty,
             include_answers=request.include_answers,
+            test_mode=request.test_mode,
             question_types=request.question_types
         )
         
@@ -74,7 +75,8 @@ async def generate_paper(request: QuestionPaperRequest):
             title=paper.get("title", f"Question Paper - {request.topic}"),
             instructions=paper.get("instructions", "Answer all questions carefully."),
             sections=paper.get("sections", []),
-            total_marks=paper.get("total_marks", request.num_questions * 2)
+            total_marks=paper.get("total_marks", request.num_questions),
+            duration=paper.get("duration")
         )
         
     except Exception as e:

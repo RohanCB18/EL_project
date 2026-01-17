@@ -15,7 +15,7 @@ const api = {
     formData.append('file', file);
 
     const endpoint = userType === 'teacher' ? '/teacher/upload' : '/student/upload';
-    
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
       body: formData,
@@ -127,6 +127,7 @@ const api = {
         num_questions: options.numQuestions || 10,
         difficulty: options.difficulty || 'medium',
         include_answers: options.includeAnswers || false,
+        test_mode: options.testMode || 'mcq',
         question_types: options.questionTypes || ['mcq', 'short_answer', 'long_answer'],
       }),
     });

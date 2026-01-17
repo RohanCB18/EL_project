@@ -19,9 +19,9 @@ class Settings:
         "http://127.0.0.1:3000",
     ]
     
-    # Ollama settings
-    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3:8b")
-    OLLAMA_EMBED_MODEL: str = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+    # OpenRouter settings
+    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
+    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "google/gemma-3-27b-it:free")
     
     # Vector store settings
     VECTOR_STORE_PATH: str = os.getenv("VECTOR_STORE_PATH", "./vector_stores")
