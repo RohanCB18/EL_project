@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings import OllamaEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from app.config import settings
 
 # In-memory store for session vector databases
@@ -9,8 +9,11 @@ _vector_stores: dict = {}
 
 
 def get_embeddings():
-    """Get Ollama embeddings instance."""
-    return OllamaEmbeddings(model=settings.OLLAMA_EMBED_MODEL)
+    """Get HuggingFace embeddings instance (local, free, works offline)."""
+    return HuggingFaceEmbeddings(
+        model_name="all-MiniLM-L6-v2",
+        model_kwargs={'device': 'cpu'}
+    )
 
 
 def create_vector_store(chunks: List[str], session_id: str) -> bool:

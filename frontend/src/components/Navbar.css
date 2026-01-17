@@ -4,10 +4,11 @@
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(10, 10, 15, 0.8);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
 }
 
 .navbar-container {
@@ -34,10 +35,11 @@
 .brand-text {
     font-size: var(--font-size-xl);
     font-weight: 700;
-    background: var(--color-accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-text-primary);
+}
+
+.brand-text-accent {
+    color: var(--color-accent-primary);
 }
 
 .navbar-links {
@@ -65,8 +67,8 @@
 
 .nav-btn-student {
     color: var(--color-student-primary);
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.15);
 }
 
 .nav-btn-student:hover,
@@ -75,13 +77,13 @@
     color: white;
     border-color: transparent;
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
 }
 
 .nav-btn-teacher {
     color: var(--color-teacher-primary);
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.15);
 }
 
 .nav-btn-teacher:hover,
@@ -90,7 +92,7 @@
     color: white;
     border-color: transparent;
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 }
 
 @media (max-width: 640px) {
