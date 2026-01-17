@@ -26,18 +26,21 @@ import {
 } from "lucide-react";
 
 import Notifications from "@/components/notifications";
+import TeacherProfile from "@/components/teacher-profile";
 import TeacherProjects from "@/components/teacher-projects";
 import FindStudents from "@/components/find-students";
 import TeacherProjectOpenings from "@/components/teacher-project-openings";
 
 const CURRENT_FACULTY_ID = "FAC101"; // temp
-type Page = "home" | "students" | "projects" | "openings";
+type Page = "home" | "students" | "projects" | "openings" | "profile";
+
 
 export default function TeacherDashboard() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
   const navItems = [
     { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
+    { id: "profile" as Page, icon: UserPlus, label: "My Profile", color: "text-chart-3" },
     { id: "students" as Page, icon: Users, label: "Connect with Students", color: "text-chart-2" },
     { id: "projects" as Page, icon: FileText, label: "Projects", color: "text-chart-3" },
     { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-2" }
@@ -255,6 +258,8 @@ export default function TeacherDashboard() {
         {currentPage === "students" && <FindStudents />}
         {currentPage === "projects" && <TeacherProjects />}
         {currentPage === "openings" && <TeacherProjectOpenings />}
+        {currentPage === "profile" && <TeacherProfile />}
+
       </main>
     </div>
   );
