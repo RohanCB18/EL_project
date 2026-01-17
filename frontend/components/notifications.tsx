@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Bell, Eye, Mail } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Eye, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -15,14 +15,36 @@ const BASE_URL = "http://localhost:5000";
 
 type RecipientType = "student" | "teacher";
 
+async function safeJson(res: Response) {
+  const text = await res.text();
+
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("❌ Response is not JSON:", text);
+    throw new Error("Server returned non-JSON response");
+  }
+}
+
 export default function Notifications({
   recipientType,
-  recipientId
+  recipientId,
+  open: controlledOpen,
+  setOpen: controlledSetOpen
 }: {
   recipientType: RecipientType;
   recipientId: string;
+
+  // ✅ optional (for new dashboard usage)
+  open?: boolean;
+  setOpen?: (v: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  // ---- Backward compatible open state ----
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledSetOpen ?? setInternalOpen;
+
   const [notifications, setNotifications] = useState<any[]>([]);
 
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
@@ -30,7 +52,8 @@ export default function Notifications({
 
   // store sender info so we can connect later
   const [selectedSenderId, setSelectedSenderId] = useState<string | null>(null);
-  const [selectedSenderType, setSelectedSenderType] = useState<RecipientType | null>(null);
+  const [selectedSenderType, setSelectedSenderType] =
+    useState<RecipientType | null>(null);
 
   // Fetch notifications only when modal opens
   useEffect(() => {
@@ -41,7 +64,14 @@ export default function Notifications({
         const res = await fetch(
           `${BASE_URL}/api/notifications/${recipientType}/${recipientId}`
         );
-        const data = await res.json();
+
+        if (!res.ok) {
+          console.error("❌ Failed notifications fetch:", res.status);
+          setNotifications([]);
+          return;
+        }
+
+        const data = await safeJson(res);
         setNotifications(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch notifications:", err);
@@ -61,7 +91,8 @@ export default function Notifications({
 
     const res = await fetch(endpoint);
     if (!res.ok) throw new Error("Failed to fetch my profile");
-    return res.json();
+
+    return safeJson(res);
   };
 
   // View profile (student or teacher based on sender_type)
@@ -73,7 +104,13 @@ export default function Notifications({
           : `${BASE_URL}/api/teacher/${senderId}`;
 
       const res = await fetch(endpoint);
-      const data = await res.json();
+
+      if (!res.ok) {
+        alert("Unable to load profile");
+        return;
+      }
+
+      const data = await safeJson(res);
 
       setSelectedType(senderType);
       setSelectedProfile(data);
@@ -89,9 +126,14 @@ export default function Notifications({
   // Mark notification read
   const markAsRead = async (notificationId: number) => {
     try {
-      await fetch(`${BASE_URL}/api/notifications/${notificationId}/read`, {
+      const res = await fetch(`${BASE_URL}/api/notifications/${notificationId}/read`, {
         method: "PATCH"
       });
+
+      if (!res.ok) {
+        console.error("❌ markAsRead failed:", res.status);
+        return;
+      }
 
       setNotifications((prev) =>
         prev.map((n) =>
@@ -113,14 +155,13 @@ export default function Notifications({
 
       const me = await fetchMyProfile();
 
-      // target email (from selected profile)
       const targetEmail = selectedProfile.rvce_email;
       if (!targetEmail) {
         alert("Email not available for this user");
         return;
       }
 
-      // 1) Send in-app notification to sender
+      // 1) Send in-app notification to the sender (the person who originally contacted me)
       await fetch(`${BASE_URL}/api/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,28 +205,25 @@ ${me.rvce_email || ""}
     }
   };
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.is_read).length,
+    [notifications]
+  );
 
   return (
     <>
-      {/* 🔔 Bell Icon */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
-        onClick={() => setOpen(true)}
-      >
-        <Bell className="w-6 h-6" />
-        {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-        )}
-      </Button>
-
-      {/* Notifications Modal */}
+      {/* ✅ ONLY MODAL (no bell icon here) */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Notifications</DialogTitle>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {unreadCount} unread
+                </span>
+              )}
+            </DialogTitle>
           </DialogHeader>
 
           {notifications.length === 0 ? (
@@ -236,7 +274,6 @@ ${me.rvce_email || ""}
                 {selectedType === "teacher" ? "Teacher Profile" : "Student Profile"}
               </span>
 
-              {/* CONNECT BUTTON */}
               <Button onClick={handleConnect}>
                 <Mail className="w-4 h-4 mr-2" />
                 Connect (Email)
