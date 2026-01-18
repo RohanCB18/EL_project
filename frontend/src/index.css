@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
+
 /* ================================
    StudyGenius - Professional Design System
    Light Mode - Google/CRED Inspired
@@ -43,6 +45,8 @@
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-display: 'Syne', sans-serif;
+  /* New Display Font */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -114,9 +118,11 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-family-display);
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-text-primary);
+  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -201,13 +207,16 @@ a:hover {
 
 /* Buttons */
 .btn {
+  font-family: var(--font-family-display);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   border: none;
   border-radius: var(--radius-lg);
   cursor: pointer;
