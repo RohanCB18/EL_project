@@ -335,7 +335,8 @@ ${me.rvce_email}
         open={!!selectedTeacher}
         onOpenChange={() => setSelectedTeacher(null)}
       >
-        <DialogContent className="max-w-3xl animate-in fade-in zoom-in-95">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle>Mentor Profile</DialogTitle>
           </DialogHeader>

@@ -172,7 +172,8 @@ ${CURRENT_FACULTY_ID}
       </div>
 
       <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle>Student Profile</DialogTitle>
           </DialogHeader>

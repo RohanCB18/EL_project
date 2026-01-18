@@ -248,7 +248,8 @@ ${me.rvce_email}
 
       {/* DETAILS MODAL */}
       <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle>Project Details</DialogTitle>
           </DialogHeader>

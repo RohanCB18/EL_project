@@ -268,7 +268,8 @@ ${me.rvce_email || ""}
           setSelectedSenderType(null);
         }}
       >
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between gap-4">
               <span>

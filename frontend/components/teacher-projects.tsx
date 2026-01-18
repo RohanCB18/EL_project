@@ -350,7 +350,8 @@ export default function TeacherProjects({ facultyId }: { facultyId: string }) {
 
       {/* ---------------- ADD PROJECT MODAL ---------------- */}
       <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle>Add New Project</DialogTitle>
           </DialogHeader>
@@ -503,7 +504,8 @@ export default function TeacherProjects({ facultyId }: { facultyId: string }) {
 
       {/* ---------------- EDIT PROJECT MODAL ---------------- */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle>Edit Project</DialogTitle>
           </DialogHeader>

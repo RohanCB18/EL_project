@@ -237,7 +237,8 @@ ${me.rvce_email}
         open={!!selectedStudent}
         onOpenChange={() => setSelectedStudent(null)}
       >
-        <DialogContent className="max-w-3xl animate-in fade-in zoom-in-95">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+
           <DialogHeader>
             <DialogTitle>Student Profile</DialogTitle>
           </DialogHeader>
