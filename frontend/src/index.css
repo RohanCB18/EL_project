@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
-
 /* ================================
    StudyGenius - Professional Design System
    Light Mode - Google/CRED Inspired
@@ -43,10 +41,13 @@
   --color-error: #000000;
   --color-warning: #000000;
 
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-display: 'Syne', sans-serif;
-  /* New Display Font */
+  /* Typography - Geist Font Family */
+  --font-family: "Geist Sans", "Geist Fallback", sans-serif;
+  --font-family-mono: "Geist Mono", "Geist Mono Fallback", monospace;
+
+  --font-family-display: var(--font-family);
+  /* Use Geist for display too */
+
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
