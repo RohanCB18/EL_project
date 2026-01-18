@@ -164,7 +164,7 @@ export default function Home() {
   return (
     <div className="h-screen w-full bg-[#F4F4F7] overflow-hidden grid lg:grid-cols-12 p-8 gap-8">
       {/* Left side - Hero content */}
-      <div className="col-span-12 lg:col-span-7 h-full flex flex-col justify-center min-h-0 space-y-8 pl-12 lg:pl-32">
+      <div className="col-span-12 lg:col-span-6 h-full flex flex-col justify-center min-h-0 space-y-8 pl-12 lg:pl-32">
         <div className="space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-black text-[10px] font-black uppercase tracking-widest opacity-80 shadow-sm animate-float">
             <Sparkles className="w-4 h-4" />
@@ -180,35 +180,41 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 pt-8">
+        <div className="grid grid-cols-3 gap-4 w-full max-w-lg pt-6">
           {/* Teams */}
-          <div className="flex flex-col gap-4 group cursor-pointer">
-            <div className="w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center transition-transform group-hover:scale-110">
-              <Users className="w-5 h-5" />
-            </div>
-            <span className="text-sm font-bold uppercase tracking-wide opacity-50 group-hover:opacity-100 transition-opacity">Teams</span>
-          </div>
+          <Card className="border-0 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:translate-y-[-4px] cursor-pointer group rounded-[2rem]">
+            <CardContent className="flex flex-col items-center justify-center p-6 gap-4">
+              <div className="w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-0">
+                <Users className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity text-center">Teams</span>
+            </CardContent>
+          </Card>
 
           {/* Mentors */}
-          <div className="flex flex-col gap-4 group cursor-pointer">
-            <div className="w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center transition-transform group-hover:scale-110">
-              <UserPlus className="w-5 h-5" />
-            </div>
-            <span className="text-sm font-bold uppercase tracking-wide opacity-50 group-hover:opacity-100 transition-opacity">Mentors</span>
-          </div>
+          <Card className="border-0 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:translate-y-[-4px] cursor-pointer group rounded-[2rem]">
+            <CardContent className="flex flex-col items-center justify-center p-6 gap-4">
+              <div className="w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-0">
+                <UserPlus className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity text-center">Mentors</span>
+            </CardContent>
+          </Card>
 
           {/* Projects */}
-          <div className="flex flex-col gap-4 group cursor-pointer">
-            <div className="w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center transition-transform group-hover:scale-110">
-              <FolderKanban className="w-5 h-5" />
-            </div>
-            <span className="text-sm font-bold uppercase tracking-wide opacity-50 group-hover:opacity-100 transition-opacity">Projects</span>
-          </div>
+          <Card className="border-0 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:translate-y-[-4px] cursor-pointer group rounded-[2rem]">
+            <CardContent className="flex flex-col items-center justify-center p-6 gap-4">
+              <div className="w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-0">
+                <FolderKanban className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity text-center">Projects</span>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Right side - Login form */}
-      <div className="col-span-12 lg:col-span-5 h-full flex flex-col justify-center min-h-0">
+      <div className="col-span-12 lg:col-span-6 h-full flex flex-col justify-center min-h-0">
         <Card className="h-auto max-h-full overflow-y-auto shadow-2xl bg-white border-0 p-2">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-4xl font-bold text-center">
