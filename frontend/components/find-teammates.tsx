@@ -174,14 +174,14 @@ ${me.rvce_email}
                         <div>
                           <h3 className="text-xl font-bold">{s?.name}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {s?.usn} • {s?.branch} • Year {s?.year}
+                            <span className="font-mono">{s?.usn}</span> • {s?.branch} • Year {s?.year}
                           </p>
                         </div>
 
                         <div
                           className={`px-4 py-2 rounded-xl ${color.bg} ${color.text} border ${color.border}`}
                         >
-                          <p className="text-2xl font-bold">
+                          <p className="text-2xl font-bold font-mono">
                             {match.match_score || 0}%
                           </p>
                           <p className="text-xs text-center">Match</p>
@@ -249,8 +249,8 @@ ${me.rvce_email}
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2">Personal Information</h4>
                   <p>Name: {selectedStudent.name}</p>
-                  <p>USN: {selectedStudent.usn}</p>
-                  <p>Email: {selectedStudent.rvce_email}</p>
+                  <p>USN: <span className="font-mono">{selectedStudent.usn}</span></p>
+                  <p>Email: <span className="font-mono">{selectedStudent.rvce_email}</span></p>
                   <p>Gender: {selectedStudent.gender}</p>
                 </CardContent>
               </Card>
@@ -261,7 +261,7 @@ ${me.rvce_email}
                   <p>Branch: {selectedStudent.branch}</p>
                   <p>Year: {selectedStudent.year}</p>
                   <p>Section: {selectedStudent.section}</p>
-                  <p>Average EL Marks: {selectedStudent.average_el_marks}</p>
+                  <p>Average EL Marks: <span className="font-mono">{selectedStudent.average_el_marks}</span></p>
                 </CardContent>
               </Card>
 
