@@ -1,7 +1,25 @@
 /* ================================
    StudyGenius - Professional Design System
-   Light Mode - Google/CRED Inspired
+   Light Mode - Monochrome
    ================================ */
+
+/* Geist Sans */
+@font-face {
+  font-family: 'Geist Sans';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* Geist Mono */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
 
 /* CSS Custom Properties (Design Tokens) */
 :root {
