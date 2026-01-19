@@ -444,6 +444,7 @@ class StudentAttemptSummary(BaseModel):
     end_time: str
     auto_submitted: bool
     violations: List[Dict]
+    session_id: Optional[str] = None
 
 
 # Authentication Endpoints
@@ -566,10 +567,12 @@ async def get_subject_questions(subject: str):
         if subject not in ['adld', 'dsa', 'os']:
             raise HTTPException(status_code=400, detail="Invalid subject")
         
-        # Read JSON file from root
-        json_path = f"{subject}.json"
+        # Read JSON file from project root (parent directory)
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        json_path = os.path.join(project_root, f"{subject}.json")
+        
         if not os.path.exists(json_path):
-            raise HTTPException(status_code=404, detail="Question bank not found")
+            raise HTTPException(status_code=404, detail=f"Question bank not found at {json_path}")
         
         with open(json_path, 'r', encoding='utf-8') as f:
             questions = json.load(f)
@@ -928,7 +931,8 @@ async def get_quiz_attempts(quiz_id: str, teacher_email: str):
                 start_time=attempt.start_time.isoformat() + 'Z',
                 end_time=attempt.end_time.isoformat() + 'Z' if attempt.end_time else '',
                 auto_submitted=attempt.auto_submitted,
-                violations=violations
+                violations=violations,
+                session_id=attempt.session_id
             ))
         
         db.close()

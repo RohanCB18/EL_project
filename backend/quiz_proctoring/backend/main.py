@@ -44,6 +44,11 @@ app.include_router(router)  # Proctoring routes with /proctor prefix
 app.include_router(auth_router)  # Auth routes with /auth prefix
 app.include_router(quiz_router)  # Quiz routes with /quiz prefix
 
+# Mount static files (CSS, JS, etc.)
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/css", StaticFiles(directory=os.path.join(FRONTEND_DIR, "css")), name="css")
+    app.mount("/js", StaticFiles(directory=os.path.join(FRONTEND_DIR, "js")), name="js")
+
 # Serve frontend pages
 @app.get("/")
 async def root():
