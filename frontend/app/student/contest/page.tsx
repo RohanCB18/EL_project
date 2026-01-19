@@ -79,6 +79,42 @@ export default function StudentContestPage() {
     load()
   }, [router, token])
 
+  // Fullscreen and tab detection
+  useEffect(() => {
+    // Request fullscreen on mount
+    const enterFullscreen = async () => {
+      try {
+        await document.documentElement.requestFullscreen()
+      } catch (err) {
+        console.log("Fullscreen request failed:", err)
+      }
+    }
+
+    enterFullscreen()
+
+    // Auto-submit on visibility change (tab switch)
+    const handleVisibilityChange = () => {
+      if (document.hidden && !submitted && !alreadySubmitted) {
+        submitCode()
+      }
+    }
+
+    // Auto-submit on fullscreen exit
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && !submitted && !alreadySubmitted) {
+        submitCode()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    }
+  }, [submitted, alreadySubmitted, code, language, token])
+
   const runCode = async () => {
     if (!token) return
     setLoading(true)
@@ -107,7 +143,7 @@ export default function StudentContestPage() {
       const res = await fetch(`${BACKEND_URL}/contests/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ source_code: code, language_id: LANGUAGE_MAP[language] }),
+        body: JSON.stringify({ source_code: code || "", language_id: LANGUAGE_MAP[language] }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -363,7 +399,7 @@ export default function StudentContestPage() {
                     </Button>
                     <Button 
                       onClick={submitCode} 
-                      disabled={loading || !code.trim()} 
+                      disabled={loading} 
                       className="h-10 px-8 bg-black text-white text-[10px] uppercase font-black tracking-widest rounded-xl shadow-lg hover:translate-y-[-2px] transition-all duration-300"
                     >
                         {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <><Send className="w-4 h-4 mr-2" /> Submit</>}

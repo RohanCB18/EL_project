@@ -31,10 +31,61 @@ export default function StudentDashboard() {
   const [quizActive, setQuizActive] = useState(false)
   const [contestActive, setContestActive] = useState(false)
   const [classInfo, setClassInfo] = useState<{ room_code: string, teacher_name: string } | null>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
   const name = typeof window !== "undefined" ? localStorage.getItem("name") || "" : ""
   const email = typeof window !== "undefined" ? localStorage.getItem("email") || "" : ""
+
+  // Fullscreen and tab-switching enforcement
+  useEffect(() => {
+    if (!token || !isFullscreen) return
+
+    const leaveClassroom = async () => {
+      try {
+        await fetch(`${BACKEND_URL}/classrooms/leave`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      } catch (e) {
+        console.error("Failed to leave classroom:", e)
+      } finally {
+        router.push("/")
+      }
+    }
+
+    // Monitor fullscreen changes
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        leaveClassroom()
+      }
+    }
+
+    // Monitor tab visibility
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        leaveClassroom()
+      }
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [token, router, isFullscreen])
+
+  const enterFullscreen = async () => {
+    try {
+      await document.documentElement.requestFullscreen()
+      setIsFullscreen(true)
+    } catch (e) {
+      console.error("Failed to enter fullscreen:", e)
+      alert("Please allow fullscreen mode to continue")
+    }
+  }
 
   useEffect(() => {
     if (!token) { router.push("/"); return }
@@ -82,6 +133,28 @@ export default function StudentDashboard() {
 
   return (
     <main className="min-h-screen bg-[#F4F4F7] text-[#111111] antialiased">
+      {/* Fullscreen Entry Modal */}
+      {!isFullscreen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] p-12 max-w-md text-center shadow-2xl">
+            <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-2xl font-black tracking-tighter uppercase mb-3">Enter Fullscreen</h2>
+            <p className="text-sm text-black/60 mb-8 leading-relaxed">
+              To ensure a focused learning environment, you must enter fullscreen mode. 
+              Exiting fullscreen or switching tabs will automatically remove you from the class.
+            </p>
+            <Button 
+              onClick={enterFullscreen}
+              className="w-full h-14 bg-black text-white rounded-xl font-bold uppercase text-sm tracking-widest hover:bg-black/90"
+            >
+              Enter Fullscreen & Continue
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Top Navigation Bar */}
       <nav className="h-20 bg-white border-b border-black/5 sticky top-0 z-50">
         <div className="max-w-[1440px] mx-auto px-8 h-full flex items-center justify-between">
