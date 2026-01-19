@@ -6,6 +6,8 @@
 .dashboard-main {
     padding-top: 92px;
     padding-bottom: var(--spacing-3xl);
+    flex: 1;
+    overflow-y: auto;
 }
 
 /* Header */
@@ -86,10 +88,10 @@
 
 .sidebar-section {
     background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border: none;
+    border-radius: var(--radius-3xl);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-xl);
 }
 
 .sidebar-section h3 {
@@ -126,13 +128,13 @@
 }
 
 .status-card.success {
-    border-left: 3px solid var(--color-success);
+    border-left: 3px solid var(--color-led-emerald);
 }
 
 .status-card svg {
     width: 24px;
     height: 24px;
-    color: var(--color-success);
+    color: var(--color-led-emerald);
     flex-shrink: 0;
 }
 
@@ -145,7 +147,7 @@
 .status-title {
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--color-success);
+    color: var(--color-led-emerald);
 }
 
 .status-file {

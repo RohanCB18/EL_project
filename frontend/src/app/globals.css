@@ -1,0 +1,334 @@
+@import "tailwindcss";
+
+/* ================================
+   StudyGenius - Warm Glassmorphic Design System
+   ================================ */
+
+/* Force light mode - no dark mode */
+:root {
+  color-scheme: light;
+}
+
+/* Base colors applied directly */
+body {
+  background-color: #FDF8F3 !important;
+  color: #2D2A26 !important;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* ================================
+   Glass Utility Class
+   ================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.glass:hover {
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* ================================
+   Color Classes (Override Tailwind)
+   ================================ */
+
+/* Primary - Deep Indigo */
+.bg-primary {
+  background-color: #4338CA !important;
+}
+
+.text-primary {
+  color: #4338CA !important;
+}
+
+.text-primary-foreground {
+  color: #FFFFFF !important;
+}
+
+.border-primary {
+  border-color: #4338CA !important;
+}
+
+/* Accent - Emerald Green */
+.bg-accent {
+  background-color: #10B981 !important;
+}
+
+.text-accent {
+  color: #10B981 !important;
+}
+
+.text-accent-foreground {
+  color: #FFFFFF !important;
+}
+
+/* Foreground */
+.text-foreground {
+  color: #2D2A26 !important;
+}
+
+/* Muted */
+.bg-muted {
+  background-color: #F5F0EB !important;
+}
+
+.text-muted-foreground {
+  color: #78716C !important;
+}
+
+/* Success */
+.bg-success {
+  background-color: #10B981 !important;
+}
+
+.text-success {
+  color: #10B981 !important;
+}
+
+/* Destructive */
+.bg-destructive {
+  background-color: #DC2626 !important;
+}
+
+.text-destructive {
+  color: #DC2626 !important;
+}
+
+/* Border */
+.border-border {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ================================
+   Icon Wrapper
+   ================================ */
+.icon-wrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(67, 56, 202, 0.1);
+  color: #4338CA;
+  border-radius: 0.75rem;
+}
+
+.icon-wrap-accent {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+/* Navbar Link Hover States */
+.nav-link-student {
+  transition: all 0.2s ease;
+}
+
+.nav-link-student:hover {
+  background-color: #4338CA !important;
+  color: #FFFFFF !important;
+}
+
+.nav-link-teacher {
+  transition: all 0.2s ease;
+}
+
+.nav-link-teacher:hover {
+  background-color: #10B981 !important;
+  color: #FFFFFF !important;
+}
+
+/* ================================
+   Buttons
+   ================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: #4338CA !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+  background: #3730A3 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(67, 56, 202, 0.35);
+}
+
+.btn-primary:disabled {
+  background: #A5A3C7 !important;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-accent {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-accent:hover {
+  background: #059669 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #4338CA;
+}
+
+.btn-ghost:hover {
+  background: rgba(67, 56, 202, 0.1);
+}
+
+/* ================================
+   Form Elements
+   ================================ */
+.input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: #2D2A26;
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  border-color: #4338CA;
+  box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1);
+}
+
+.input::placeholder {
+  color: #78716C;
+}
+
+.input:disabled {
+  background: #F5F0EB;
+  cursor: not-allowed;
+}
+
+/* ================================
+   Labels
+   ================================ */
+.label-muted {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #78716C;
+}
+
+/* ================================
+   Background Blobs
+   ================================ */
+.blob-primary {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(67, 56, 202, 0.06);
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+.blob-accent {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(16, 185, 129, 0.08);
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+/* ================================
+   Animations
+   ================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* ================================
+   Scrollbar
+   ================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ================================
+   Prose (Markdown)
+   ================================ */
+.prose {
+  color: #2D2A26;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: #2D2A26;
+  font-weight: 600;
+}
+
+.prose p {
+  margin-bottom: 0.75rem;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+}
+
+.prose code {
+  background: rgba(67, 56, 202, 0.1);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}

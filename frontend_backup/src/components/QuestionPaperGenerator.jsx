@@ -38,42 +38,69 @@ function QuestionPaperGenerator({ sessionId, onGenerate, isLoading }) {
 
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
-        const margin = 20;
-        let y = 20;
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 25; // Increased margin for better spacing
+        const contentWidth = pageWidth - 2 * margin;
+        const lineHeight = 6; // Consistent line height
+        let y = 25;
+
+        // Helper function to add text with proper wrapping and page breaks
+        const addWrappedText = (text, x, fontSize = 10, fontStyle = 'normal') => {
+            doc.setFontSize(fontSize);
+            doc.setFont('helvetica', fontStyle);
+            const lines = doc.splitTextToSize(text, contentWidth - (x - margin));
+            
+            lines.forEach((line) => {
+                if (y > pageHeight - 30) {
+                    doc.addPage();
+                    y = 25;
+                }
+                doc.text(line, x, y);
+                y += lineHeight;
+            });
+        };
 
         // Title
-        doc.setFontSize(18);
+        doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text(generatedPaper.title, pageWidth / 2, y, { align: 'center' });
-        y += 15;
+        const titleLines = doc.splitTextToSize(generatedPaper.title, contentWidth);
+        titleLines.forEach((line) => {
+            doc.text(line, pageWidth / 2, y, { align: 'center' });
+            y += 8;
+        });
+        y += 5;
 
         // Duration and Marks
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`Total Marks: ${generatedPaper.total_marks}`, margin, y);
         doc.text(`Duration: ${generatedPaper.duration || `${(generatedPaper.total_marks || 10) * 2} minutes`}`, pageWidth - margin, y, { align: 'right' });
         y += 10;
 
         // Instructions
-        doc.setFontSize(10);
-        doc.text('Instructions: ' + generatedPaper.instructions, margin, y, { maxWidth: pageWidth - 2 * margin });
-        y += 15;
+        doc.setFontSize(9);
+        const instructionLines = doc.splitTextToSize('Instructions: ' + generatedPaper.instructions, contentWidth);
+        instructionLines.forEach((line) => {
+            doc.text(line, margin, y);
+            y += 5;
+        });
+        y += 5;
 
         // Divider line
-        doc.setDrawColor(200);
+        doc.setDrawColor(180);
         doc.line(margin, y, pageWidth - margin, y);
         y += 10;
 
         // Sections
-        generatedPaper.sections?.forEach((section, sectionIdx) => {
-            // Check if we need a new page
-            if (y > 260) {
+        generatedPaper.sections?.forEach((section) => {
+            // Check if we need a new page for section header
+            if (y > pageHeight - 50) {
                 doc.addPage();
-                y = 20;
+                y = 25;
             }
 
             // Section header
-            doc.setFontSize(12);
+            doc.setFontSize(11);
             doc.setFont('helvetica', 'bold');
             doc.text(section.name, margin, y);
             y += 8;
@@ -83,46 +110,66 @@ function QuestionPaperGenerator({ sessionId, onGenerate, isLoading }) {
 
             section.questions?.forEach((q, qIdx) => {
                 // Check if we need a new page
-                if (y > 250) {
+                if (y > pageHeight - 40) {
                     doc.addPage();
-                    y = 20;
+                    y = 25;
                 }
 
                 // Question
                 const questionNum = q.number || qIdx + 1;
                 const questionText = `${questionNum}. ${q.question}`;
-                const splitQuestion = doc.splitTextToSize(questionText, pageWidth - 2 * margin);
-                doc.text(splitQuestion, margin, y);
-                y += splitQuestion.length * 5 + 3;
+                const splitQuestion = doc.splitTextToSize(questionText, contentWidth);
+                
+                splitQuestion.forEach((line) => {
+                    if (y > pageHeight - 25) {
+                        doc.addPage();
+                        y = 25;
+                    }
+                    doc.text(line, margin, y);
+                    y += lineHeight;
+                });
+                y += 2;
 
                 // Options for MCQs
                 if (q.options && q.options.length > 0) {
                     q.options.forEach((opt) => {
-                        if (y > 270) {
-                            doc.addPage();
-                            y = 20;
-                        }
-                        // Wrap long option text
                         const optionText = `    ${opt}`;
-                        const splitOption = doc.splitTextToSize(optionText, pageWidth - 2 * margin - 10);
-                        doc.text(splitOption, margin, y);
-                        y += splitOption.length * 5;
+                        const splitOption = doc.splitTextToSize(optionText, contentWidth - 10);
+                        
+                        splitOption.forEach((line) => {
+                            if (y > pageHeight - 25) {
+                                doc.addPage();
+                                y = 25;
+                            }
+                            doc.text(line, margin, y);
+                            y += 5;
+                        });
                     });
                     y += 3;
                 }
 
-                // Answer (if included)
+                // Answer (if included) - with proper wrapping
                 if (includeAnswers && q.answer) {
                     doc.setFont('helvetica', 'italic');
-                    doc.text(`Answer: ${q.answer}`, margin + 10, y);
+                    const answerText = `Answer: ${q.answer}`;
+                    const splitAnswer = doc.splitTextToSize(answerText, contentWidth - 15);
+                    
+                    splitAnswer.forEach((line) => {
+                        if (y > pageHeight - 25) {
+                            doc.addPage();
+                            y = 25;
+                        }
+                        doc.text(line, margin + 10, y);
+                        y += 5;
+                    });
                     doc.setFont('helvetica', 'normal');
-                    y += 8;
+                    y += 3;
                 }
 
                 y += 5;
             });
 
-            y += 10;
+            y += 8;
         });
 
         // Save the PDF

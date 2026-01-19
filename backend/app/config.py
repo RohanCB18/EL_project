@@ -11,12 +11,16 @@ class Settings:
     PORT: int = int(os.getenv("PORT", 8000))
     DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     
-    # CORS settings
+    # CORS settings - Add your Vercel URL after deployment
     CORS_ORIGINS: list = [
         "http://localhost:5173",  # Vite default
-        "http://localhost:3000",
+        "http://localhost:5174",  # Vite alternate port
+        "http://localhost:3000",  # Next.js default
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
         "http://127.0.0.1:3000",
+        # Production URLs - UPDATE AFTER DEPLOYMENT
+        "https://*.vercel.app",  # Vercel preview deployments
     ]
     
     # OpenRouter settings
