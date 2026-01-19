@@ -64,13 +64,7 @@ export default function TeacherDashboard({
   const [studentMatchesCount, setStudentMatchesCount] = useState(0);
   const [openingsCount, setOpeningsCount] = useState(0);
 
-  const navItems = [
-    { id: "home" as Page, icon: Home, label: "Dashboard", color: "text-primary" },
-    { id: "profile" as Page, icon: UserPlus, label: "My Profile", color: "text-chart-3" },
-    { id: "students" as Page, icon: Users, label: "Connect with Students", color: "text-chart-2" },
-    { id: "projects" as Page, icon: FileText, label: "Projects", color: "text-chart-3" },
-    { id: "openings" as Page, icon: Briefcase, label: "Project Openings", color: "text-chart-2" }
-  ];
+
 
   // ---------- Load dashboard stats + unread notifications ----------
   useEffect(() => {
@@ -159,50 +153,57 @@ export default function TeacherDashboard({
     if (currentPage === "home") loadStats();
   }, [currentPage]);
 
+  const navItems = [
+    { id: "home" as Page, icon: Home, label: "Dashboard" },
+    { id: "profile" as Page, icon: UserPlus, label: "My Profile" },
+    { id: "students" as Page, icon: Users, label: "Connect with Students" },
+    { id: "projects" as Page, icon: FileText, label: "Projects" },
+    { id: "openings" as Page, icon: Briefcase, label: "Project Openings" }
+  ];
+
   const quickStats = useMemo(
     () => [
       {
         label: "Projects Posted",
         value: String(projectsCount),
         icon: FolderKanban,
-        color: "bg-chart-3/10 text-chart-3",
-        hover: "hover:bg-chart-3/20"
       },
       {
         label: "Student Matches > 60%",
         value: String(studentMatchesCount),
         icon: Users,
-        color: "bg-secondary/10 text-secondary",
-        hover: "hover:bg-secondary/20"
       },
       {
         label: "Project Openings",
         value: String(openingsCount),
         icon: Briefcase,
-        color: "bg-accent/10 text-accent",
-        hover: "hover:bg-accent/20"
       }
     ],
     [projectsCount, studentMatchesCount, openingsCount]
   );
 
   return (
-    <div className="h-screen w-full bg-[#F4F4F7] overflow-hidden grid lg:grid-cols-12 p-8 gap-8">
+    <div className="h-screen w-full bg-background overflow-hidden relative grid lg:grid-cols-12 p-4 lg:p-6 gap-6">
+
+      {/* Background Decor Elements */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent/20 rounded-full blur-[100px] pointer-events-none" />
+
       {/* Sidebar */}
-      <aside className="col-span-12 lg:col-span-3 bg-white h-full rounded-[2.5rem] shadow-xl flex flex-col overflow-hidden relative z-20">
-        <div className="p-8 pb-4">
+      <aside className="col-span-12 lg:col-span-3 glass h-full rounded-2xl flex flex-col overflow-hidden relative z-20 border border-white/50 shadow-lg">
+        <div className="p-6 pb-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center shadow-lg rotate-3 group-hover:rotate-0 transition-all">
-              <GraduationCap className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
+              <GraduationCap className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-black uppercase tracking-wider text-black">RVCE Hub</h1>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Teacher Portal</p>
+              <h1 className="text-lg font-bold uppercase tracking-wider text-foreground">RVCE Hub</h1>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Teacher Portal</p>
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-hide">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-hide">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -211,13 +212,13 @@ export default function TeacherDashboard({
               <button
                 key={item.id}
                 onClick={() => setCurrentPage(item.id)}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-sm uppercase tracking-wide transition-all duration-300 group ${isActive
-                  ? "bg-black text-white shadow-lg translate-x-2"
-                  : "text-gray-400 hover:bg-gray-100 hover:text-black hover:translate-x-1"
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 group ${isActive
+                  ? "bg-primary/10 text-primary shadow-sm"
+                  : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                   }`}
               >
                 <Icon
-                  className={`w-5 h-5 transition-all duration-300 ${isActive ? "text-white" : "group-hover:scale-110"
+                  className={`w-5 h-5 transition-transform duration-200 ${isActive ? "text-primary scale-110" : "group-hover:scale-110"
                     }`}
                 />
                 <span>{item.label}</span>
@@ -226,27 +227,27 @@ export default function TeacherDashboard({
           })}
         </nav>
 
-        <div className="p-6">
+        <div className="p-4">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-xl py-6"
+            className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl py-6"
             onClick={onLogout}
           >
             <LogOut className="w-5 h-5" />
-            <span className="font-bold uppercase tracking-wide">Sign Out</span>
+            <span className="font-bold uppercase tracking-wide text-xs">Sign Out</span>
           </Button>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="col-span-12 lg:col-span-9 h-full flex flex-col min-h-0 overflow-y-auto rounded-[2.5rem] pr-2">
+      <main className="col-span-12 lg:col-span-9 h-full flex flex-col min-h-0 overflow-y-auto rounded-2xl pr-2 z-10 scrollbar-hide">
         {currentPage === "home" && (
           <div className="space-y-6 w-full pb-10">
             {/* Top header row */}
-            <div className="flex items-start justify-between gap-6 px-4 pt-2">
-              <div>
-                <h2 className="text-4xl font-black text-black tracking-tight uppercase">Welcome back</h2>
-                <p className="text-sm text-gray-500 mt-1 font-medium">
+            <div className="flex items-start justify-between gap-6 pt-2">
+              <div className="space-y-1">
+                <h2 className="text-3xl font-bold text-foreground tracking-tight">Welcome back</h2>
+                <p className="text-sm text-muted-foreground font-medium">
                   Manage mentorships & projects
                 </p>
               </div>
@@ -255,18 +256,18 @@ export default function TeacherDashboard({
               <div className="flex items-center gap-3">
                 {/* 🔔 Big notifications icon on right */}
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="icon"
-                  className="relative rounded-2xl w-12 h-12 shadow-sm border-0 bg-white hover:shadow-md"
+                  className="relative w-12 h-12 rounded-xl bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all border border-white/50"
                   onClick={() => setNotifOpen(true)}
                 >
-                  <Bell className="w-6 h-6 text-black" />
+                  <Bell className="w-6 h-6 text-foreground" />
                   {unreadNotifCount > 0 && (
-                    <span className="absolute top-3 right-3 w-2 h-2 bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                    <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-primary rounded-full shadow-sm ring-2 ring-white" />
                   )}
                 </Button>
 
-                <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 text-green-600 text-[10px] font-black uppercase tracking-widest">
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 text-green-600 text-[10px] font-bold uppercase tracking-widest">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   Active Mentor
                 </div>
@@ -288,18 +289,18 @@ export default function TeacherDashboard({
                 return (
                   <Card
                     key={i}
-                    className="hover:translate-y-[-4px] transition-all duration-300 border-0 bg-white"
+                    className="hover:-translate-y-1 transition-all duration-300 border border-white/50 glass shadow-md"
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{stat.label}</p>
-                          <p className="text-4xl font-black mt-2 text-black font-mono">{stat.value}</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</p>
+                          <p className="text-4xl font-bold mt-2 text-foreground font-sans">{stat.value}</p>
                         </div>
                         <div
-                          className={`w-10 h-10 bg-black text-white rounded-xl rotate-3 flex items-center justify-center`}
+                          className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center"
                         >
-                          <Icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                          <Icon className="w-6 h-6" />
                         </div>
                       </div>
                     </CardContent>
@@ -309,7 +310,7 @@ export default function TeacherDashboard({
             </div>
 
             {/* Quick actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 {
                   title: "Connect Students",
@@ -340,18 +341,18 @@ export default function TeacherDashboard({
                 return (
                   <Card
                     key={action.title}
-                    className="cursor-pointer group relative overflow-hidden bg-white border-0 hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-300"
+                    className="cursor-pointer group relative overflow-hidden glass border border-white/50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
                     onClick={() => setCurrentPage(action.page)}
                   >
-                    <CardHeader className="space-y-4">
-                      <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <CardHeader className="space-y-4 p-5">
+                      <div className="w-12 h-12 bg-secondary/50 text-foreground rounded-2xl flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         <Icon className="w-6 h-6" />
                       </div>
                       <div>
-                        <CardTitle className="font-bold text-lg leading-tight">
+                        <CardTitle className="font-bold text-base leading-tight text-foreground">
                           {action.title}
                         </CardTitle>
-                        <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-40 mt-2">{action.desc}</CardDescription>
+                        <CardDescription className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-1">{action.desc}</CardDescription>
                       </div>
                     </CardHeader>
                   </Card>
@@ -360,10 +361,10 @@ export default function TeacherDashboard({
             </div>
 
             {/* Recent activity */}
-            <Card className="border-0 bg-white">
+            <Card className="border-0 glass shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <TrendingUp className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 text-lg text-foreground">
+                  <TrendingUp className="w-5 h-5 text-primary" />
                   Recent Activity
                 </CardTitle>
               </CardHeader>
@@ -375,13 +376,13 @@ export default function TeacherDashboard({
                   ].map((activity, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between p-4 rounded-2xl bg-[#F4F4F7] hover:bg-gray-100 transition-all cursor-pointer group"
+                      className="flex items-center justify-between p-4 rounded-xl bg-white/50 hover:bg-white/80 transition-all cursor-pointer group border border-transparent hover:border-white/50"
                     >
                       <div>
-                        <p className="font-bold text-sm">{activity.action}</p>
-                        <p className="text-[10px] uppercase tracking-wide opacity-50">{activity.subject}</p>
+                        <p className="font-bold text-sm text-foreground">{activity.action}</p>
+                        <p className="text-[11px] font-medium text-muted-foreground">{activity.subject}</p>
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest opacity-30">{activity.time}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">{activity.time}</span>
                     </div>
                   ))}
                 </div>

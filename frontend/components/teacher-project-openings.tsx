@@ -222,7 +222,7 @@ ${me.rvce_email}
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5 text-secondary" />
-              Student Projects Looking for Students
+              Student Projects Looking for Mentors
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

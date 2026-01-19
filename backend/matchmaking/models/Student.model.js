@@ -3,12 +3,12 @@ import { matchmakingPool } from "../../config/db.js";
 export const StudentModel = {
 
   async setPasswordHash(usn, password_hash) {
-  const { rows } = await matchmakingPool.query(
-    `UPDATE students SET password_hash = $1 WHERE usn = $2 RETURNING usn, name`,
-    [password_hash, usn]
-  );
-  return rows[0];
-},
+    const { rows } = await matchmakingPool.query(
+      `UPDATE students SET password_hash = $1 WHERE usn = $2 RETURNING usn, name`,
+      [password_hash, usn]
+    );
+    return rows[0];
+  },
 
   // =========================
   // CREATE
@@ -37,21 +37,21 @@ export const StudentModel = {
       student.usn,
       student.name,
       student.rvce_email,
-      student.branch,
-      student.year,
-      student.section,
+      student.branch || null,
+      student.year || null,
+      student.section || null,
       student.cgpa,
       student.average_el_marks,
-      student.gender,
-      student.residence,
-      student.project_completion_approach,
-      student.commitment_preference,
+      student.gender || null,
+      student.residence || null,
+      student.project_completion_approach || null,
+      student.commitment_preference || null,
       student.programming_languages || [],
       student.tech_skills || [],
       student.domain_interests || [],
       JSON.stringify(student.past_projects || {}),
       student.hackathon_participation_count,
-      student.hackathon_achievement_level,
+      student.hackathon_achievement_level || null,
       student.is_visible_for_matching ?? true
     ];
 
@@ -104,21 +104,21 @@ export const StudentModel = {
       student.usn,
       student.name,
       student.rvce_email,
-      student.branch,
-      student.year,
-      student.section,
+      student.branch || null,
+      student.year || null,
+      student.section || null,
       student.cgpa,
       student.average_el_marks,
-      student.gender,
-      student.residence,
-      student.project_completion_approach,
-      student.commitment_preference,
+      student.gender || null,
+      student.residence || null,
+      student.project_completion_approach || null,
+      student.commitment_preference || null,
       student.programming_languages || [],
       student.tech_skills || [],
       student.domain_interests || [],
       JSON.stringify(student.past_projects || {}),
       student.hackathon_participation_count,
-      student.hackathon_achievement_level,
+      student.hackathon_achievement_level || null,
       student.is_visible_for_matching ?? true
     ];
 

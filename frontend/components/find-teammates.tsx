@@ -136,13 +136,13 @@ ${me.rvce_email}
   if (loading) return <div className="p-8">Loading matches…</div>;
 
   return (
-    <div className="p-8 space-y-6">
-      <h2 className="text-3xl font-bold flex items-center gap-3">
+    <div className="p-6 space-y-6">
+      <h2 className="text-3xl font-bold flex items-center gap-3 text-foreground">
         <Users className="w-8 h-8 text-primary" />
         Find EL Teammates
       </h2>
 
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {Array.isArray(matches) &&
           matches
             .filter((m) => m?.student) // ✅ skip broken match objects
@@ -153,13 +153,13 @@ ${me.rvce_email}
               return (
                 <Card
                   key={idx}
-                  className={`border-2 ${color.border} transition-all duration-300 hover:shadow-xl hover:scale-[1.02]`}
+                  className={`glass border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${color.border} shadow-sm`}
                 >
-                  <CardContent className="p-6 flex gap-6">
+                  <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-start">
                     {/* Avatar */}
-                    <Avatar className="w-16 h-16">
+                    <Avatar className="w-16 h-16 rounded-2xl shadow-sm">
                       <AvatarFallback
-                        className={`${color.bg} ${color.text} font-bold text-lg`}
+                        className={`${color.bg} ${color.text} font-bold text-lg rounded-2xl`}
                       >
                         {(s?.name || "NA")
                           .split(" ")
@@ -169,48 +169,51 @@ ${me.rvce_email}
                     </Avatar>
 
                     {/* Content */}
-                    <div className="flex-1">
-                      <div className="flex justify-between mb-2">
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-col md:flex-row md:items-start justify-between mb-4 gap-4">
                         <div>
-                          <h3 className="text-xl font-bold">{s?.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            <span className="font-mono">{s?.usn}</span> • {s?.branch} • Year {s?.year}
+                          <h3 className="text-xl font-bold text-foreground">{s?.name}</h3>
+                          <p className="text-sm text-muted-foreground font-medium mt-1">
+                            <span className="font-mono bg-secondary/30 px-1.5 py-0.5 rounded text-foreground">{s?.usn}</span> • {s?.branch} • Year {s?.year}
                           </p>
                         </div>
 
                         <div
-                          className={`px-4 py-2 rounded-xl ${color.bg} ${color.text} border ${color.border}`}
+                          className={`px-4 py-2 rounded-xl flex flex-col items-center ${color.bg} ${color.text} border ${color.border}`}
                         >
-                          <p className="text-2xl font-bold font-mono">
+                          <p className="text-2xl font-bold font-sans">
                             {match.match_score || 0}%
                           </p>
-                          <p className="text-xs text-center">Match</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Match</p>
                         </div>
                       </div>
 
                       {/* Skills */}
-                      <div className="flex flex-wrap gap-2 mb-3">
+                      <div className="flex flex-wrap gap-2 mb-4">
                         {(s?.tech_skills || []).map((skill: string, i: number) => (
-                          <Badge key={i} variant="outline">
+                          <Badge key={i} variant="secondary" className="bg-white/50 hover:bg-white text-foreground border border-black/5">
                             {skill}
                           </Badge>
                         ))}
                       </div>
 
                       {/* Top 3 reasons */}
-                      <ul className="list-disc ml-5 text-sm text-muted-foreground mb-4">
-                        {(match.match_reason || [])
-                          .slice(0, 3)
-                          .map((r: string, i: number) => (
-                            <li key={i}>{r}</li>
-                          ))}
-                      </ul>
+                      <div className="bg-white/40 rounded-xl p-4 mb-5 border border-white/50">
+                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Why you match</p>
+                        <ul className="list-disc ml-4 text-sm text-muted-foreground space-y-1">
+                          {(match.match_reason || [])
+                            .slice(0, 3)
+                            .map((r: string, i: number) => (
+                              <li key={i}>{r}</li>
+                            ))}
+                        </ul>
+                      </div>
 
                       {/* Actions */}
-                      <div className="flex gap-3">
+                      <div className="flex gap-4">
                         <Button
                           variant="outline"
-                          className="flex-1"
+                          className="flex-1 bg-transparent border-primary/20 text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/50"
                           onClick={() => setSelectedStudent(s)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
@@ -218,7 +221,7 @@ ${me.rvce_email}
                         </Button>
 
                         <Button
-                          className="flex-1"
+                          className="flex-1 shadow-md hover:shadow-lg transition-all"
                           onClick={() => handleConnectEmail(s)}
                         >
                           <Mail className="w-4 h-4 mr-2" />
@@ -238,7 +241,6 @@ ${me.rvce_email}
         onOpenChange={() => setSelectedStudent(null)}
       >
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-
           <DialogHeader>
             <DialogTitle>Student Profile</DialogTitle>
           </DialogHeader>
@@ -249,8 +251,8 @@ ${me.rvce_email}
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2">Personal Information</h4>
                   <p>Name: {selectedStudent.name}</p>
-                  <p>USN: <span className="font-mono">{selectedStudent.usn}</span></p>
-                  <p>Email: <span className="font-mono">{selectedStudent.rvce_email}</span></p>
+                  <p>USN: {selectedStudent.usn}</p>
+                  <p>Email: {selectedStudent.rvce_email}</p>
                   <p>Gender: {selectedStudent.gender}</p>
                 </CardContent>
               </Card>
@@ -261,7 +263,7 @@ ${me.rvce_email}
                   <p>Branch: {selectedStudent.branch}</p>
                   <p>Year: {selectedStudent.year}</p>
                   <p>Section: {selectedStudent.section}</p>
-                  <p>Average EL Marks: <span className="font-mono">{selectedStudent.average_el_marks}</span></p>
+                  <p>Average EL Marks: {selectedStudent.average_el_marks}</p>
                 </CardContent>
               </Card>
 
@@ -270,12 +272,21 @@ ${me.rvce_email}
                   <h4 className="font-semibold mb-2">Technical Profile</h4>
                   <p>
                     Languages:{" "}
-                    {(selectedStudent.programming_languages || []).join(", ")}
+                    {Array.isArray(selectedStudent.programming_languages)
+                      ? selectedStudent.programming_languages.join(", ")
+                      : selectedStudent.programming_languages}
                   </p>
-                  <p>Skills: {(selectedStudent.tech_skills || []).join(", ")}</p>
+                  <p>
+                    Skills:{" "}
+                    {Array.isArray(selectedStudent.tech_skills)
+                      ? selectedStudent.tech_skills.join(", ")
+                      : selectedStudent.tech_skills}
+                  </p>
                   <p>
                     Domains:{" "}
-                    {(selectedStudent.domain_interests || []).join(", ")}
+                    {Array.isArray(selectedStudent.domain_interests)
+                      ? selectedStudent.domain_interests.join(", ")
+                      : selectedStudent.domain_interests}
                   </p>
                 </CardContent>
               </Card>

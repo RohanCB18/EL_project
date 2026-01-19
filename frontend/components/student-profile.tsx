@@ -17,7 +17,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-import { upsertStudentProfile } from "@/lib/student";
+import { upsertStudentProfile, toggleStudentVisibility } from "@/lib/student";
 
 const BASE_URL = "http://localhost:5000";
 // ❌ removed hardcoded CURRENT_USN
@@ -221,6 +221,20 @@ export default function StudentProfile({ usn }: { usn: string }) {
     }
   };
 
+  const handleVisibilityToggle = async (checked: boolean) => {
+    try {
+      // Optimistic update
+      setProfile((prev: any) => ({ ...prev, is_visible_for_matching: checked }));
+
+      await toggleStudentVisibility(usn, checked);
+    } catch (err) {
+      console.error("Failed to toggle visibility:", err);
+      // Revert on failure
+      setProfile((prev: any) => ({ ...prev, is_visible_for_matching: !checked }));
+      alert("Failed to update visibility setting.");
+    }
+  };
+
   const headerRight = useMemo(() => {
     if (editMode) {
       return (
@@ -250,13 +264,14 @@ export default function StudentProfile({ usn }: { usn: string }) {
     );
   }, [editMode, isSaving]);
 
+
   if (loading) return <div className="p-8">Loading student profile…</div>;
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold flex items-center gap-3">
+        <h2 className="text-3xl font-bold flex items-center gap-3 text-foreground">
           <User className="w-8 h-8 text-primary" />
           Student Profile
         </h2>
@@ -264,16 +279,16 @@ export default function StudentProfile({ usn }: { usn: string }) {
       </div>
 
       {/* BASIC / PERSONAL INFO */}
-      <Card className="border-2">
+      <Card className="glass border border-white/50 shadow-sm">
         <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
+          <CardTitle className="text-xl text-primary font-bold">Personal Information</CardTitle>
         </CardHeader>
 
-        <CardContent className="grid md:grid-cols-2 gap-4">
+        <CardContent className="grid md:grid-cols-2 gap-6">
           <div>
             <Label>Full Name</Label>
             <Input
-              className="w-full"
+              className="w-full bg-white/50 border-white/50 focus:bg-white transition-all mt-1.5"
               value={profile.name}
               disabled={!editMode}
               onChange={(e) => update("name", e.target.value)}
@@ -282,13 +297,13 @@ export default function StudentProfile({ usn }: { usn: string }) {
 
           <div>
             <Label>USN</Label>
-            <Input className="w-full" value={profile.usn} disabled />
+            <Input className="w-full bg-white/50 border-white/50 mt-1.5" value={profile.usn} disabled />
           </div>
 
           <div>
             <Label>RVCE Email</Label>
             <Input
-              className="w-full"
+              className="w-full bg-white/50 border-white/50 focus:bg-white transition-all mt-1.5"
               value={profile.rvce_email}
               disabled={!editMode}
               onChange={(e) => update("rvce_email", e.target.value)}
@@ -302,7 +317,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
               onValueChange={(v) => update("gender", v)}
               disabled={!editMode}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
@@ -322,7 +337,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
               onValueChange={(v) => update("residence", v)}
               disabled={!editMode}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
                 <SelectValue placeholder="Select residence" />
               </SelectTrigger>
               <SelectContent>
@@ -335,11 +350,10 @@ export default function StudentProfile({ usn }: { usn: string }) {
             </Select>
           </div>
 
-          <div className="flex items-center gap-3 mt-6">
+          <div className="flex items-center gap-3 mt-8">
             <Switch
               checked={!!profile.is_visible_for_matching}
-              disabled={!editMode}
-              onCheckedChange={(v) => update("is_visible_for_matching", v)}
+              onCheckedChange={handleVisibilityToggle}
             />
             <Label>Visible for matching</Label>
           </div>
@@ -347,12 +361,12 @@ export default function StudentProfile({ usn }: { usn: string }) {
       </Card>
 
       {/* ACADEMICS */}
-      <Card className="border-2">
+      <Card className="glass border border-white/50 shadow-sm">
         <CardHeader>
-          <CardTitle>Academic Information</CardTitle>
+          <CardTitle className="text-xl text-primary font-bold">Academic Information</CardTitle>
         </CardHeader>
 
-        <CardContent className="grid md:grid-cols-3 gap-4">
+        <CardContent className="grid md:grid-cols-3 gap-6">
           <div>
             <Label>Branch</Label>
             <Select
@@ -360,7 +374,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
               onValueChange={(v) => update("branch", v)}
               disabled={!editMode}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
                 <SelectValue placeholder="Select branch" />
               </SelectTrigger>
               <SelectContent>
@@ -380,7 +394,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
               onValueChange={(v) => update("year", v)}
               disabled={!editMode}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent>
@@ -396,7 +410,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
           <div>
             <Label>Section</Label>
             <Input
-              className="w-full"
+              className="w-full bg-white/50 border-white/50 mt-1.5"
               value={profile.section}
               disabled={!editMode}
               onChange={(e) => update("section", e.target.value)}
@@ -406,7 +420,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
           <div>
             <Label>CGPA</Label>
             <Input
-              className="w-full"
+              className="w-full bg-white/50 border-white/50 mt-1.5"
               type="number"
               value={profile.cgpa ?? ""}
               disabled={!editMode}
@@ -417,7 +431,7 @@ export default function StudentProfile({ usn }: { usn: string }) {
           <div>
             <Label>Average EL Marks</Label>
             <Input
-              className="w-full"
+              className="w-full bg-white/50 border-white/50 mt-1.5"
               type="number"
               value={profile.average_el_marks ?? ""}
               disabled={!editMode}
@@ -428,12 +442,12 @@ export default function StudentProfile({ usn }: { usn: string }) {
       </Card>
 
       {/* TECHNICAL */}
-      <Card className="border-2">
+      <Card className="glass border border-white/50 shadow-sm">
         <CardHeader>
-          <CardTitle>Technical Profile</CardTitle>
+          <CardTitle className="text-xl text-primary font-bold">Technical Profile</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-6">
           <ArrayInput
             label="Programming Languages"
             value={toArray(profile.programming_languages)}
@@ -458,16 +472,16 @@ export default function StudentProfile({ usn }: { usn: string }) {
       </Card>
 
       {/* PROJECTS & PREFERENCES */}
-      <Card className="border-2">
+      <Card className="glass border border-white/50 shadow-sm">
         <CardHeader>
-          <CardTitle>Projects & Preferences</CardTitle>
+          <CardTitle className="text-xl text-primary font-bold">Projects & Preferences</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div>
             <Label>Past Projects</Label>
             <Textarea
-              className="w-full"
+              className="w-full bg-white/50 border-white/50 mt-1.5 min-h-[100px]"
               value={profile.past_projects || ""}
               disabled={!editMode}
               placeholder="Describe your past projects"
@@ -475,77 +489,79 @@ export default function StudentProfile({ usn }: { usn: string }) {
             />
           </div>
 
-          <div>
-            <Label>Hackathon Participation Count</Label>
-            <Input
-              className="w-full"
-              type="number"
-              value={profile.hackathon_participation_count ?? 0}
-              disabled={!editMode}
-              onChange={(e) =>
-                update("hackathon_participation_count", Number(e.target.value))
-              }
-            />
-          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <Label>Hackathon Participation Count</Label>
+              <Input
+                className="w-full bg-white/50 border-white/50 mt-1.5"
+                type="number"
+                value={profile.hackathon_participation_count ?? 0}
+                disabled={!editMode}
+                onChange={(e) =>
+                  update("hackathon_participation_count", Number(e.target.value))
+                }
+              />
+            </div>
 
-          <div>
-            <Label>Hackathon Achievement Level</Label>
-            <Select
-              value={profile.hackathon_achievement_level || ""}
-              onValueChange={(v) => update("hackathon_achievement_level", v)}
-              disabled={!editMode}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select achievement level" />
-              </SelectTrigger>
-              <SelectContent>
-                {ACHIEVEMENTS.map((a) => (
-                  <SelectItem key={a} value={a}>
-                    {a}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label>Hackathon Achievement Level</Label>
+              <Select
+                value={profile.hackathon_achievement_level || ""}
+                onValueChange={(v) => update("hackathon_achievement_level", v)}
+                disabled={!editMode}
+              >
+                <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
+                  <SelectValue placeholder="Select achievement level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ACHIEVEMENTS.map((a) => (
+                    <SelectItem key={a} value={a}>
+                      {a}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label>Project Work Style</Label>
-            <Select
-              value={profile.project_completion_approach || ""}
-              onValueChange={(v) => update("project_completion_approach", v)}
-              disabled={!editMode}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select work style" />
-              </SelectTrigger>
-              <SelectContent>
-                {WORK_STYLES.map((w) => (
-                  <SelectItem key={w} value={w}>
-                    {w}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label>Project Work Style</Label>
+              <Select
+                value={profile.project_completion_approach || ""}
+                onValueChange={(v) => update("project_completion_approach", v)}
+                disabled={!editMode}
+              >
+                <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
+                  <SelectValue placeholder="Select work style" />
+                </SelectTrigger>
+                <SelectContent>
+                  {WORK_STYLES.map((w) => (
+                    <SelectItem key={w} value={w}>
+                      {w}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label>Commitment Preference</Label>
-            <Select
-              value={profile.commitment_preference || ""}
-              onValueChange={(v) => update("commitment_preference", v)}
-              disabled={!editMode}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select commitment preference" />
-              </SelectTrigger>
-              <SelectContent>
-                {COMMITMENT_PREFS.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div>
+              <Label>Commitment Preference</Label>
+              <Select
+                value={profile.commitment_preference || ""}
+                onValueChange={(v) => update("commitment_preference", v)}
+                disabled={!editMode}
+              >
+                <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
+                  <SelectValue placeholder="Select commitment preference" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMMITMENT_PREFS.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
