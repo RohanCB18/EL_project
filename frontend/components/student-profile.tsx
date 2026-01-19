@@ -19,7 +19,8 @@ import {
 
 import { upsertStudentProfile, toggleStudentVisibility } from "@/lib/student";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+const BASE_URL = API_BASE_URL;
 // ❌ removed hardcoded CURRENT_USN
 
 const BRANCHES = ["CSE", "ISE", "AIML", "CY", "ECE", "EEE", "ME", "CE", "ETE", "BT", "MCA"];

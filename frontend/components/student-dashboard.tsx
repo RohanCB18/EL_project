@@ -31,7 +31,8 @@ import FindMentors from "@/components/find-mentors";
 import StudentProjects from "@/components/student-projects";
 import ProjectOpenings from "@/components/project-openings";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+const BASE_URL = API_BASE_URL;
 
 type Page = "home" | "profile" | "teammates" | "mentors" | "projects" | "openings";
 

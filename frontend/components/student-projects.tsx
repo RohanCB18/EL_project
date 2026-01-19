@@ -30,8 +30,9 @@ import {
   RefreshCw
 } from "lucide-react";
 
+import { API_BASE_URL } from "@/lib/utils";
 // ❌ removed hardcoded CURRENT_USN
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = API_BASE_URL;
 
 type Project = {
   project_id: number;

@@ -30,7 +30,9 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+
+const BASE_URL = API_BASE_URL;
 
 export default function Home() {
   const [userType, setUserType] = useState<"student" | "teacher" | null>(null);

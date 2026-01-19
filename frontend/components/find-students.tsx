@@ -8,10 +8,12 @@ import { Users, Mail, Eye } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const CURRENT_FACULTY_ID = "FAC101"; // temp
+import { API_BASE_URL } from "@/lib/utils";
 
-async function fetchMyTeacherProfile() {
-  const res = await fetch(`http://localhost:5000/api/teacher/${CURRENT_FACULTY_ID}`);
+const BASE_URL = API_BASE_URL;
+
+async function fetchMyTeacherProfile(facultyId: string) {
+  const res = await fetch(`${BASE_URL}/api/teacher/${facultyId}`);
   if (!res.ok) throw new Error("Failed to fetch current teacher profile");
   return res.json();
 }
@@ -27,7 +29,7 @@ export default function FindStudents({ facultyId }: { facultyId: string }) {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/api/matchmaking/teacher/${CURRENT_FACULTY_ID}/students`
+          `${BASE_URL}/api/matchmaking/teacher/${facultyId}/students`
         );
 
         const data = await res.json();
@@ -41,7 +43,7 @@ export default function FindStudents({ facultyId }: { facultyId: string }) {
     };
 
     fetchMatches();
-  }, []);
+  }, [facultyId]);
 
   const getMatchColor = (score: number) => {
     if (score >= 80)
@@ -58,29 +60,29 @@ export default function FindStudents({ facultyId }: { facultyId: string }) {
         return;
       }
 
-      // ⚠️ You don't have teacher route yet, so skip teacher fetch for now
+      const me = await fetchMyTeacherProfile(facultyId).catch(() => ({ name: facultyId }));
       const subject = `EduConnect | Faculty Connection Request`;
       const body = `
 Hi ${student.name},
 
-I found your profile on EduConnect and would like to connect with you regarding collaboration / mentorship opportunities.
+I'm ${me.name}, a faculty member at RVCE. I found your profile on EduConnect and would like to connect with you regarding collaboration / mentorship opportunities.
 
 Best regards,
-${CURRENT_FACULTY_ID}
+${me.name}
 `.trim();
 
       // 🔔 Notify student
-      await fetch("http://localhost:5000/api/notifications", {
+      await fetch(`${BASE_URL}/api/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recipient_type: "student",
           recipient_id: student.usn,
           sender_type: "teacher",
-          sender_id: CURRENT_FACULTY_ID,
+          sender_id: facultyId,
           entity_type: "profile",
-          entity_id: CURRENT_FACULTY_ID,
-          message: `Faculty (${CURRENT_FACULTY_ID}) wants to connect with you`
+          entity_id: facultyId,
+          message: `Faculty (${me.name}) wants to connect with you`
         })
       });
 

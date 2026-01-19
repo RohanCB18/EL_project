@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Briefcase, Users, Eye, Mail } from "lucide-react";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+const BASE_URL = API_BASE_URL;
 
 /* ---------------- FETCH CURRENT TEACHER ---------------- */
 async function fetchMyTeacherProfile(facultyId: string) {

@@ -32,7 +32,8 @@ import TeacherProjects from "@/components/teacher-projects";
 import FindStudents from "@/components/find-students";
 import TeacherProjectOpenings from "@/components/teacher-project-openings";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+const BASE_URL = API_BASE_URL;
 
 type Page = "home" | "students" | "projects" | "openings" | "profile";
 

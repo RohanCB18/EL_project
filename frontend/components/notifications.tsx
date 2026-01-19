@@ -11,7 +11,9 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+
+const BASE_URL = API_BASE_URL;
 
 type RecipientType = "student" | "teacher";
 
@@ -227,33 +229,33 @@ ${me.rvce_email || ""}
           </DialogHeader>
 
           {notifications.length === 0 ? (
-  <p className="text-sm text-muted-foreground">No notifications yet</p>
-) : (
-  <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3">
-    {notifications.map((n) => (
-      <Card
-        key={n.notification_id}
-        className={n.is_read ? "opacity-60 bg-muted" : ""}
-      >
-        <CardContent className="p-4 flex justify-between items-center gap-3">
-          <p className="text-sm flex-1">{n.message}</p>
+            <p className="text-sm text-muted-foreground">No notifications yet</p>
+          ) : (
+            <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3">
+              {notifications.map((n) => (
+                <Card
+                  key={n.notification_id}
+                  className={n.is_read ? "opacity-60 bg-muted" : ""}
+                >
+                  <CardContent className="p-4 flex justify-between items-center gap-3">
+                    <p className="text-sm flex-1">{n.message}</p>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              markAsRead(n.notification_id);
-              openProfile(n.sender_type, n.sender_id);
-            }}
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            View Profile
-          </Button>
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-)}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        markAsRead(n.notification_id);
+                        openProfile(n.sender_type, n.sender_id);
+                      }}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Profile
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
         </DialogContent>
       </Dialog>

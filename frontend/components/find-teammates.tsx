@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Mail, Eye } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { API_BASE_URL } from "@/lib/utils";
+
+const BASE_URL = API_BASE_URL;
 import {
   Dialog,
   DialogContent,
@@ -22,7 +25,7 @@ export default function FindTeammates({ usn }: { usn: string }) {
 
   // ✅ moved inside component so it can use `usn`
   const fetchMyProfile = async () => {
-    const res = await fetch(`http://localhost:5000/api/student/${usn}`);
+    const res = await fetch(`${BASE_URL}/api/student/${usn}`);
     if (!res.ok) throw new Error("Failed to fetch current student profile");
     return res.json();
   };
@@ -33,7 +36,7 @@ export default function FindTeammates({ usn }: { usn: string }) {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/api/matchmaking/student/${usn}/students`
+          `${BASE_URL}/api/matchmaking/student/${usn}/students`
         );
 
         const data = await res.json();
@@ -108,7 +111,7 @@ ${me.rvce_email}
 `.trim();
 
       // 🔔 CREATE IN-APP NOTIFICATION
-      await fetch("http://localhost:5000/api/notifications", {
+      await fetch(`${BASE_URL}/api/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

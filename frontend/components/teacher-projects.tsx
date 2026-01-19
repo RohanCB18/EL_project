@@ -30,7 +30,9 @@ import {
   RefreshCw
 } from "lucide-react";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+
+const BASE_URL = API_BASE_URL;
 
 type Project = {
   project_id: number;

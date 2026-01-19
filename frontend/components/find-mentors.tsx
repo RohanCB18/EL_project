@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Mail, Eye } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { API_BASE_URL } from "@/lib/utils";
+
+const BASE_URL = API_BASE_URL;
 import {
   Dialog,
   DialogContent,
@@ -45,7 +48,7 @@ export default function FindMentors({ usn }: { usn: string }) {
         setLoading(true);
 
         const res = await fetch(
-          `http://localhost:5000/api/matchmaking/student/${usn}/teachers`
+          `${BASE_URL}/api/matchmaking/student/${usn}/teachers`
         );
 
         const data = await res.json();
@@ -94,10 +97,10 @@ export default function FindMentors({ usn }: { usn: string }) {
   };
 
   const fetchMyProfile = async () => {
-  const res = await fetch(`http://localhost:5000/api/student/${usn}`);
-  if (!res.ok) throw new Error("Failed to fetch student profile");
-  return res.json();
-};
+    const res = await fetch(`${BASE_URL}/api/student/${usn}`);
+    if (!res.ok) throw new Error("Failed to fetch student profile");
+    return res.json();
+  };
 
 
   /* ---------------- CONNECT EMAIL + NOTIFICATION ---------------- */
@@ -132,7 +135,7 @@ ${me.rvce_email}
 `.trim();
 
       // 🔔 In-app notification for teacher
-      await fetch("http://localhost:5000/api/notifications", {
+      await fetch(`${BASE_URL}/api/notifications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -16,7 +16,8 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-const BASE_URL = "http://localhost:5000";
+import { API_BASE_URL } from "@/lib/utils";
+const BASE_URL = API_BASE_URL;
 
 // ------------------ Dropdown Options ------------------
 const DEPARTMENTS = [
