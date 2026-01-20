@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -156,6 +156,13 @@ export default function StudentProfile({ usn }: { usn: string }) {
     is_visible_for_matching: true
   });
 
+  const profileRef = useRef(profile);
+
+useEffect(() => {
+  profileRef.current = profile;
+}, [profile]);
+
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -197,30 +204,48 @@ export default function StudentProfile({ usn }: { usn: string }) {
     setProfile((prev: any) => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
+const handleSave = async () => {
+  try {
+    setIsSaving(true);
 
-      const payload = {
-        ...profile,
-        usn: usn, // ✅ ensure correct logged-in usn always saved
-        cgpa: profile.cgpa === "" ? null : Number(profile.cgpa),
-        average_el_marks: profile.average_el_marks === "" ? null : Number(profile.average_el_marks),
-        hackathon_participation_count: Number(profile.hackathon_participation_count) || 0,
-        year: profile.year === "" ? null : Number(profile.year)
-      };
+    const latest = profileRef.current;
 
-      await upsertStudentProfile(payload);
+    const payload = {
+      ...latest,
+      usn: usn,
+      cgpa: latest.cgpa === "" ? null : Number(latest.cgpa),
+      average_el_marks: latest.average_el_marks === "" ? null : Number(latest.average_el_marks),
+      hackathon_participation_count: Number(latest.hackathon_participation_count) || 0,
+      year: latest.year === "" ? null : Number(latest.year),
+    };
 
-      alert("Profile saved successfully");
-      setEditMode(false);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save profile");
-    } finally {
-      setIsSaving(false);
+    await upsertStudentProfile(payload);  // ✅ after this line add reload code
+
+    // ✅ ADD THIS BLOCK HERE
+    const res = await fetch(`${BASE_URL}/api/student/${usn}`);
+    if (res.ok) {
+      const data = await res.json();
+      setProfile((prev: any) => ({
+        ...prev,
+        ...data,
+        usn: data.usn || usn,
+        programming_languages: toArray(data.programming_languages),
+        tech_skills: toArray(data.tech_skills),
+        domain_interests: toArray(data.domain_interests),
+        past_projects: data.past_projects ?? ""
+      }));
     }
-  };
+
+    alert("Profile saved successfully");
+    setEditMode(false);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save profile");
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   const handleVisibilityToggle = async (checked: boolean) => {
     try {
@@ -392,7 +417,8 @@ export default function StudentProfile({ usn }: { usn: string }) {
             <Label>Year</Label>
             <Select
               value={profile.year ? String(profile.year) : ""}
-              onValueChange={(v) => update("year", v)}
+              onValueChange={(v) => update("year", Number(v))}
+
               disabled={!editMode}
             >
               <SelectTrigger className="w-full bg-white/50 border-white/50 mt-1.5">
