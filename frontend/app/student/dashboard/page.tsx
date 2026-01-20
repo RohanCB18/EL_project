@@ -131,6 +131,20 @@ export default function StudentDashboard() {
     setNewDoubt("")
   }
 
+  const leaveClassroom = async () => {
+    if (!token) return
+    try {
+      await fetch(`${BACKEND_URL}/classrooms/leave`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    } catch (e) {
+      console.error("Failed to leave classroom:", e)
+    } finally {
+      router.push("/")
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#F4F4F7] text-[#111111] antialiased">
       {/* Fullscreen Entry Modal */}
@@ -178,8 +192,12 @@ export default function StudentDashboard() {
                   <AvatarFallback className="bg-black text-white text-xs font-bold uppercase">{name[0]}</AvatarFallback>
                </Avatar>
             </div>
-            <Button variant="ghost" onClick={() => router.push("/")} className="text-red-500 font-bold uppercase text-[10px] tracking-widest hover:bg-red-50">
-              <LogOut className="w-4 h-4 mr-2" /> Leave Class
+            <Button
+              variant="ghost"
+              onClick={() => leaveClassroom()}
+              className="text-destructive hover:bg-destructive/10 font-medium rounded-xl h-10 px-4"
+            >
+              <LogOut className="w-4 h-4 mr-2" /> Leave
             </Button>
           </div>
         </div>
