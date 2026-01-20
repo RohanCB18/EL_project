@@ -19,9 +19,8 @@ const app = express();
 // ✅ ENABLE CORS (THIS FIXES YOUR ERROR)
 
 app.use(cors({
-  origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
-  allowedHeaders: ["Content-Type"]
+  origin: true,
+  credentials: true,
 }));
 
 
