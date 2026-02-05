@@ -8,8 +8,8 @@
 }
 
 .teacher-badge {
-    background: rgba(16, 185, 129, 0.08) !important;
-    border-color: rgba(16, 185, 129, 0.15) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
     color: var(--color-teacher-primary) !important;
 }
 
@@ -50,8 +50,9 @@
 }
 
 .teacher-icon {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--color-teacher-primary);
+    background: var(--color-teacher-primary);
+    color: white;
+    transform: rotate(3deg);
 }
 
 .section-icon svg {
@@ -79,10 +80,10 @@
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
     padding: var(--spacing-md);
-    background: rgba(16, 185, 129, 0.06);
-    border: 1px solid rgba(16, 185, 129, 0.12);
-    border-radius: var(--radius-lg);
-    color: var(--color-teacher-primary);
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-xl);
+    color: var(--color-led-emerald);
     font-size: var(--font-size-sm);
 }
 
@@ -113,15 +114,16 @@
 }
 
 .feature-icon-sm {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    background: rgba(16, 185, 129, 0.08);
-    border-radius: var(--radius-md);
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    background: var(--color-accent-primary);
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-teacher-primary);
+    color: white;
+    transform: rotate(3deg);
 }
 
 .feature-icon-sm svg {
@@ -143,10 +145,10 @@
 /* Generator Section */
 .generator-section {
     background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border: none;
+    border-radius: var(--radius-3xl);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-xl);
 }
 
 @media (max-width: 768px) {

@@ -1,49 +1,54 @@
 /* ================================
-   StudyGenius - Professional Design System
-   Light Mode - Google/CRED Inspired
+   StudyGenius - Platinum Tactical Design System
+   Light Mode - Premium Dashboard Aesthetic
    ================================ */
 
 /* CSS Custom Properties (Design Tokens) */
 :root {
   /* Colors - Light Theme */
-  --color-bg-primary: #f5f5f7;
+  --color-bg-primary: #F4F4F7;
   --color-bg-secondary: #ffffff;
-  --color-bg-card: #ffffff;
+  --color-bg-card: #FFFFFF;
   --color-bg-card-hover: #fafafa;
-  
-  /* Accent Colors - Purple/Violet */
-  --color-accent-primary: #7c3aed;
-  --color-accent-secondary: #8b5cf6;
-  --color-accent-gradient: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-  --color-accent-glow: rgba(124, 58, 237, 0.15);
-  
-  /* Student Theme - Purple */
-  --color-student-primary: #7c3aed;
-  --color-student-secondary: #8b5cf6;
-  --color-student-gradient: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-  
-  /* Teacher Theme - Green */
-  --color-teacher-primary: #10b981;
-  --color-teacher-secondary: #34d399;
-  --color-teacher-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  
+
+  /* Accent Colors - Deep Black Primary */
+  --color-accent-primary: #000000;
+  --color-accent-secondary: #1a1a1a;
+  --color-accent-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  --color-accent-glow: rgba(0, 0, 0, 0.15);
+
+  /* Student Theme - Deep Black */
+  --color-student-primary: #000000;
+  --color-student-secondary: #1a1a1a;
+  --color-student-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+
+  /* Teacher Theme - Deep Black */
+  --color-teacher-primary: #000000;
+  --color-teacher-secondary: #1a1a1a;
+  --color-teacher-gradient: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+
+  /* LED Indicator Colors */
+  --color-led-indigo: #6366F1;
+  --color-led-emerald: #10B981;
+
   /* Text Colors */
-  --color-text-primary: #1a1a2e;
+  --color-text-primary: #000000;
   --color-text-secondary: #4b5563;
   --color-text-muted: #9ca3af;
-  
+
   /* Border Colors */
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-hover: rgba(0, 0, 0, 0.15);
-  
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+
   /* Status Colors */
-  --color-success: #10b981;
+  --color-success: #10B981;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
-  
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-size-xs: 0.75rem;
+
+  /* Typography - Geist Font System */
+  --font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'Geist Mono', 'SF Mono', Monaco, Consolas, monospace;
+  --font-size-xs: 0.625rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -52,7 +57,7 @@
   --font-size-3xl: 2rem;
   --font-size-4xl: 2.5rem;
   --font-size-5xl: 3.5rem;
-  
+
   /* Spacing */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -61,22 +66,25 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
   --spacing-3xl: 4rem;
-  
-  /* Border Radius */
+
+  /* Border Radius - Super Radius */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
+  --radius-3xl: 2.5rem;
+  --radius-super: 3rem;
   --radius-full: 9999px;
-  
-  /* Shadows - Subtle and Professional */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+
+  /* Shadows - Enhanced Depth */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
@@ -108,18 +116,40 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-text-primary);
 }
 
-h1 { font-size: var(--font-size-5xl); }
-h2 { font-size: var(--font-size-4xl); }
-h3 { font-size: var(--font-size-3xl); }
-h4 { font-size: var(--font-size-2xl); }
-h5 { font-size: var(--font-size-xl); }
-h6 { font-size: var(--font-size-lg); }
+h1 {
+  font-size: var(--font-size-5xl);
+}
+
+h2 {
+  font-size: var(--font-size-4xl);
+}
+
+h3 {
+  font-size: var(--font-size-3xl);
+}
+
+h4 {
+  font-size: var(--font-size-2xl);
+}
+
+h5 {
+  font-size: var(--font-size-xl);
+}
+
+h6 {
+  font-size: var(--font-size-lg);
+}
 
 p {
   color: var(--color-text-secondary);
@@ -150,22 +180,29 @@ a:hover {
   background-clip: text;
 }
 
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
+.text-center {
+  text-align: center;
+}
 
-/* Card - Clean White with Subtle Shadow */
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Card - Premium White with Super Radius */
 .glass-card {
   background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
+  border: none;
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-xl);
   transition: all var(--transition-base);
 }
 
 .glass-card:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-2xl);
   transform: translateY(-2px);
 }
 
@@ -179,43 +216,43 @@ a:hover {
   font-size: var(--font-size-base);
   font-weight: 600;
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-2xl);
   cursor: pointer;
   transition: all var(--transition-base);
   text-decoration: none;
 }
 
 .btn-primary {
-  background: var(--color-accent-gradient);
+  background: var(--color-accent-primary);
   color: white;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .btn-student {
-  background: var(--color-student-gradient);
+  background: var(--color-student-primary);
   color: white;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .btn-student:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .btn-teacher {
-  background: var(--color-teacher-gradient);
+  background: var(--color-teacher-primary);
   color: white;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .btn-teacher:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .btn-outline {
@@ -227,7 +264,8 @@ a:hover {
 .btn-outline:hover {
   border-color: var(--color-accent-primary);
   color: var(--color-accent-primary);
-  background: rgba(124, 58, 237, 0.05);
+  background: rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
 }
 
 .btn-lg {
@@ -255,7 +293,7 @@ a:hover {
 
 .input-field:focus {
   border-color: var(--color-accent-primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
 }
 
 .input-field::placeholder {
@@ -264,13 +302,27 @@ a:hover {
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
 }
 
 @keyframes slide-up {
@@ -278,6 +330,7 @@ a:hover {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -285,8 +338,13 @@ a:hover {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-float {
@@ -316,17 +374,94 @@ a:hover {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  h1 { font-size: var(--font-size-3xl); }
-  h2 { font-size: var(--font-size-2xl); }
-  h3 { font-size: var(--font-size-xl); }
-  
+  h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-2xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-xl);
+  }
+
   .container {
     padding: 0 var(--spacing-md);
   }
 }
 
+/* ================================
+   Platinum Tactical Utility Classes
+   ================================ */
+
+/* Tactical Label - Small uppercase metadata */
+.label-tactical {
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.3;
+}
+
+/* Tactical Icon - 10x10 black bg with rotation */
+.icon-tactical {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--color-accent-primary);
+  color: white;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(3deg);
+  transition: all var(--transition-base);
+}
+
+.icon-tactical:hover {
+  transform: rotate(0deg) scale(1.05);
+}
+
+.icon-tactical svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Mono Font - For technical data */
+.font-mono {
+  font-family: var(--font-family-mono);
+  letter-spacing: -0.02em;
+}
+
+/* LED Status Indicators */
+.led-indigo {
+  color: var(--color-led-indigo);
+}
+
+.led-emerald {
+  color: var(--color-led-emerald);
+}
+
+.led-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.led-indicator-indigo {
+  background: var(--color-led-indigo);
+  box-shadow: 0 0 8px var(--color-led-indigo);
+}
+
+.led-indicator-emerald {
+  background: var(--color-led-emerald);
+  box-shadow: 0 0 8px var(--color-led-emerald);
+}

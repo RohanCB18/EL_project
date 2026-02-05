@@ -21,11 +21,12 @@
 
 .form-group label {
     display: block;
-    font-size: var(--font-size-sm);
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.15em;
     color: var(--color-text-muted);
+    opacity: 0.5;
     margin-bottom: var(--spacing-sm);
 }
 
@@ -123,11 +124,13 @@
 
 .marks-badge {
     font-size: var(--font-size-xs);
-    font-weight: normal;
-    background: rgba(16, 185, 129, 0.08);
+    font-weight: 900;
+    background: rgba(0, 0, 0, 0.06);
     color: var(--color-teacher-primary);
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .questions-list {
@@ -139,10 +142,10 @@
 .question-item {
     padding: var(--spacing-md);
     background: var(--color-bg-primary);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
+    border: none;
     border-left: 3px solid var(--color-teacher-primary);
-    border: 1px solid var(--color-border);
-    border-left: 3px solid var(--color-teacher-primary);
+    box-shadow: var(--shadow-sm);
 }
 
 .question-item .question-text {

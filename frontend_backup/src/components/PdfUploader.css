@@ -4,7 +4,7 @@
 
 .upload-zone {
     border: 2px dashed var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-3xl);
     padding: var(--spacing-3xl) var(--spacing-xl);
     text-align: center;
     cursor: pointer;
@@ -15,19 +15,20 @@
 .upload-zone:hover,
 .upload-zone.dragging {
     border-color: var(--color-accent-primary);
-    background: rgba(124, 58, 237, 0.04);
+    background: rgba(0, 0, 0, 0.02);
+    transform: translateY(-2px);
 }
 
 .uploader-student .upload-zone:hover,
 .uploader-student .upload-zone.dragging {
     border-color: var(--color-student-primary);
-    background: rgba(124, 58, 237, 0.04);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .uploader-teacher .upload-zone:hover,
 .uploader-teacher .upload-zone.dragging {
     border-color: var(--color-teacher-primary);
-    background: rgba(16, 185, 129, 0.04);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .upload-zone.has-file {
@@ -84,27 +85,29 @@
     gap: var(--spacing-md);
     padding: var(--spacing-md);
     background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    border: none;
+    box-shadow: var(--shadow-md);
 }
 
 .file-icon {
-    width: 48px;
-    height: 48px;
+    width: 2.5rem;
+    height: 2.5rem;
     padding: var(--spacing-sm);
-    background: rgba(124, 58, 237, 0.1);
-    color: var(--color-accent-primary);
-    border-radius: var(--radius-md);
+    background: var(--color-accent-primary);
+    color: white;
+    border-radius: var(--radius-xl);
+    transform: rotate(3deg);
 }
 
 .uploader-student .file-icon {
-    background: rgba(124, 58, 237, 0.1);
-    color: var(--color-student-primary);
+    background: var(--color-student-primary);
+    color: white;
 }
 
 .uploader-teacher .file-icon {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--color-teacher-primary);
+    background: var(--color-teacher-primary);
+    color: white;
 }
 
 .file-info {

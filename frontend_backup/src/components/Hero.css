@@ -26,7 +26,7 @@
 .hero-orb-1 {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(26, 26, 46, 0.08) 0%, transparent 70%);
     top: -200px;
     right: -200px;
     animation-delay: 0s;
@@ -44,7 +44,7 @@
 .hero-orb-3 {
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(26, 26, 46, 0.06) 0%, transparent 70%);
     top: 50%;
     left: 50%;
     animation-delay: -4s;
@@ -54,8 +54,8 @@
     position: absolute;
     inset: 0;
     background-image:
-        linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(26, 26, 46, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 26, 46, 0.02) 1px, transparent 1px);
     background-size: 60px 60px;
 }
 
@@ -72,8 +72,8 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-lg);
-    background: rgba(124, 58, 237, 0.08);
-    border: 1px solid rgba(124, 58, 237, 0.15);
+    background: rgba(26, 26, 46, 0.06);
+    border: 1px solid rgba(26, 26, 46, 0.08);
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
     color: var(--color-accent-primary);
@@ -123,53 +123,58 @@
 
 .feature-card {
     background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border: none;
+    border-radius: var(--radius-3xl);
     padding: var(--spacing-xl);
     text-align: left;
     transition: all var(--transition-base);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-xl);
 }
 
 .feature-card:hover {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-border-hover);
+    box-shadow: var(--shadow-2xl);
     transform: translateY(-4px);
 }
 
 .feature-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-lg);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: var(--spacing-md);
+    transform: rotate(3deg);
+    transition: all var(--transition-base);
+}
+
+.feature-card:hover .feature-icon {
+    transform: rotate(0deg) scale(1.05);
 }
 
 .feature-icon svg {
-    width: 24px;
-    height: 24px;
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 .feature-icon-blue {
-    background: rgba(124, 58, 237, 0.1);
-    color: #7c3aed;
+    background: var(--color-accent-primary);
+    color: white;
 }
 
 .feature-icon-purple {
-    background: rgba(139, 92, 246, 0.1);
-    color: #8b5cf6;
+    background: var(--color-led-indigo);
+    color: white;
 }
 
 .feature-icon-green {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+    background: var(--color-led-emerald);
+    color: white;
 }
 
 .feature-icon-orange {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
+    background: var(--color-accent-primary);
+    color: white;
 }
 
 .feature-card h3 {
